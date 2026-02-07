@@ -1,0 +1,33 @@
+# Node / build
+node_modules/
+dist/
+dist-ssr/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Vite cache
+.vite/
+
+# Coverage / test outputs (future-proof)
+coverage/
+
+# Storybook (optional)
+storybook-static/
+
+# Misc
+*.tsbuildinfo

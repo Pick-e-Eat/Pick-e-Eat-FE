@@ -1,0 +1,14 @@
+{
+  "_comment": "린트와 포맷을 단일 도구로 통일하기 위한 설정",
+  "formatter": {
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "linter": {
+    "enabled": true
+  },
+  "organizeImports": {
+    "enabled": true
+  }
+}
