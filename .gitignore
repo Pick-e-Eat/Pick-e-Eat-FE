@@ -23,6 +23,13 @@ pnpm-debug.log*
 # Vite cache
 .vite/
 
+# Yarn (Berry)
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
 # Coverage / test outputs (future-proof)
 coverage/
 

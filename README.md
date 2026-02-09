@@ -6,16 +6,25 @@ React 19 + TypeScript 5 + Vite 6 기반이며, 상태 관리는 Zustand와 TanSt
 ## 요구사항
 
 - Node.js 20 이상 (react-router-dom v7 권장 사양)
-- npm 9 이상
+- Yarn 4 이상
+
+### Yarn 고정 (Corepack)
+
+이 레포는 `packageManager`에 Yarn 버전을 고정합니다. 처음 한 번만 아래를 실행하세요.
+
+```bash
+corepack enable
+corepack prepare yarn@4.9.4 --activate
+```
 
 ## 빠른 시작
 
 ```bash
 git clone <레포지토리_URL>
 cd Pick-e-Eat-FE
-npm install
+yarn install
 cp .env.example .env
-npm run dev
+yarn dev
 ```
 
 브라우저에서 `http://127.0.0.1:5173/`로 접속하세요.
@@ -31,11 +40,11 @@ VITE_APP_TITLE=Pick-e-Eat MVP
 
 ## 주요 스크립트
 
-- `npm run dev`: 개발 서버 실행
-- `npm run build`: 프로덕션 빌드
-- `npm run preview`: 빌드 결과 미리보기
-- `npm run lint`: Biome 린트
-- `npm run format`: Biome 포맷
+- `yarn dev`: 개발 서버 실행
+- `yarn build`: 프로덕션 빌드
+- `yarn preview`: 빌드 결과 미리보기
+- `yarn lint`: Biome 린트
+- `yarn format`: Biome 포맷
 
 ## 프로젝트 구조
 
