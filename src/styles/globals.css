@@ -95,6 +95,12 @@
     font-family: var(--font-sans);
     @apply bg-background text-foreground min-h-dvh antialiased;
   }
+  /* 데스크톱: 앱이 가운데 올 때 좌우 여백 구분용 배경 */
+  @media (min-width: 640px) {
+    body {
+      @apply bg-muted;
+    }
+  }
   a {
     color: inherit;
     text-decoration: none;
