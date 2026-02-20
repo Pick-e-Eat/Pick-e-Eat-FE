@@ -8,14 +8,14 @@ interface CardSectionProps extends HTMLAttributes<HTMLDivElement> {}
 export function Card({ className, ...props }: CardProps) {
   return (
     <div
-      className={cn("rounded-lg border border-slate-200 bg-white shadow-sm", className)}
+      className={cn("rounded-lg border border-border bg-card text-card-foreground shadow-sm", className)}
       {...props}
     />
   );
 }
 
 export function CardHeader({ className, ...props }: CardSectionProps) {
-  return <div className={cn("border-b border-slate-100 px-4 py-3", className)} {...props} />;
+  return <div className={cn("border-b border-border px-4 py-3", className)} {...props} />;
 }
 
 export function CardTitle({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) {
@@ -27,5 +27,5 @@ export function CardContent({ className, ...props }: CardSectionProps) {
 }
 
 export function CardFooter({ className, ...props }: CardSectionProps) {
-  return <div className={cn("border-t border-slate-100 px-4 py-3", className)} {...props} />;
+  return <div className={cn("border-t border-border px-4 py-3", className)} {...props} />;
 }

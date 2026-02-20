@@ -2,10 +2,8 @@
 import { createBrowserRouter } from "react-router-dom";
 import { routes } from "@/shared/constants/routes";
 import { HomePage } from "@/pages/HomePage";
-import { PostCreatePage } from "@/pages/PostCreatePage";
-import { PostDetailPage } from "@/pages/PostDetailPage";
-import { PostListPage } from "@/pages/PostListPage";
-import { NotFoundPage } from "@/pages/NotFoundPage";
+import { LoginPage } from "@/pages/LoginPage";
+import { SignupPage } from "@/pages/SignupPage";
 
 export const appRouter = createBrowserRouter([
   {
@@ -13,19 +11,11 @@ export const appRouter = createBrowserRouter([
     element: <HomePage />,
   },
   {
-    path: routes.posts.list,
-    element: <PostListPage />,
+    path: routes.auth.login,
+    element: <LoginPage />,
   },
   {
-    path: routes.posts.create,
-    element: <PostCreatePage />,
-  },
-  {
-    path: routes.posts.detail,
-    element: <PostDetailPage />,
-  },
-  {
-    path: "*",
-    element: <NotFoundPage />,
+    path: routes.auth.signup,
+    element: <SignupPage />,
   },
 ]);
