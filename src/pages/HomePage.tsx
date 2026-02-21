@@ -1,21 +1,23 @@
 import { useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { routes } from "@/shared/constants/routes";
 import type { Restaurant, FilterSettings, SavedAddress, SwipeResult } from "@/lib/types";
 import { mockRestaurants } from "@/lib/mock-data";
 import { useResultsStore } from "@/shared/stores/results-store";
 import { SwipeCard } from "@/components/swipe-card";
 import { ReviewSheet } from "@/components/review-sheet";
 import { HamburgerMenu } from "@/components/hamburger-menu";
-import { ResultsScreen } from "@/components/results-screen";
 import { Menu, X, ThumbsDown, ThumbsUp } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 const MAX_SELECTIONS = 10;
 
 export function HomePage() {
+  const navigate = useNavigate();
   const { results, addResult, resetResults } = useResultsStore();
+
   const [restaurants, setRestaurants] = useState<Restaurant[]>(mockRestaurants);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [showResults, setShowResults] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [currentLocation, setCurrentLocation] = useState("서울특별시 강남구 역삼동");
@@ -54,17 +56,16 @@ export function HomePage() {
         setExitDirection(null);
         // results 상태는 비동기적으로 업데이트되므로, 갱신될 길이를 예측하기 위해 +1을 사용합니다.
         if (results.length + 1 >= MAX_SELECTIONS) {
-          setTimeout(() => setShowResults(true), 100);
+          navigate(routes.results);
         }
       }, 300);
     },
-    [currentRestaurant, results, addResult],
+    [currentRestaurant, results, addResult, navigate],
   );
 
-  const handleReset = () => {
+  const handleStartOver = () => {
     resetResults();
     setCurrentIndex(0);
-    setShowResults(false);
   };
 
   const handleAddAddress = (address: SavedAddress) => setSavedAddresses((prev) => [...prev, address]);
@@ -73,10 +74,6 @@ export function HomePage() {
     setCurrentLocation(address.address);
     setMenuOpen(false);
   };
-
-  if (showResults) {
-    return <ResultsScreen onContinue={() => setShowResults(false)} onReset={handleReset} />;
-  }
 
   return (
     <main className="relative flex h-dvh flex-col overflow-hidden bg-background">
@@ -99,9 +96,9 @@ export function HomePage() {
           {results.length > 0 && (
             <button
               type="button"
-              onClick={() => setShowResults(true)}
+              onClick={() => navigate(routes.results)}
               className="rounded-full p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-              aria-label="그만하기"
+              aria-label="결과 보기"
             >
               <X className="h-5 w-5" />
             </button>
@@ -133,7 +130,7 @@ export function HomePage() {
               </p>
               <button
                 type="button"
-                onClick={handleReset}
+                onClick={handleStartOver}
                 className="rounded-xl bg-primary px-6 py-3 font-medium text-primary-foreground hover:bg-primary/90"
               >
                 다시 시작하기

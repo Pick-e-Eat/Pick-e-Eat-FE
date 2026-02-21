@@ -1,17 +1,24 @@
-import type { SwipeResult } from "@/lib/types";
+import { useNavigate } from "react-router-dom";
+import { routes } from "@/shared/constants/routes";
+import { useResultsStore } from "@/shared/stores/results-store";
 import { Star, MapPin, ThumbsUp, ThumbsDown, RotateCcw, Navigation } from "lucide-react";
 import { motion } from "framer-motion";
-import { useResultsStore } from "@/shared/stores/results-store";
 
-interface ResultsScreenProps {
-  onContinue: () => void;
-  onReset: () => void;
-}
-
-export function ResultsScreen({ onContinue, onReset }: ResultsScreenProps) {
-  const { results } = useResultsStore();
+export function ResultsPage() {
+  const navigate = useNavigate();
+  const { results, resetResults } = useResultsStore();
+  
   const likedRestaurants = results.filter((r) => r.liked);
   const dislikedRestaurants = results.filter((r) => !r.liked);
+
+  const handleReset = () => {
+    resetResults();
+    navigate(routes.home);
+  };
+
+  const handleContinue = () => {
+    navigate(routes.home);
+  };
 
   return (
     <div className="flex min-h-dvh flex-col bg-background">
@@ -136,7 +143,7 @@ export function ResultsScreen({ onContinue, onReset }: ResultsScreenProps) {
         <div className="flex gap-3">
           <button
             type="button"
-            onClick={onReset}
+            onClick={handleReset}
             className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-card py-4 font-medium text-card-foreground transition-colors hover:bg-muted"
           >
             <RotateCcw className="size-5" />
@@ -144,7 +151,7 @@ export function ResultsScreen({ onContinue, onReset }: ResultsScreenProps) {
           </button>
           <button
             type="button"
-            onClick={onContinue}
+            onClick={handleContinue}
             className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary py-4 font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             더 검색하기
