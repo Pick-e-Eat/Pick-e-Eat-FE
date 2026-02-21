@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import type { Restaurant, FilterSettings, SavedAddress, SwipeResult } from "@/lib/types";
 import { mockRestaurants } from "@/lib/mock-data";
+import { useResultsStore } from "@/shared/stores/results-store";
 import { SwipeCard } from "@/components/swipe-card";
 import { ReviewSheet } from "@/components/review-sheet";
 import { HamburgerMenu } from "@/components/hamburger-menu";
@@ -11,9 +12,9 @@ import { AnimatePresence, motion } from "framer-motion";
 const MAX_SELECTIONS = 10;
 
 export function HomePage() {
+  const { results, addResult, resetResults } = useResultsStore();
   const [restaurants, setRestaurants] = useState<Restaurant[]>(mockRestaurants);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [results, setResults] = useState<SwipeResult[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -46,19 +47,22 @@ export function HomePage() {
       if (!currentRestaurant) return;
       setExitDirection(direction);
       const newResult: SwipeResult = { restaurant: currentRestaurant, liked: direction === "right" };
-      const updatedResults = [...results, newResult];
+
       setTimeout(() => {
-        setResults(updatedResults);
+        addResult(newResult);
         setCurrentIndex((prev) => prev + 1);
         setExitDirection(null);
-        if (updatedResults.length >= MAX_SELECTIONS) setTimeout(() => setShowResults(true), 100);
+        // results 상태는 비동기적으로 업데이트되므로, 갱신될 길이를 예측하기 위해 +1을 사용합니다.
+        if (results.length + 1 >= MAX_SELECTIONS) {
+          setTimeout(() => setShowResults(true), 100);
+        }
       }, 300);
     },
-    [currentRestaurant, results]
+    [currentRestaurant, results, addResult],
   );
 
   const handleReset = () => {
-    setResults([]);
+    resetResults();
     setCurrentIndex(0);
     setShowResults(false);
   };
@@ -71,19 +75,18 @@ export function HomePage() {
   };
 
   if (showResults) {
-    return (
-      <ResultsScreen
-        results={results}
-        onContinue={() => setShowResults(false)}
-        onReset={handleReset}
-      />
-    );
+    return <ResultsScreen onContinue={() => setShowResults(false)} onReset={handleReset} />;
   }
 
   return (
     <main className="relative flex h-dvh flex-col overflow-hidden bg-background">
       <header className="relative z-10 flex items-center justify-between bg-card/80 px-4 py-3 backdrop-blur-lg">
-        <button type="button" onClick={() => setMenuOpen(true)} className="rounded-full p-2 text-card-foreground hover:bg-muted" aria-label="메뉴 열기">
+        <button
+          type="button"
+          onClick={() => setMenuOpen(true)}
+          className="rounded-full p-2 text-card-foreground hover:bg-muted"
+          aria-label="메뉴 열기"
+        >
           <Menu className="h-6 w-6" />
         </button>
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -94,7 +97,12 @@ export function HomePage() {
             {results.length}/{MAX_SELECTIONS}
           </span>
           {results.length > 0 && (
-            <button type="button" onClick={() => setShowResults(true)} className="rounded-full p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive" aria-label="그만하기">
+            <button
+              type="button"
+              onClick={() => setShowResults(true)}
+              className="rounded-full p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+              aria-label="그만하기"
+            >
               <X className="h-5 w-5" />
             </button>
           )}
@@ -123,7 +131,11 @@ export function HomePage() {
               <p className="mb-4 text-lg font-medium text-card-foreground">
                 {filteredRestaurants.length === 0 ? "조건에 맞는 음식점이 없습니다" : "모든 음식점을 확인했어요!"}
               </p>
-              <button type="button" onClick={handleReset} className="rounded-xl bg-primary px-6 py-3 font-medium text-primary-foreground hover:bg-primary/90">
+              <button
+                type="button"
+                onClick={handleReset}
+                className="rounded-xl bg-primary px-6 py-3 font-medium text-primary-foreground hover:bg-primary/90"
+              >
                 다시 시작하기
               </button>
             </motion.div>

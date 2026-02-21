@@ -1,14 +1,15 @@
 import type { SwipeResult } from "@/lib/types";
 import { Star, MapPin, ThumbsUp, ThumbsDown, RotateCcw, Navigation } from "lucide-react";
 import { motion } from "framer-motion";
+import { useResultsStore } from "@/shared/stores/results-store";
 
 interface ResultsScreenProps {
-  results: SwipeResult[];
   onContinue: () => void;
   onReset: () => void;
 }
 
-export function ResultsScreen({ results, onContinue, onReset }: ResultsScreenProps) {
+export function ResultsScreen({ onContinue, onReset }: ResultsScreenProps) {
+  const { results } = useResultsStore();
   const likedRestaurants = results.filter((r) => r.liked);
   const dislikedRestaurants = results.filter((r) => !r.liked);
 
