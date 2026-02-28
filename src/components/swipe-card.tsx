@@ -18,6 +18,8 @@ import {
   ThumbsUp,
   ThumbsDown,
 } from "lucide-react";
+import { FastAverageColor } from "fast-average-color";
+import { useHeaderColorStore } from "@/features/home/stores/header-color-store";
 
 const SWIPE_THRESHOLD = 100;
 const EXIT_OFFSET = 500;
@@ -44,6 +46,7 @@ export function SwipeCard({
   const nopeOpacity = useTransform(x, [-100, 0], [1, 0]);
 
   const isExiting = exitDirection !== null;
+  const { setColors, resetColors } = useHeaderColorStore();
 
   useEffect(() => {
     if (!isExiting) return;
@@ -51,6 +54,27 @@ export function SwipeCard({
     animate(x, to, { type: "spring", stiffness: 300, damping: 30 });
     setOpacity(0);
   }, [isExiting, exitDirection, x]);
+
+  useEffect(() => {
+    if (isTop) {
+      const fac = new FastAverageColor();
+      fac
+        .getColorAsync(restaurant.image, {
+          crossOrigin: "anonymous",
+        })
+        .then((color) => {
+          setColors(color.hex, color.isDark ? "#fff" : "#000");
+        })
+        .catch((e) => {
+          console.error("Failed to extract color:", e);
+          resetColors();
+        });
+
+      return () => {
+        resetColors();
+      };
+    }
+  }, [isTop, restaurant.image, setColors, resetColors]);
 
   const handleDragEnd = (
     _: MouseEvent | TouchEvent | PointerEvent,
