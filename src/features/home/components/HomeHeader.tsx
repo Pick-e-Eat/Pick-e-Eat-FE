@@ -16,7 +16,7 @@ export function HomeHeader({ onMenuOpen, maxSelections }: HomeHeaderProps) {
   const { backgroundColor, textColor } = useHeaderColorStore();
 
   const headerStyle = {
-    backgroundColor: backgroundColor || "hsl(var(--card) / 0.8)",
+    backgroundColor: backgroundColor ? `${backgroundColor}CC` : "hsl(var(--card) / 0.8)",
     color: textColor || "hsl(var(--card-foreground))",
     transition: "background-color 0.5s ease, color 0.5s ease",
   };
@@ -27,7 +27,7 @@ export function HomeHeader({ onMenuOpen, maxSelections }: HomeHeaderProps) {
 
   return (
     <header
-      className="relative z-10 flex items-center justify-between px-4 py-3 backdrop-blur-lg"
+      className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-3 backdrop-blur-lg"
       style={headerStyle}
     >
       <button
