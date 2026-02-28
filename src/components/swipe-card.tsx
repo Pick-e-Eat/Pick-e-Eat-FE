@@ -22,12 +22,16 @@ import { FastAverageColor } from "fast-average-color";
 import { useHeaderColorStore } from "@/features/home/stores/header-color-store";
 
 const SWIPE_THRESHOLD = 100;
+const Y_SWIPE_THRESHOLD = -100; // Swipe up
+const Y_SWIPE_DOWN_THRESHOLD = 100; // Swipe down
 const EXIT_OFFSET = 500;
+const DRAG_LOCK_THRESHOLD = 5; // Pixels to determine initial drag direction
 
 interface SwipeCardProps {
   restaurant: Restaurant;
   onSwipe: (direction: "left" | "right") => void;
   onShowReviews: () => void;
+  onStop: () => void;
   isTop?: boolean;
   exitDirection?: "left" | "right" | null;
 }
@@ -36,11 +40,16 @@ export function SwipeCard({
   restaurant,
   onSwipe,
   onShowReviews,
+  onStop,
   isTop = true,
   exitDirection = null,
 }: SwipeCardProps) {
   const [opacity, setOpacity] = useState(1);
+  const [lockedDirection, setLockedDirection] = useState<"x" | "y" | null>(
+    null
+  );
   const x = useMotionValue(0);
+  const y = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-15, 15]);
   const likeOpacity = useTransform(x, [0, 50], [0, 1]);
   const nopeOpacity = useTransform(x, [-50, 0], [1, 0]);
@@ -48,6 +57,7 @@ export function SwipeCard({
   const isExiting = exitDirection !== null;
   const { setColors, resetColors } = useHeaderColorStore();
 
+  // Animate card out when horizontal swipe is triggered
   useEffect(() => {
     if (!isExiting) return;
     const to = exitDirection === "right" ? EXIT_OFFSET : -EXIT_OFFSET;
@@ -55,6 +65,7 @@ export function SwipeCard({
     setOpacity(0);
   }, [isExiting, exitDirection, x]);
 
+  // Extract color from image when card is on top
   useEffect(() => {
     if (isTop) {
       const fac = new FastAverageColor();
@@ -76,18 +87,64 @@ export function SwipeCard({
     }
   }, [isTop, restaurant.image, setColors, resetColors]);
 
+  const handleDragStart = () => {
+    setLockedDirection(null); // Reset locked direction on new drag
+    x.set(0); // Ensure x, y are at 0 when starting a new drag
+    y.set(0);
+  };
+
+  const handleDrag = (_: any, info: PanInfo) => {
+    if (lockedDirection === null) {
+      // Determine lock direction after initial movement threshold
+      if (Math.abs(info.offset.x) > DRAG_LOCK_THRESHOLD || Math.abs(info.offset.y) > DRAG_LOCK_THRESHOLD) {
+        if (Math.abs(info.offset.x) > Math.abs(info.offset.y)) {
+          setLockedDirection("x");
+        } else {
+          setLockedDirection("y");
+        }
+      }
+    }
+
+    // Constrain motion to locked direction
+    if (lockedDirection === "y") {
+      x.set(0); // If locked to Y, prevent X movement
+    } else if (lockedDirection === "x") {
+      y.set(0); // If locked to X, prevent Y movement
+    }
+  };
+
   const handleDragEnd = (
     _: MouseEvent | TouchEvent | PointerEvent,
     info: PanInfo
   ) => {
-    const offset = info.offset.x;
-    if (offset > SWIPE_THRESHOLD) {
-      onSwipe("right");
-    } else if (offset < -SWIPE_THRESHOLD) {
-      onSwipe("left");
+    const { offset } = info;
+    
+    if (lockedDirection === "y") {
+      if (offset.y < Y_SWIPE_THRESHOLD) {
+        onShowReviews();
+      } else if (offset.y > Y_SWIPE_DOWN_THRESHOLD) {
+        onStop();
+      }
+      // Animate card back to center after any vertical swipe
+      animate(x, 0, { type: "spring", stiffness: 500, damping: 30 });
+      animate(y, 0, { type: "spring", stiffness: 500, damping: 30 });
+    } else if (lockedDirection === "x") {
+      if (offset.x > SWIPE_THRESHOLD) {
+        onSwipe("right");
+      } else if (offset.x < -SWIPE_THRESHOLD) {
+        onSwipe("left");
+      } else {
+        // Animate card back if not swiped far enough horizontally
+        animate(x, 0, { type: "spring", stiffness: 500, damping: 30 });
+        animate(y, 0, { type: "spring", stiffness: 500, damping: 30 });
+      }
     } else {
-      animate(x, 0, { type: "spring", stiffness: 400, damping: 35 });
+        // No significant drag occurred to lock a direction, animate back
+        animate(x, 0, { type: "spring", stiffness: 500, damping: 30 });
+        animate(y, 0, { type: "spring", stiffness: 500, damping: 30 });
     }
+    
+    setLockedDirection(null); // Reset locked direction for the next drag
   };
 
   const dragEnabled = isTop && !isExiting;
@@ -95,10 +152,12 @@ export function SwipeCard({
   return (
     <motion.div
       className="absolute inset-0 cursor-grab active:cursor-grabbing touch-none"
-      style={{ x, rotate, opacity }}
-      drag={dragEnabled ? "x" : false}
-      dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={1}
+      style={{ x, y, rotate, opacity }}
+      drag={dragEnabled ? true : false} // Allow dragging in both directions initially
+      dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+      dragElastic={{ top: 0.2, bottom: 0.2, left: 1, right: 1 }}
+      onDragStart={handleDragStart}
+      onDrag={handleDrag}
       onDragEnd={handleDragEnd}
       initial={{ scale: isTop ? 1 : 0.95, y: isTop ? 0 : 20 }}
       animate={{ scale: isTop ? 1 : 0.95, y: isTop ? 0 : 20 }}

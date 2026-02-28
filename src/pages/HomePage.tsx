@@ -94,6 +94,7 @@ export function HomePage() {
                       restaurant={restaurant}
                       onSwipe={isTop ? handleSwipe : () => {}}
                       onShowReviews={isTop ? () => setShowReviews(true) : () => {}}
+                      onStop={isTop ? () => navigate(routes.results) : () => {}}
                       isTop={isTop}
                       exitDirection={isTop ? exitDirection : null}
                     />
