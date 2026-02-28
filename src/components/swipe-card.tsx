@@ -42,8 +42,8 @@ export function SwipeCard({
   const [opacity, setOpacity] = useState(1);
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-15, 15]);
-  const likeOpacity = useTransform(x, [0, 100], [0, 1]);
-  const nopeOpacity = useTransform(x, [-100, 0], [1, 0]);
+  const likeOpacity = useTransform(x, [0, 50], [0, 1]);
+  const nopeOpacity = useTransform(x, [-50, 0], [1, 0]);
 
   const isExiting = exitDirection !== null;
   const { setColors, resetColors } = useHeaderColorStore();
@@ -119,13 +119,13 @@ export function SwipeCard({
           className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-like"
           style={{ opacity: likeOpacity }}
         >
-          <ThumbsUp className="size-32 opacity-40" />
+          <ThumbsUp className="size-32 opacity-60" />
         </motion.div>
         <motion.div
           className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-unlike"
           style={{ opacity: nopeOpacity }}
         >
-          <ThumbsDown className="size-32 opacity-40" />
+          <ThumbsDown className="size-32 opacity-60" />
         </motion.div>
 
         {/* Content */}
