@@ -15,6 +15,8 @@ import {
   Car,
   Users,
   Dog,
+  ThumbsUp,
+  ThumbsDown,
 } from "lucide-react";
 
 const SWIPE_THRESHOLD = 100;
@@ -87,6 +89,20 @@ export function SwipeCard({
 
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-linear-to-t from-foreground/90 via-foreground/30 to-transparent" />
+
+        {/* Centered Action Icons */}
+        <motion.div
+          className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-like"
+          style={{ opacity: likeOpacity }}
+        >
+          <ThumbsUp className="size-32 opacity-40" />
+        </motion.div>
+        <motion.div
+          className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-unlike"
+          style={{ opacity: nopeOpacity }}
+        >
+          <ThumbsDown className="size-32 opacity-40" />
+        </motion.div>
 
         {/* Like/Nope Indicators */}
         <motion.div
