@@ -17,6 +17,7 @@ import {
   Dog,
   ThumbsUp,
   ThumbsDown,
+  X,
 } from "lucide-react";
 import { FastAverageColor } from "fast-average-color";
 import { useHeaderColorStore } from "@/features/home/stores/header-color-store";
@@ -51,8 +52,14 @@ export function SwipeCard({
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-15, 15]);
+  
+  // Horizontal swipe opacities
   const likeOpacity = useTransform(x, [0, 50], [0, 1]);
   const nopeOpacity = useTransform(x, [-50, 0], [1, 0]);
+
+  // Vertical swipe opacities
+  const reviewOpacity = useTransform(y, [0, -50], [0, 1]);
+  const stopOpacity = useTransform(y, [0, 50], [0, 1]);
 
   const isExiting = exitDirection !== null;
   const { setColors, resetColors } = useHeaderColorStore();
@@ -185,6 +192,18 @@ export function SwipeCard({
           style={{ opacity: nopeOpacity }}
         >
           <ThumbsDown className="size-32 opacity-60" />
+        </motion.div>
+        <motion.div
+          className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-blue-500"
+          style={{ opacity: reviewOpacity }}
+        >
+          <MessageSquare className="size-28 opacity-60" />
+        </motion.div>
+        <motion.div
+          className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-destructive"
+          style={{ opacity: stopOpacity }}
+        >
+          <X className="size-32 opacity-60" />
         </motion.div>
 
         {/* Content */}
