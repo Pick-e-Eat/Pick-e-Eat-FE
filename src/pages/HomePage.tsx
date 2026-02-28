@@ -7,7 +7,8 @@ import { useResultsStore } from "@/shared/stores/results-store";
 import { SwipeCard } from "@/components/swipe-card";
 import { ReviewSheet } from "@/components/review-sheet";
 import { HamburgerMenu } from "@/components/hamburger-menu";
-import { Menu, X, ThumbsDown, ThumbsUp } from "lucide-react";
+import { HomeHeader } from "@/features/home/components/HomeHeader";
+import { ThumbsDown, ThumbsUp } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 const MAX_SELECTIONS = 10;
@@ -77,49 +78,27 @@ export function HomePage() {
 
   return (
     <main className="relative flex h-dvh flex-col overflow-hidden bg-background">
-      <header className="relative z-10 flex items-center justify-between bg-card/80 px-4 py-3 backdrop-blur-lg">
-        <button
-          type="button"
-          onClick={() => setMenuOpen(true)}
-          className="rounded-full p-2 text-card-foreground hover:bg-muted"
-          aria-label="메뉴 열기"
-        >
-          <Menu className="h-6 w-6" />
-        </button>
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <h1 className="text-xl font-bold text-primary">Pick-e-Eat</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
-            {results.length}/{MAX_SELECTIONS}
-          </span>
-          {results.length > 0 && (
-            <button
-              type="button"
-              onClick={() => navigate(routes.results)}
-              className="rounded-full p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-              aria-label="결과 보기"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          )}
-        </div>
-      </header>
+      <HomeHeader onMenuOpen={() => setMenuOpen(true)} maxSelections={MAX_SELECTIONS} />
 
       <div className="relative flex-1 px-4 py-4">
         {filteredRestaurants.length > 0 && currentIndex < filteredRestaurants.length ? (
           <div className="relative h-full">
-            <AnimatePresence mode="wait">
-              {currentRestaurant && (
-                <SwipeCard
-                  key={currentRestaurant.id}
-                  restaurant={currentRestaurant}
-                  onSwipe={handleSwipe}
-                  onShowReviews={() => setShowReviews(true)}
-                  isTop
-                  exitDirection={exitDirection}
-                />
-              )}
+            <AnimatePresence>
+              {[filteredRestaurants[currentIndex + 1], filteredRestaurants[currentIndex]]
+                .filter(Boolean)
+                .map((restaurant, index, arr) => {
+                  const isTop = index === arr.length - 1;
+                  return (
+                    <SwipeCard
+                      key={restaurant.id}
+                      restaurant={restaurant}
+                      onSwipe={isTop ? handleSwipe : () => {}}
+                      onShowReviews={isTop ? () => setShowReviews(true) : () => {}}
+                      isTop={isTop}
+                      exitDirection={isTop ? exitDirection : null}
+                    />
+                  );
+                })}
             </AnimatePresence>
           </div>
         ) : (
@@ -139,35 +118,6 @@ export function HomePage() {
           </div>
         )}
       </div>
-
-      {currentRestaurant && (
-        <div className="flex items-center justify-center gap-8 bg-card/80 px-4 py-6 backdrop-blur-lg">
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            type="button"
-            onClick={() => handleSwipe("left")}
-            className="flex h-16 w-16 items-center justify-center rounded-full bg-unlike/10 text-unlike shadow-lg hover:bg-unlike/20"
-            aria-label="싫어요"
-          >
-            <ThumbsDown className="h-7 w-7" />
-          </motion.button>
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground">남은 선택</p>
-            <p className="text-2xl font-bold text-card-foreground">{remainingCount}</p>
-          </div>
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            type="button"
-            onClick={() => handleSwipe("right")}
-            className="flex h-16 w-16 items-center justify-center rounded-full bg-like/10 text-like shadow-lg hover:bg-like/20"
-            aria-label="좋아요"
-          >
-            <ThumbsUp className="h-7 w-7" />
-          </motion.button>
-        </div>
-      )}
 
       <ReviewSheet restaurant={currentRestaurant ?? null} isOpen={showReviews} onClose={() => setShowReviews(false)} />
       <HamburgerMenu
