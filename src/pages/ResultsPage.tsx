@@ -77,7 +77,7 @@ export function ResultsPage() {
                     <div className="flex flex-col items-center justify-center gap-2 p-3">
                       <button
                         type="button"
-                        className="rounded-full bg-accent p-2 text-accent-foreground transition-colors hover:bg-accent/80"
+                        className="rounded-full bg-accent p-2 text-accent-foreground transition-colors hover:bg-accent/80 cursor-pointer"
                         aria-label="길찾기"
                       >
                         <Navigation className="size-4" />
@@ -144,7 +144,7 @@ export function ResultsPage() {
           <button
             type="button"
             onClick={handleReset}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-card py-4 font-medium text-card-foreground transition-colors hover:bg-muted"
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-card py-4 font-medium text-card-foreground transition-colors hover:bg-muted cursor-pointer"
           >
             <RotateCcw className="size-5" />
             처음부터
@@ -152,7 +152,7 @@ export function ResultsPage() {
           <button
             type="button"
             onClick={handleContinue}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary py-4 font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary py-4 font-medium text-primary-foreground transition-colors hover:bg-primary/90 cursor-pointer"
           >
             더 검색하기
           </button>

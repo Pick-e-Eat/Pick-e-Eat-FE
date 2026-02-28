@@ -111,7 +111,7 @@ export function HomePage() {
               <button
                 type="button"
                 onClick={handleStartOver}
-                className="rounded-xl bg-primary px-6 py-3 font-medium text-primary-foreground hover:bg-primary/90"
+                className="rounded-xl bg-primary px-6 py-3 font-medium text-primary-foreground hover:bg-primary/90 cursor-pointer"
               >
                 다시 시작하기
               </button>

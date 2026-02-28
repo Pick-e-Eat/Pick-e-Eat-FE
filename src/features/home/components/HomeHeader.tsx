@@ -33,7 +33,7 @@ export function HomeHeader({ onMenuOpen, maxSelections }: HomeHeaderProps) {
       <button
         type="button"
         onClick={onMenuOpen}
-        className="rounded-full p-2 hover:bg-muted"
+        className="rounded-full p-2 hover:bg-primary/10 cursor-pointer"
         aria-label="메뉴 열기"
         style={{ color: "inherit" }}
       >
@@ -55,7 +55,7 @@ export function HomeHeader({ onMenuOpen, maxSelections }: HomeHeaderProps) {
           <button
             type="button"
             onClick={() => navigate(routes.results)}
-            className="rounded-full p-2 hover:bg-destructive/10"
+            className="rounded-full p-2 hover:bg-destructive/10 cursor-pointer"
             aria-label="결과 보기"
             style={{ color: "inherit" }}
           >

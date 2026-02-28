@@ -53,7 +53,7 @@ export function ReviewSheet({ restaurant, isOpen, onClose }: ReviewSheetProps) {
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted"
+                className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted cursor-pointer"
                 aria-label="닫기"
               >
                 <X className="size-5" />

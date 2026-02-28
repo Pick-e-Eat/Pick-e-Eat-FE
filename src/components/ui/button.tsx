@@ -9,9 +9,9 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        outline: "border border-border bg-background hover:bg-accent hover:text-accent-foreground",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer",
+        outline: "border border-border bg-background hover:bg-accent hover:text-accent-foreground cursor-pointer",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 cursor-pointer",
       },
       size: {
         sm: "h-8 px-3",
@@ -26,9 +26,7 @@ const buttonVariants = cva(
   },
 );
 
-interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 

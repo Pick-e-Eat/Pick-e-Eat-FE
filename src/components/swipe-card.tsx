@@ -283,7 +283,7 @@ export function SwipeCard({ restaurant, onSwipe, onShowReviews, onStop, isTop = 
               e.stopPropagation();
               onShowReviews();
             }}
-            className="w-full rounded-xl bg-card/20 py-3 text-center font-medium backdrop-blur-sm transition-colors hover:bg-card/30"
+            className="w-full rounded-xl bg-card/20 py-3 text-center font-medium backdrop-blur-sm transition-colors hover:bg-card/30 cursor-pointer"
           >
             리뷰 더보기
           </button>

@@ -3,20 +3,7 @@ import { createPortal } from "react-dom";
 import type { FilterSettings, SavedAddress } from "@/lib/types";
 import { LoginDialog } from "@/features/auth/components";
 import { APP_OVERLAY_ROOT_ID } from "@/app/AppLayout";
-import {
-  X,
-  MapPin,
-  Car,
-  Users,
-  Dog,
-  RefreshCw,
-  History,
-  CircleUserRound,
-  Save,
-  Plus,
-  Trash2,
-  ChevronRight,
-} from "lucide-react";
+import { X, MapPin, Car, Users, Dog, RefreshCw, History, CircleUserRound, Save, Plus, Trash2, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface HamburgerMenuProps {
@@ -45,9 +32,7 @@ export function HamburgerMenu({
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [newAddressLabel, setNewAddressLabel] = useState("");
   const [newAddressValue, setNewAddressValue] = useState("");
-  const [activeFilterSection, setActiveFilterSection] = useState<
-    "range" | "amenities" | null
-  >(null);
+  const [activeFilterSection, setActiveFilterSection] = useState<"range" | "amenities" | null>(null);
   const [showLogin, setShowLogin] = useState(false);
 
   const handleAddAddress = () => {
@@ -70,10 +55,7 @@ export function HamburgerMenu({
     { value: 250, label: "250m" },
   ];
 
-  const overlayRoot =
-    typeof document !== "undefined"
-      ? document.getElementById(APP_OVERLAY_ROOT_ID)
-      : null;
+  const overlayRoot = typeof document !== "undefined" ? document.getElementById(APP_OVERLAY_ROOT_ID) : null;
 
   const menuContent = (
     <AnimatePresence>
@@ -99,7 +81,7 @@ export function HamburgerMenu({
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted"
+                className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted cursor-pointer"
                 aria-label="닫기"
               >
                 <X className="size-5" />
@@ -110,21 +92,15 @@ export function HamburgerMenu({
             <div className="p-4">
               {/* Current Location */}
               <div className="mb-6">
-                <h3 className="mb-2 text-sm font-medium text-muted-foreground">
-                  내 위치
-                </h3>
+                <h3 className="mb-2 text-sm font-medium text-muted-foreground">내 위치</h3>
                 <button
                   type="button"
-                  className="flex w-full items-center gap-3 rounded-xl bg-muted/50 p-4 text-left transition-colors hover:bg-muted"
+                  className="flex w-full items-center gap-3 rounded-xl bg-muted/50 p-4 text-left transition-colors hover:bg-muted cursor-pointer"
                 >
                   <MapPin className="size-5 text-primary" />
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-card-foreground">
-                      {currentLocation}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      탭하여 위치 변경
-                    </p>
+                    <p className="font-medium text-card-foreground">{currentLocation}</p>
+                    <p className="text-xs text-muted-foreground">탭하여 위치 변경</p>
                   </div>
                   <ChevronRight className="size-5 shrink-0 text-muted-foreground" />
                 </button>
@@ -134,12 +110,8 @@ export function HamburgerMenu({
               <div className="mb-6">
                 <button
                   type="button"
-                  className="mb-2 flex w-full items-center justify-between text-sm font-medium text-muted-foreground"
-                  onClick={() =>
-                    setActiveFilterSection(
-                      activeFilterSection === "range" ? null : "range"
-                    )
-                  }
+                  className="mb-2 flex w-full items-center justify-between text-sm font-medium text-muted-foreground cursor-pointer"
+                  onClick={() => setActiveFilterSection(activeFilterSection === "range" ? null : "range")}
                 >
                   <span>검색 범위</span>
                   <motion.span
@@ -169,10 +141,10 @@ export function HamburgerMenu({
                                 searchRange: option.value,
                               })
                             }
-                            className={`flex-1 rounded-xl px-3 py-3 text-sm font-medium transition-colors ${
+                            className={`flex-1 rounded-xl px-3 py-3 text-sm font-medium transition-colors cursor-pointer ${
                               filterSettings.searchRange === option.value
                                 ? "bg-primary text-primary-foreground"
-                                : "bg-muted text-muted-foreground hover:bg-muted/80"
+                                : "bg-muted text-muted-foreground hover:bg-muted/80 cursor-pointer"
                             }`}
                           >
                             {option.label}
@@ -183,9 +155,7 @@ export function HamburgerMenu({
                   )}
                 </AnimatePresence>
                 {activeFilterSection !== "range" && (
-                  <div className="rounded-xl bg-muted/50 px-4 py-2 text-sm text-card-foreground">
-                    현재: {filterSettings.searchRange}m
-                  </div>
+                  <div className="rounded-xl bg-muted/50 px-4 py-2 text-sm text-card-foreground">현재: {filterSettings.searchRange}m</div>
                 )}
               </div>
 
@@ -193,12 +163,8 @@ export function HamburgerMenu({
               <div className="mb-6">
                 <button
                   type="button"
-                  className="mb-2 flex w-full items-center justify-between text-sm font-medium text-muted-foreground"
-                  onClick={() =>
-                    setActiveFilterSection(
-                      activeFilterSection === "amenities" ? null : "amenities"
-                    )
-                  }
+                  className="mb-2 flex w-full items-center justify-between text-sm font-medium text-muted-foreground cursor-pointer"
+                  onClick={() => setActiveFilterSection(activeFilterSection === "amenities" ? null : "amenities")}
                 >
                   <span>필터</span>
                   <motion.span
@@ -272,13 +238,9 @@ export function HamburgerMenu({
                         <Dog className="size-3" /> 반려동물
                       </span>
                     )}
-                    {!filterSettings.hasParking &&
-                      !filterSettings.hasGroupSeating &&
-                      !filterSettings.petFriendly && (
-                        <span className="text-sm text-muted-foreground">
-                          필터 없음
-                        </span>
-                      )}
+                    {!filterSettings.hasParking && !filterSettings.hasGroupSeating && !filterSettings.petFriendly && (
+                      <span className="text-sm text-muted-foreground">필터 없음</span>
+                    )}
                   </div>
                 )}
               </div>
@@ -286,13 +248,11 @@ export function HamburgerMenu({
               {/* Saved Addresses */}
               <div className="mb-6">
                 <div className="mb-2 flex items-center justify-between">
-                  <h3 className="text-sm font-medium text-muted-foreground">
-                    저장된 주소
-                  </h3>
+                  <h3 className="text-sm font-medium text-muted-foreground">저장된 주소</h3>
                   <button
                     type="button"
                     onClick={() => setShowAddressForm(!showAddressForm)}
-                    className="rounded-full p-1 text-primary transition-colors hover:bg-primary/10"
+                    className="rounded-full p-1 text-primary transition-colors hover:bg-primary/10 cursor-pointer"
                   >
                     <Plus className="size-4" />
                   </button>
@@ -324,7 +284,7 @@ export function HamburgerMenu({
                         <button
                           type="button"
                           onClick={handleAddAddress}
-                          className="flex w-full items-center justify-center gap-1 rounded-lg bg-primary py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                          className="flex w-full items-center justify-center gap-1 rounded-lg bg-primary py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 cursor-pointer"
                         >
                           <Save className="size-4" />
                           저장
@@ -336,37 +296,22 @@ export function HamburgerMenu({
 
                 <div className="space-y-2">
                   {savedAddresses.map((address) => (
-                    <div
-                      key={address.id}
-                      className="flex items-center gap-3 rounded-xl bg-muted/50 p-3"
-                    >
-                      <button
-                        type="button"
-                        onClick={() => onSelectAddress(address)}
-                        className="min-w-0 flex-1 text-left"
-                      >
-                        <p className="font-medium text-card-foreground">
-                          {address.label}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {address.address}
-                        </p>
+                    <div key={address.id} className="flex items-center gap-3 rounded-xl bg-muted/50 p-3">
+                      <button type="button" onClick={() => onSelectAddress(address)} className="min-w-0 flex-1 text-left">
+                        <p className="font-medium text-card-foreground">{address.label}</p>
+                        <p className="text-xs text-muted-foreground">{address.address}</p>
                       </button>
                       <button
                         type="button"
                         onClick={() => onRemoveAddress(address.id)}
-                        className="rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                        className="rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive cursor-pointer"
                         aria-label={`${address.label} 삭제`}
                       >
                         <Trash2 className="size-4" />
                       </button>
                     </div>
                   ))}
-                  {savedAddresses.length === 0 && (
-                    <p className="py-4 text-center text-sm text-muted-foreground">
-                      저장된 주소가 없습니다
-                    </p>
-                  )}
+                  {savedAddresses.length === 0 && <p className="py-4 text-center text-sm text-muted-foreground">저장된 주소가 없습니다</p>}
                 </div>
               </div>
 
@@ -375,30 +320,24 @@ export function HamburgerMenu({
                 <button
                   type="button"
                   onClick={() => setShowLogin(true)}
-                  className="flex w-full items-center gap-3 rounded-xl bg-muted/50 p-4 text-left transition-colors hover:bg-muted"
+                  className="flex w-full items-center gap-3 rounded-xl bg-muted/50 p-4 text-left transition-colors hover:bg-muted cursor-pointer"
                 >
                   <CircleUserRound className="size-5 text-primary" />
-                  <span className="font-medium text-card-foreground">
-                    로그인
-                  </span>
+                  <span className="font-medium text-card-foreground">로그인</span>
                 </button>
                 <button
                   type="button"
-                  className="flex w-full items-center gap-3 rounded-xl bg-muted/50 p-4 text-left transition-colors hover:bg-muted"
+                  className="flex w-full items-center gap-3 rounded-xl bg-muted/50 p-4 text-left transition-colors hover:bg-muted cursor-pointer"
                 >
                   <RefreshCw className="size-5 text-primary" />
-                  <span className="font-medium text-card-foreground">
-                    동기화
-                  </span>
+                  <span className="font-medium text-card-foreground">동기화</span>
                 </button>
                 <button
                   type="button"
-                  className="flex w-full items-center gap-3 rounded-xl bg-muted/50 p-4 text-left transition-colors hover:bg-muted"
+                  className="flex w-full items-center gap-3 rounded-xl bg-muted/50 p-4 text-left transition-colors hover:bg-muted cursor-pointer"
                 >
                   <History className="size-5 text-primary" />
-                  <span className="font-medium text-card-foreground">
-                    히스토리
-                  </span>
+                  <span className="font-medium text-card-foreground">히스토리</span>
                 </button>
               </div>
             </div>
@@ -411,11 +350,7 @@ export function HamburgerMenu({
   return (
     <>
       {overlayRoot ? createPortal(menuContent, overlayRoot) : null}
-      <LoginDialog
-        open={showLogin}
-        onOpenChange={setShowLogin}
-        onSubmit={async (v) => console.log("Login", v)}
-      />
+      <LoginDialog open={showLogin} onOpenChange={setShowLogin} onSubmit={async (v) => console.log("Login", v)} />
     </>
   );
 }
@@ -445,25 +380,19 @@ function FilterToggle({ icon, label, value, onChange }: FilterToggleProps) {
     <button
       type="button"
       onClick={handleClick}
-      className="flex w-full items-center justify-between rounded-xl bg-muted/50 p-3 transition-colors hover:bg-muted"
+      className="flex w-full items-center justify-between rounded-xl bg-muted/50 p-3 transition-colors hover:bg-muted cursor-pointer"
     >
       <div className="flex items-center gap-2">
-        <span
-          className={value === true ? "text-primary" : "text-muted-foreground"}
-        >
-          {icon}
-        </span>
-        <span className="text-sm font-medium text-card-foreground">
-          {label}
-        </span>
+        <span className={value === true ? "text-primary" : "text-muted-foreground"}>{icon}</span>
+        <span className="text-sm font-medium text-card-foreground">{label}</span>
       </div>
       <span
         className={`rounded-full px-2 py-0.5 text-xs ${
           value === true
             ? "bg-primary text-primary-foreground"
             : value === false
-            ? "bg-destructive/10 text-destructive"
-            : "bg-muted text-muted-foreground"
+              ? "bg-destructive/10 text-destructive"
+              : "bg-muted text-muted-foreground"
         }`}
       >
         {states[currentIndex].label}

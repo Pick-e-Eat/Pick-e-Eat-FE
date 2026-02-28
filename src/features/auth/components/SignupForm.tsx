@@ -101,7 +101,7 @@ export function SignupForm({ onSubmit, onSuccess, showLoginLink = true, compact 
       {showLoginLink && (
         <p className="mt-4 text-center text-sm text-muted-foreground">
           이미 계정이 있으신가요?{" "}
-          <Link to={routes.auth.login} className="font-medium text-primary underline hover:no-underline">
+          <Link to={routes.auth.login} className="font-medium text-primary underline hover:no-underline cursor-pointer">
             로그인
           </Link>
         </p>
