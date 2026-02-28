@@ -1,24 +1,7 @@
 import { useState, useEffect } from "react";
 import type { Restaurant } from "@/lib/types";
-import {
-  motion,
-  useMotionValue,
-  useTransform,
-  PanInfo,
-  animate,
-} from "framer-motion";
-import {
-  Star,
-  MessageSquare,
-  FileText,
-  Navigation,
-  Car,
-  Users,
-  Dog,
-  ThumbsUp,
-  ThumbsDown,
-  X,
-} from "lucide-react";
+import { motion, useMotionValue, useTransform, PanInfo, animate } from "framer-motion";
+import { Star, MessageSquare, FileText, Navigation, Car, Users, Dog, ThumbsUp, ThumbsDown, X } from "lucide-react";
 import { FastAverageColor } from "fast-average-color";
 import { useHeaderColorStore } from "@/features/home/stores/header-color-store";
 
@@ -37,22 +20,13 @@ interface SwipeCardProps {
   exitDirection?: "left" | "right" | null;
 }
 
-export function SwipeCard({
-  restaurant,
-  onSwipe,
-  onShowReviews,
-  onStop,
-  isTop = true,
-  exitDirection = null,
-}: SwipeCardProps) {
+export function SwipeCard({ restaurant, onSwipe, onShowReviews, onStop, isTop = true, exitDirection = null }: SwipeCardProps) {
   const [opacity, setOpacity] = useState(1);
-  const [lockedDirection, setLockedDirection] = useState<"x" | "y" | null>(
-    null
-  );
+  const [lockedDirection, setLockedDirection] = useState<"x" | "y" | null>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-15, 15]);
-  
+
   // Horizontal swipe opacities
   const likeOpacity = useTransform(x, [0, 50], [0, 1]);
   const nopeOpacity = useTransform(x, [-50, 0], [1, 0]);
@@ -63,6 +37,7 @@ export function SwipeCard({
 
   const isExiting = exitDirection !== null;
   const { setColors, resetColors } = useHeaderColorStore();
+  const backgroundColor = useHeaderColorStore((s) => s.backgroundColor);
 
   // Animate card out when horizontal swipe is triggered
   useEffect(() => {
@@ -120,12 +95,9 @@ export function SwipeCard({
     }
   };
 
-  const handleDragEnd = (
-    _: MouseEvent | TouchEvent | PointerEvent,
-    info: PanInfo
-  ) => {
+  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const { offset } = info;
-    
+
     if (lockedDirection === "y") {
       if (offset.y < Y_SWIPE_THRESHOLD) {
         onShowReviews();
@@ -146,11 +118,11 @@ export function SwipeCard({
         animate(y, 0, { type: "spring", stiffness: 500, damping: 30 });
       }
     } else {
-        // No significant drag occurred to lock a direction, animate back
-        animate(x, 0, { type: "spring", stiffness: 500, damping: 30 });
-        animate(y, 0, { type: "spring", stiffness: 500, damping: 30 });
+      // No significant drag occurred to lock a direction, animate back
+      animate(x, 0, { type: "spring", stiffness: 500, damping: 30 });
+      animate(y, 0, { type: "spring", stiffness: 500, damping: 30 });
     }
-    
+
     setLockedDirection(null); // Reset locked direction for the next drag
   };
 
@@ -172,10 +144,7 @@ export function SwipeCard({
       {/* Card Container */}
       <div className="relative h-full w-full overflow-hidden bg-card shadow-2xl">
         {/* Background Image */}
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${restaurant.image})` }}
-        />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${restaurant.image})` }} />
 
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-linear-to-t from-foreground/90 via-foreground/30 to-transparent" />
@@ -194,16 +163,19 @@ export function SwipeCard({
           <ThumbsDown className="size-32 opacity-60" />
         </motion.div>
         <motion.div
-          className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-blue-500"
-          style={{ opacity: reviewOpacity }}
+          className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          style={{
+            opacity: reviewOpacity,
+            color: backgroundColor || "hsl(var(--primary))",
+          }}
         >
-          <MessageSquare className="size-28 opacity-60" />
+          <MessageSquare className="size-28" fill="currentColor" stroke="none" />
         </motion.div>
         <motion.div
           className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-destructive"
           style={{ opacity: stopOpacity }}
         >
-          <X className="size-32 opacity-60" />
+          <X className="size-32" />
         </motion.div>
 
         {/* Content */}
@@ -212,10 +184,7 @@ export function SwipeCard({
           {restaurant.tags.length > 0 && (
             <div className="mb-3 flex flex-wrap gap-2">
               {restaurant.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-full bg-card/20 px-3 py-1 text-xs font-medium backdrop-blur-sm"
-                >
+                <span key={tag} className="rounded-full bg-card/20 px-3 py-1 text-xs font-medium backdrop-blur-sm">
                   {tag}
                 </span>
               ))}
@@ -223,9 +192,7 @@ export function SwipeCard({
           )}
 
           {/* Restaurant Name & Type */}
-          <h2 className="mb-1 text-3xl font-bold text-balance">
-            {restaurant.name}
-          </h2>
+          <h2 className="mb-1 text-3xl font-bold text-balance">{restaurant.name}</h2>
           <p className="mb-3 text-lg text-card/80">{restaurant.type}</p>
 
           {/* Ratings & Reviews */}
@@ -236,15 +203,11 @@ export function SwipeCard({
             </div>
             <div className="flex items-center gap-1 text-card/80">
               <MessageSquare className="size-4" />
-              <span className="text-sm">
-                리뷰 {restaurant.reviewCount.toLocaleString()}
-              </span>
+              <span className="text-sm">리뷰 {restaurant.reviewCount.toLocaleString()}</span>
             </div>
             <div className="flex items-center gap-1 text-card/80">
               <FileText className="size-4" />
-              <span className="text-sm">
-                블로그 {restaurant.blogReviewCount}
-              </span>
+              <span className="text-sm">블로그 {restaurant.blogReviewCount}</span>
             </div>
           </div>
 
@@ -259,9 +222,7 @@ export function SwipeCard({
           </div>
 
           {/* Amenities */}
-          {(restaurant.hasParking ||
-            restaurant.hasGroupSeating ||
-            restaurant.petFriendly) && (
+          {(restaurant.hasParking || restaurant.hasGroupSeating || restaurant.petFriendly) && (
             <div className="mb-4 flex flex-wrap gap-2">
               {restaurant.hasParking && (
                 <span className="flex items-center gap-1 rounded-full bg-accent/80 px-3 py-1 text-xs text-accent-foreground">
