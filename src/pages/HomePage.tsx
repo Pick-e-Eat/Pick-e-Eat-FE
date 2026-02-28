@@ -80,7 +80,7 @@ export function HomePage() {
     <main className="relative flex h-dvh flex-col overflow-hidden bg-background">
       <HomeHeader onMenuOpen={() => setMenuOpen(true)} maxSelections={MAX_SELECTIONS} />
 
-      <div className="relative flex-1 px-4 py-4">
+      <div className="relative flex-1">
         {filteredRestaurants.length > 0 && currentIndex < filteredRestaurants.length ? (
           <div className="relative h-full">
             <AnimatePresence>

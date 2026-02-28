@@ -80,7 +80,7 @@ export function SwipeCard({
       animate={{ scale: isTop ? 1 : 0.95, y: isTop ? 0 : 20 }}
     >
       {/* Card Container */}
-      <div className="relative h-full w-full overflow-hidden rounded-3xl bg-card shadow-2xl">
+      <div className="relative h-full w-full overflow-hidden bg-card shadow-2xl">
         {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center"
