@@ -6,8 +6,8 @@ import { FastAverageColor } from "fast-average-color";
 import { useHeaderColorStore } from "@/features/home/stores/header-color-store";
 
 const SWIPE_THRESHOLD = 100;
-const Y_SWIPE_THRESHOLD = -100; // Swipe up
-const Y_SWIPE_DOWN_THRESHOLD = 100; // Swipe down
+const Y_SWIPE_THRESHOLD = -100; // Swipe up threshold (negative y)
+const Y_SWIPE_DOWN_THRESHOLD = 100; // Swipe down threshold (positive y)
 const EXIT_OFFSET = 500;
 const DRAG_LOCK_THRESHOLD = 5; // Pixels to determine initial drag direction
 
@@ -23,23 +23,28 @@ interface SwipeCardProps {
 export function SwipeCard({ restaurant, onSwipe, onShowReviews, onStop, isTop = true, exitDirection = null }: SwipeCardProps) {
   const [opacity, setOpacity] = useState(1);
   const [lockedDirection, setLockedDirection] = useState<"x" | "y" | null>(null);
+  // Motion values for card's physical position on screen
   const x = useMotionValue(0);
   const y = useMotionValue(0);
+
+  // Motion values for tracking user's raw gesture offset (for feedback icons)
+  const dragX = useMotionValue(0);
+  const dragY = useMotionValue(0);
+
+  // Card rotation based on horizontal drag
   const rotate = useTransform(x, [-200, 200], [-15, 15]);
 
-  // Horizontal swipe opacities
-  const likeOpacity = useTransform(x, [0, 50], [0, 1]);
-  const nopeOpacity = useTransform(x, [-50, 0], [1, 0]);
-
-  // Vertical swipe opacities
-  const reviewOpacity = useTransform(y, [0, -50], [0, 1]);
-  const stopOpacity = useTransform(y, [0, 50], [0, 1]);
+  // Opacity transforms for feedback icons based on dragX/dragY
+  const likeOpacity = useTransform(dragX, [0, 50], [0, 1]);
+  const nopeOpacity = useTransform(dragX, [-50, 0], [1, 0]);
+  const reviewOpacity = useTransform(dragY, [0, -50], [0, 1]);
+  const stopOpacity = useTransform(dragY, [0, 50], [0, 1]);
 
   const isExiting = exitDirection !== null;
   const { setColors, resetColors } = useHeaderColorStore();
   const backgroundColor = useHeaderColorStore((s) => s.backgroundColor);
 
-  // Animate card out when horizontal swipe is triggered
+  // Animate card out when horizontal swipe is triggered by onSwipe (targets x)
   useEffect(() => {
     if (!isExiting) return;
     const to = exitDirection === "right" ? EXIT_OFFSET : -EXIT_OFFSET;
@@ -69,16 +74,34 @@ export function SwipeCard({ restaurant, onSwipe, onShowReviews, onStop, isTop = 
     }
   }, [isTop, restaurant.image, setColors, resetColors]);
 
+  // Explicitly reset drag gesture motion values when card state changes due to non-drag events
+  useEffect(() => {
+    dragX.set(0);
+    dragY.set(0);
+  }, [isTop, isExiting, dragX, dragY]);
+
+
   const handleDragStart = () => {
-    setLockedDirection(null); // Reset locked direction on new drag
-    x.set(0); // Ensure x, y are at 0 when starting a new drag
+    setLockedDirection(null); // Reset locked direction for a new drag
+    // Also reset physical card position if it somehow drifted
+    x.set(0);
     y.set(0);
+    // Reset gesture tracking motion values at the start of a drag
+    dragX.set(0);
+    dragY.set(0);
   };
 
   const handleDrag = (_: any, info: PanInfo) => {
+    // Update gesture tracking motion values with raw offset
+    dragX.set(info.offset.x);
+    dragY.set(info.offset.y);
+
     if (lockedDirection === null) {
       // Determine lock direction after initial movement threshold
-      if (Math.abs(info.offset.x) > DRAG_LOCK_THRESHOLD || Math.abs(info.offset.y) > DRAG_LOCK_THRESHOLD) {
+      if (
+        Math.abs(info.offset.x) > DRAG_LOCK_THRESHOLD ||
+        Math.abs(info.offset.y) > DRAG_LOCK_THRESHOLD
+      ) {
         if (Math.abs(info.offset.x) > Math.abs(info.offset.y)) {
           setLockedDirection("x");
         } else {
@@ -87,11 +110,20 @@ export function SwipeCard({ restaurant, onSwipe, onShowReviews, onStop, isTop = 
       }
     }
 
-    // Constrain motion to locked direction
+    // Now, constrain *both* actual card motion AND gesture tracking motion to locked direction
     if (lockedDirection === "y") {
-      x.set(0); // If locked to Y, prevent X movement
+      y.set(info.offset.y); // Card moves Y
+      x.set(0); // Card X is 0
+      dragX.set(0); // Gesture tracking X is 0 if locked to Y
     } else if (lockedDirection === "x") {
-      y.set(0); // If locked to X, prevent Y movement
+      x.set(info.offset.x); // Card moves X
+      y.set(0); // Card Y is 0
+      dragY.set(0); // Gesture tracking Y is 0 if locked to X
+    } else {
+      // If direction not yet locked, card moves freely (within DRAG_LOCK_THRESHOLD, it's not actually moving)
+      // dragX and dragY are already set above
+      x.set(info.offset.x);
+      y.set(info.offset.y);
     }
   };
 
@@ -124,6 +156,8 @@ export function SwipeCard({ restaurant, onSwipe, onShowReviews, onStop, isTop = 
     }
 
     setLockedDirection(null); // Reset locked direction for the next drag
+    dragX.set(0); // Reset gesture tracking motion values
+    dragY.set(0);
   };
 
   const dragEnabled = isTop && !isExiting;
@@ -131,7 +165,7 @@ export function SwipeCard({ restaurant, onSwipe, onShowReviews, onStop, isTop = 
   return (
     <motion.div
       className="absolute inset-0 cursor-grab active:cursor-grabbing touch-none"
-      style={{ x, y, rotate, opacity }}
+      style={{ x, y, rotate, opacity }} // Card's actual position
       drag={dragEnabled ? true : false} // Allow dragging in both directions initially
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
       dragElastic={{ top: 0.2, bottom: 0.2, left: 1, right: 1 }}
