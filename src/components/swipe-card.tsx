@@ -128,21 +128,6 @@ export function SwipeCard({
           <ThumbsDown className="size-32 opacity-40" />
         </motion.div>
 
-        {/* Like/Nope Indicators */}
-        <motion.div
-          className="absolute left-8 top-8 -rotate-[15deg] rounded-lg border-4 border-like px-4 py-2"
-          style={{ opacity: likeOpacity }}
-        >
-          <span className="text-3xl font-bold text-like">LIKE</span>
-        </motion.div>
-
-        <motion.div
-          className="absolute right-8 top-8 rotate-[15deg] rounded-lg border-4 border-unlike px-4 py-2"
-          style={{ opacity: nopeOpacity }}
-        >
-          <span className="text-3xl font-bold text-unlike">NOPE</span>
-        </motion.div>
-
         {/* Content */}
         <div className="absolute inset-x-0 bottom-0 p-6 text-card">
           {/* Tags */}
