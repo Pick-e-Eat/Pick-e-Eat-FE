@@ -5,27 +5,34 @@ React 19 + TypeScript 5 + Vite 6 기반이며, 상태 관리는 Zustand와 TanSt
 
 ## 요구사항
 
-- Node.js 20 이상 (react-router-dom v7 권장 사양)
+- Node.js 20 이상 (react-router-dom v7 권장 사양). 저장소 루트의 `.nvmrc`는 **22**를 가리킵니다.
 - Yarn 4 이상
+
+Node가 없다면 예: [Homebrew](https://brew.sh)로 `brew install node@22` 후 PATH에 추가하거나, [nvm](https://github.com/nvm-sh/nvm)으로 `nvm install` (`.nvmrc` 기준) 후 `nvm use` 하세요.
 
 ### Yarn 고정 (Corepack)
 
-이 레포는 `packageManager`에 Yarn 버전을 고정합니다. 처음 한 번만 아래를 실행하세요.
+Node에 포함된 Corepack으로 Yarn 버전을 맞춥니다. 처음 한 번만 아래를 실행하세요.
 
 ```bash
 corepack enable
 corepack prepare yarn@4.9.4 --activate
 ```
 
+Corepack이 없다면(`command not found: corepack`) Node를 최신 LTS로 재설치했는지 확인하세요.
+
 ## 빠른 시작
 
 ```bash
 git clone <레포지토리_URL>
 cd Pick-e-Eat-FE
+corepack enable && corepack prepare yarn@4.9.4 --activate
 yarn install
-cp .env.example .env
+# .env가 없을 때만: cp .env.example .env
 yarn dev
 ```
+
+이 레포에는 로컬용 `.env`가 이미 있을 수 있습니다(`.gitignore`에 포함). 없다면 `cp .env.example .env`로 만드세요.
 
 브라우저에서 `http://127.0.0.1:5173/`로 접속하세요.
 

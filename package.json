@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "packageManager": "yarn@4.9.4",
   "_comment": "React + Vite 기반으로 빠른 DX를 위한 기본 패키지 구성",
   "scripts": {
