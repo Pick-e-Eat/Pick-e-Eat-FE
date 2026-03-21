@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
+import styles from "./hamburger-menu.module.scss";
 import type { FilterSettings, SavedAddress } from "@/lib/types";
 import { LoginDialog } from "@/features/auth/components";
 import { APP_OVERLAY_ROOT_ID } from "@/app/AppLayout";

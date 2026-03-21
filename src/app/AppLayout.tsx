@@ -1,4 +1,5 @@
 import { Outlet } from "react-router-dom";
+import styles from "./AppLayout.module.scss";
 
 /** 햄버거 메뉴 등 오버레이를 앱 영역 안에 뿌리기 위한 타깃 id (슬라이드가 영역 안에서만 보이도록) */
 export const APP_OVERLAY_ROOT_ID = "app-overlay-root";
