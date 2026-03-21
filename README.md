@@ -1,6 +1,6 @@
 # Pick-e-Eat FE (MVP)
 
-Atomic Design + Feature 모듈 구조로 확장 가능한 CRUD 예제 프론트엔드입니다.  
+Feature 모듈 구조로 확장 가능한 CRUD 예제 프론트엔드입니다.  
 React 19 + TypeScript 5 + Vite 6 기반이며, 상태 관리는 Zustand와 TanStack Query로 분리합니다.
 
 ## 요구사항
