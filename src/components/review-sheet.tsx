@@ -1,4 +1,5 @@
 import type { Restaurant } from "@/lib/types";
+import styles from "./review-sheet.module.scss";
 import { X, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 

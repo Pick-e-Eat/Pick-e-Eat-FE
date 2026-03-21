@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import styles from "./ResultsPage.module.scss";
 import { routes } from "@/shared/constants/routes";
 import { useResultsStore } from "@/shared/stores/results-store";
 import { Star, MapPin, ThumbsUp, ThumbsDown, RotateCcw, Navigation } from "lucide-react";

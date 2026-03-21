@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import styles from "./HomeHeader.module.scss";
 import { Menu, X } from "lucide-react";
 
 import { routes } from "@/shared/constants/routes";

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import styles from "./SignupPage.module.scss";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { SignupForm } from "@/features/auth/components";

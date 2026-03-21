@@ -1,3 +1,4 @@
+import styles from "./SignupDialog.module.scss";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SignupForm, type SignupFormValues } from "@/features/auth/components/SignupForm";
 

@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import styles from "./HomePage.module.scss";
 import { routes } from "@/shared/constants/routes";
 import type { Restaurant, FilterSettings, SavedAddress, SwipeResult } from "@/lib/types";
 import { mockRestaurants } from "@/lib/mock-data";

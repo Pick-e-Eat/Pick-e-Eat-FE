@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import styles from "./swipe-card.module.scss";
 import type { Restaurant } from "@/lib/types";
 import { motion, useMotionValue, useTransform, PanInfo, animate } from "framer-motion";
 import { Star, MessageSquare, FileText, Navigation, Car, Users, Dog, ThumbsUp, ThumbsDown, X } from "lucide-react";
