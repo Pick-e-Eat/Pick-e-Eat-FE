@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import styles from "./AppLayout.module.scss";
+import styles from "./AppLayout.module.css";
 
 /** 햄버거 메뉴 등 오버레이를 앱 영역 안에 뿌리기 위한 타깃 id (슬라이드가 영역 안에서만 보이도록) */
 export const APP_OVERLAY_ROOT_ID = "app-overlay-root";
@@ -9,11 +9,11 @@ export const APP_OVERLAY_ROOT_ID = "app-overlay-root";
  */
 export function AppLayout() {
   return (
-    <div className="relative mx-auto w-full min-h-dvh max-w-[560px] bg-background sm:min-h-dvh">
+    <div className={styles.mainContainer}>
       <Outlet />
       <div
         id={APP_OVERLAY_ROOT_ID}
-        className="pointer-events-none absolute inset-0 z-100 overflow-hidden"
+        className={styles.overlayRoot}
         aria-hidden
       />
     </div>

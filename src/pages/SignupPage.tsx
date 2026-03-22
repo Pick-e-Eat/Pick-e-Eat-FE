@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import styles from "./SignupPage.module.scss";
+import styles from "./SignupPage.module.css";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { SignupForm } from "@/features/auth/components";
@@ -18,18 +18,18 @@ export function SignupPage() {
   };
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center bg-background p-4">
-      <div className="w-full max-w-[400px] space-y-6">
+    <main className={styles.mainContainer}>
+      <div className={styles.contentWrapper}>
         <Button variant="outline" size="sm" asChild>
-          <Link to={routes.home} className="gap-2">
+          <Link to={routes.home} className={styles.backButton}>
             <ArrowLeft className="size-4" />
             홈으로
           </Link>
         </Button>
         <Card>
-          <CardHeader className="text-center">
-            <h1 className="text-2xl font-bold text-foreground">Pick-e-Eat</h1>
-            <p className="text-muted-foreground">
+          <CardHeader className={styles.cardHeader}>
+            <h1 className={styles.cardTitle}>Pick-e-Eat</h1>
+            <p className={styles.cardDescription}>
               회원가입하고 맞춤 음식점을 추천받으세요
             </p>
           </CardHeader>

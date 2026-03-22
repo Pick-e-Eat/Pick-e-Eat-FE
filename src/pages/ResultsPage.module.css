@@ -1,0 +1,171 @@
+@reference "../../../styles/globals.css";
+
+.mainContainer {
+  @apply flex min-h-dvh flex-col bg-background;
+}
+
+/* Header */
+.header {
+  @apply border-b border-border bg-card px-6 py-6;
+}
+
+.headerTitle {
+  @apply text-center text-2xl font-bold text-card-foreground;
+}
+
+.headerDescription {
+  @apply mt-1 text-center text-sm text-muted-foreground;
+}
+
+/* Results Section */
+.resultsSection {
+  @apply flex-1 overflow-y-auto p-4;
+}
+
+/* Liked Section */
+.likedSection {
+  @apply mb-6;
+}
+
+.sectionHeader {
+  @apply mb-3 flex items-center gap-2;
+}
+
+.thumbsUpIcon {
+  @apply size-5 text-like;
+}
+
+.sectionTitle {
+  @apply text-lg font-semibold text-card-foreground;
+}
+
+.likedList {
+  @apply space-y-3;
+}
+
+.likedItem {
+  @apply overflow-hidden rounded-2xl border border-border bg-card shadow-sm;
+}
+
+.likedItemContent {
+  @apply flex;
+}
+
+.likedItemImage {
+  @apply h-24 w-24 shrink-0 bg-cover bg-center;
+}
+
+.likedItemDetails {
+  @apply flex flex-1 flex-col justify-center p-3;
+}
+
+.likedItemName {
+  @apply font-semibold text-card-foreground;
+}
+
+.likedItemType {
+  @apply text-xs text-muted-foreground;
+}
+
+.likedItemMeta {
+  @apply mt-1 flex items-center gap-2;
+}
+
+.likedItemRating {
+  @apply flex items-center gap-0.5;
+}
+
+.starIcon {
+  @apply size-3 fill-amber-400 text-amber-400;
+}
+
+.ratingValue {
+  @apply text-xs font-medium text-card-foreground;
+}
+
+.walkingTime {
+  @apply text-xs text-muted-foreground;
+}
+
+.likedItemActions {
+  @apply flex flex-col items-center justify-center gap-2 p-3;
+}
+
+.navigationButton {
+  @apply rounded-full bg-accent p-2 text-accent-foreground transition-colors hover:bg-accent/80 cursor-pointer;
+}
+
+.navigationIcon {
+  @apply size-4;
+}
+
+/* Disliked Section */
+.dislikedSection {
+  @apply mb-6;
+}
+
+.thumbsDownIcon {
+  @apply size-5 text-unlike;
+}
+
+.dislikedList {
+  @apply space-y-2;
+}
+
+.dislikedItem {
+  @apply flex items-center gap-3 rounded-xl bg-muted/30 p-3;
+}
+
+.dislikedItemImage {
+  @apply h-12 w-12 shrink-0 rounded-lg bg-cover bg-center;
+}
+
+.dislikedItemDetails {
+  @apply min-w-0 flex-1;
+}
+
+.dislikedItemName {
+  @apply text-sm font-medium text-card-foreground;
+}
+
+.dislikedItemType {
+  @apply text-xs text-muted-foreground;
+}
+
+/* Empty State */
+.emptyStateContainer {
+  @apply flex flex-col items-center justify-center py-20 text-center;
+}
+
+.emptyStateIcon {
+  @apply mb-4 size-12 text-muted-foreground;
+}
+
+.emptyStateTitle {
+  @apply text-lg font-medium text-card-foreground;
+}
+
+.emptyStateDescription {
+  @apply text-sm text-muted-foreground;
+}
+
+/* Actions */
+.actionsContainer {
+  @apply border-t border-border bg-card p-4;
+}
+
+.actionButtonsWrapper {
+  @apply flex gap-3;
+}
+
+.resetButton {
+  @apply flex flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-card py-4 font-medium text-card-foreground transition-colors hover:bg-muted cursor-pointer;
+}
+
+.resetIcon {
+  @apply size-5;
+}
+
+.continueButton {
+  @apply flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary py-4 font-medium text-primary-foreground transition-colors hover:bg-primary/90 cursor-pointer;
+}

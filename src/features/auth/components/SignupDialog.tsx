@@ -1,4 +1,4 @@
-import styles from "./SignupDialog.module.scss";
+import styles from "./SignupDialog.module.css";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SignupForm, type SignupFormValues } from "@/features/auth/components/SignupForm";
 
@@ -17,10 +17,10 @@ export function SignupDialog({ open, onOpenChange, onSubmit }: SignupDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[400px]">
-        <DialogHeader>
-          <DialogTitle>회원가입</DialogTitle>
-          <p className="text-sm text-muted-foreground">Pick-e-Eat 계정을 만들어 보세요</p>
+      <DialogContent className={styles.dialogContent}>
+        <DialogHeader className={styles.dialogHeader}>
+          <DialogTitle className={styles.dialogTitle}>회원가입</DialogTitle>
+          <p className={styles.dialogDescription}>Pick-e-Eat 계정을 만들어 보세요</p>
         </DialogHeader>
         <SignupForm onSubmit={handleSubmit} onSuccess={handleSuccess} showLoginLink compact showDisplayName />
       </DialogContent>

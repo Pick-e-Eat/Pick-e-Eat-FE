@@ -1,0 +1,41 @@
+@reference "../../../../styles/globals.css";
+
+.form {
+  /* The form itself can have external classes passed via `className` prop, so no direct styling here unless needed */
+}
+
+.headerContainer {
+  @apply mb-6 text-center;
+}
+
+.headerTitle {
+  @apply text-xl font-bold text-foreground;
+}
+
+.headerDescription {
+  @apply mt-1 text-sm text-muted-foreground;
+}
+
+.inputGroup {
+  @apply space-y-4;
+}
+
+.inputWrapper {
+  @apply space-y-2;
+}
+
+.errorMessage {
+  @apply text-sm text-destructive;
+}
+
+.submitButton {
+  @apply w-full;
+}
+
+.loginLinkContainer {
+  @apply mt-4 text-center text-sm text-muted-foreground;
+}
+
+.loginLink {
+  @apply font-medium text-primary underline hover:no-underline cursor-pointer;
+}

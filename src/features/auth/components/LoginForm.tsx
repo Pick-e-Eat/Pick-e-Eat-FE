@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import styles from "./LoginForm.module.scss";
+import styles from "./LoginForm.module.css";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -50,13 +50,13 @@ export function LoginForm({ onSubmit, onSuccess, showSignupLink = true, compact 
   return (
     <form onSubmit={handleSubmit} className={className} noValidate>
       {!compact && (
-        <div className="mb-6 text-center">
-          <h2 className="text-xl font-bold text-foreground">로그인</h2>
-          <p className="mt-1 text-sm text-muted-foreground">이메일과 비밀번호를 입력해 주세요</p>
+        <div className={styles.headerContainer}>
+          <h2 className={styles.headerTitle}>로그인</h2>
+          <p className={styles.headerDescription}>이메일과 비밀번호를 입력해 주세요</p>
         </div>
       )}
-      <div className="space-y-4">
-        <div className="space-y-2">
+      <div className={styles.inputGroup}>
+        <div className={styles.inputWrapper}>
           <Label htmlFor="login-email">이메일</Label>
           <Input
             id="login-email"
@@ -68,7 +68,7 @@ export function LoginForm({ onSubmit, onSuccess, showSignupLink = true, compact 
             disabled={isSubmitting}
           />
         </div>
-        <div className="space-y-2">
+        <div className={styles.inputWrapper}>
           <Label htmlFor="login-password">비밀번호</Label>
           <Input
             id="login-password"
@@ -80,15 +80,15 @@ export function LoginForm({ onSubmit, onSuccess, showSignupLink = true, compact 
             disabled={isSubmitting}
           />
         </div>
-        {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
+        {error && <p className={styles.errorMessage} role="alert">{error}</p>}
+        <Button type="submit" className={styles.submitButton} disabled={isSubmitting}>
           {isSubmitting ? "로그인 중…" : "로그인"}
         </Button>
       </div>
       {showSignupLink && (
-        <p className="mt-4 text-center text-sm text-muted-foreground">
+        <p className={styles.signupLinkContainer}>
           계정이 없으신가요?{" "}
-          <Link to={routes.auth.signup} className="font-medium text-primary underline hover:no-underline cursor-pointer">
+          <Link to={routes.auth.signup} className={styles.signupLink}>
             회원가입
           </Link>
         </p>

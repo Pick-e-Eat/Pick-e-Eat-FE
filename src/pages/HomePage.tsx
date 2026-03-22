@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "./HomePage.module.scss";
+import styles from "./HomePage.module.css";
 import { routes } from "@/shared/constants/routes";
 import type { Restaurant, FilterSettings, SavedAddress, SwipeResult } from "@/lib/types";
 import { mockRestaurants } from "@/lib/mock-data";
@@ -78,12 +78,12 @@ export function HomePage() {
   };
 
   return (
-    <main className="relative flex h-dvh flex-col overflow-hidden bg-background">
+    <main className={styles.mainContainer}>
       <HomeHeader onMenuOpen={() => setMenuOpen(true)} maxSelections={MAX_SELECTIONS} />
 
-      <div className="relative flex-1">
+      <div className={styles.cardStackContainer}>
         {filteredRestaurants.length > 0 && currentIndex < filteredRestaurants.length ? (
-          <div className="relative h-full">
+          <div className={styles.cardWrapper}>
             <AnimatePresence>
               {[filteredRestaurants[currentIndex + 1], filteredRestaurants[currentIndex]]
                 .filter(Boolean)
@@ -104,16 +104,12 @@ export function HomePage() {
             </AnimatePresence>
           </div>
         ) : (
-          <div className="flex h-full flex-col items-center justify-center text-center">
-            <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="rounded-3xl bg-card p-8 shadow-lg">
-              <p className="mb-4 text-lg font-medium text-card-foreground">
+          <div className={styles.noRestaurantsContainer}>
+            <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className={styles.noRestaurantsCard}>
+              <p className={styles.noRestaurantsMessage}>
                 {filteredRestaurants.length === 0 ? "조건에 맞는 음식점이 없습니다" : "모든 음식점을 확인했어요!"}
               </p>
-              <button
-                type="button"
-                onClick={handleStartOver}
-                className="rounded-xl bg-primary px-6 py-3 font-medium text-primary-foreground hover:bg-primary/90 cursor-pointer"
-              >
+              <button type="button" onClick={handleStartOver} className={styles.startOverButton}>
                 다시 시작하기
               </button>
             </motion.div>

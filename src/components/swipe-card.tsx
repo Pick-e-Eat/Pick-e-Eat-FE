@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import styles from "./swipe-card.module.scss";
+import styles from "./swipe-card.module.css";
 import type { Restaurant } from "@/lib/types";
 import { motion, useMotionValue, useTransform, PanInfo, animate } from "framer-motion";
 import { Star, MessageSquare, FileText, Navigation, Car, Users, Dog, ThumbsUp, ThumbsDown, X } from "lucide-react";
 import { FastAverageColor } from "fast-average-color";
 import { useHeaderColorStore } from "@/features/home/stores/header-color-store";
+import { cn } from "@/shared/utils/cn"; // Added cn import
 
 const SWIPE_THRESHOLD = 100;
 const Y_SWIPE_THRESHOLD = -100; // Swipe up threshold (negative y)
@@ -165,7 +166,7 @@ export function SwipeCard({ restaurant, onSwipe, onShowReviews, onStop, isTop = 
 
   return (
     <motion.div
-      className="absolute inset-0 cursor-grab active:cursor-grabbing touch-none"
+      className={styles.cardWrapper}
       style={{ x, y, rotate, opacity }} // Card's actual position
       drag={dragEnabled ? true : false} // Allow dragging in both directions initially
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
@@ -177,49 +178,40 @@ export function SwipeCard({ restaurant, onSwipe, onShowReviews, onStop, isTop = 
       animate={{ scale: isTop ? 1 : 0.95, y: isTop ? 0 : 20 }}
     >
       {/* Card Container */}
-      <div className="relative h-full w-full overflow-hidden bg-card shadow-2xl">
+      <div className={styles.cardContainer}>
         {/* Background Image */}
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${restaurant.image})` }} />
+        <div className={styles.backgroundImage} style={{ backgroundImage: `url(${restaurant.image})` }} />
 
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-linear-to-t from-foreground/90 via-foreground/30 to-transparent" />
+        <div className={styles.gradientOverlay} />
 
         {/* Centered Action Icons */}
-        <motion.div
-          className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-like"
-          style={{ opacity: likeOpacity }}
-        >
-          <ThumbsUp className="size-32 opacity-60" />
+        <motion.div className={styles.actionIconLike} style={{ opacity: likeOpacity }}>
+          <ThumbsUp className={styles.thumbsUpIcon} />
+        </motion.div>
+        <motion.div className={styles.actionIconNope} style={{ opacity: nopeOpacity }}>
+          <ThumbsDown className={styles.thumbsDownIcon} />
         </motion.div>
         <motion.div
-          className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-unlike"
-          style={{ opacity: nopeOpacity }}
-        >
-          <ThumbsDown className="size-32 opacity-60" />
-        </motion.div>
-        <motion.div
-          className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          className={styles.actionIconReview}
           style={{
             opacity: reviewOpacity,
             color: backgroundColor || "hsl(var(--primary))",
           }}
         >
-          <MessageSquare className="size-28" fill="currentColor" stroke="none" />
+          <MessageSquare className={cn(styles.messageSquareIcon, "fill-current stroke-none")} />
         </motion.div>
-        <motion.div
-          className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-destructive"
-          style={{ opacity: stopOpacity }}
-        >
-          <X className="size-32" />
+        <motion.div className={styles.actionIconStop} style={{ opacity: stopOpacity }}>
+          <X className={styles.xIcon} />
         </motion.div>
 
         {/* Content */}
-        <div className="absolute inset-x-0 bottom-0 p-6 text-card">
+        <div className={styles.contentSection}>
           {/* Tags */}
           {restaurant.tags.length > 0 && (
-            <div className="mb-3 flex flex-wrap gap-2">
+            <div className={styles.tagsContainer}>
               {restaurant.tags.map((tag) => (
-                <span key={tag} className="rounded-full bg-card/20 px-3 py-1 text-xs font-medium backdrop-blur-sm">
+                <span key={tag} className={styles.tag}>
                   {tag}
                 </span>
               ))}
@@ -227,30 +219,30 @@ export function SwipeCard({ restaurant, onSwipe, onShowReviews, onStop, isTop = 
           )}
 
           {/* Restaurant Name & Type */}
-          <h2 className="mb-1 text-3xl font-bold text-balance">{restaurant.name}</h2>
-          <p className="mb-3 text-lg text-card/80">{restaurant.type}</p>
+          <h2 className={styles.restaurantName}>{restaurant.name}</h2>
+          <p className={styles.restaurantType}>{restaurant.type}</p>
 
           {/* Ratings & Reviews */}
-          <div className="mb-4 flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-1">
-              <Star className="size-5 fill-amber-400 text-amber-400" />
-              <span className="font-semibold">{restaurant.rating}</span>
+          <div className={styles.ratingsReviewsContainer}>
+            <div className={styles.ratingItem}>
+              <Star className={styles.starIcon} />
+              <span className={styles.ratingValue}>{restaurant.rating}</span>
             </div>
-            <div className="flex items-center gap-1 text-card/80">
-              <MessageSquare className="size-4" />
-              <span className="text-sm">리뷰 {restaurant.reviewCount.toLocaleString()}</span>
+            <div className={styles.reviewCountItem}>
+              <MessageSquare className={styles.reviewCountIcon} />
+              <span className={styles.reviewCountText}>리뷰 {restaurant.reviewCount.toLocaleString()}</span>
             </div>
-            <div className="flex items-center gap-1 text-card/80">
-              <FileText className="size-4" />
-              <span className="text-sm">블로그 {restaurant.blogReviewCount}</span>
+            <div className={styles.reviewCountItem}>
+              <FileText className={styles.reviewCountIcon} />
+              <span className={styles.reviewCountText}>블로그 {restaurant.blogReviewCount}</span>
             </div>
           </div>
 
           {/* Distance */}
-          <div className="mb-4 flex items-center gap-3">
-            <div className="flex items-center gap-2 rounded-full bg-card/20 px-3 py-1.5 backdrop-blur-sm">
-              <Navigation className="size-4" />
-              <span className="text-sm font-medium">
+          <div className={styles.distanceContainer}>
+            <div className={styles.distanceBadge}>
+              <Navigation className={styles.navigationIcon} />
+              <span className={styles.distanceText}>
                 도보 {restaurant.walkingTime}분 ({restaurant.distance}m)
               </span>
             </div>
@@ -258,20 +250,20 @@ export function SwipeCard({ restaurant, onSwipe, onShowReviews, onStop, isTop = 
 
           {/* Amenities */}
           {(restaurant.hasParking || restaurant.hasGroupSeating || restaurant.petFriendly) && (
-            <div className="mb-4 flex flex-wrap gap-2">
+            <div className={styles.amenitiesContainer}>
               {restaurant.hasParking && (
-                <span className="flex items-center gap-1 rounded-full bg-accent/80 px-3 py-1 text-xs text-accent-foreground">
-                  <Car className="size-3" /> 주차
+                <span className={styles.amenityBadge}>
+                  <Car className={styles.amenityIcon} /> 주차
                 </span>
               )}
               {restaurant.hasGroupSeating && (
-                <span className="flex items-center gap-1 rounded-full bg-accent/80 px-3 py-1 text-xs text-accent-foreground">
-                  <Users className="size-3" /> 단체석
+                <span className={styles.amenityBadge}>
+                  <Users className={styles.amenityIcon} /> 단체석
                 </span>
               )}
               {restaurant.petFriendly && (
-                <span className="flex items-center gap-1 rounded-full bg-accent/80 px-3 py-1 text-xs text-accent-foreground">
-                  <Dog className="size-3" /> 반려동물
+                <span className={styles.amenityBadge}>
+                  <Dog className={styles.amenityIcon} /> 반려동물
                 </span>
               )}
             </div>

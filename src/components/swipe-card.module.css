@@ -1,0 +1,141 @@
+@reference "../styles/globals.css";
+
+/* Main Card Container */
+.cardWrapper {
+  @apply absolute inset-0 cursor-grab active:cursor-grabbing touch-none;
+}
+
+/* Card Content Container */
+.cardContainer {
+  @apply relative h-full w-full overflow-hidden bg-card shadow-2xl;
+}
+
+/* Background Image */
+.backgroundImage {
+  @apply absolute inset-0 bg-cover bg-center;
+}
+
+/* Gradient Overlay */
+.gradientOverlay {
+  @apply absolute inset-0 bg-linear-to-t from-foreground/90 via-foreground/30 to-transparent;
+}
+
+/* Centered Action Icons */
+.actionIconLike {
+  @apply pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-like;
+}
+
+.actionIconNope {
+  @apply pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-unlike;
+}
+
+.actionIconReview {
+  @apply pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2;
+}
+
+.actionIconStop {
+  @apply pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-destructive;
+}
+
+.thumbsUpIcon {
+  @apply size-32 opacity-60;
+}
+
+.thumbsDownIcon {
+  @apply size-32 opacity-60;
+}
+
+.messageSquareIcon {
+  @apply size-28;
+}
+
+.xIcon {
+  @apply size-32;
+}
+
+/* Content Section */
+.contentSection {
+  @apply absolute inset-x-0 bottom-0 p-6 text-card;
+}
+
+/* Tags */
+.tagsContainer {
+  @apply mb-3 flex flex-wrap gap-2;
+}
+
+.tag {
+  @apply rounded-full bg-card/20 px-3 py-1 text-xs font-medium backdrop-blur-sm;
+}
+
+/* Restaurant Name & Type */
+.restaurantName {
+  @apply mb-1 text-3xl font-bold text-balance;
+}
+
+.restaurantType {
+  @apply mb-3 text-lg text-card/80;
+}
+
+/* Ratings & Reviews */
+.ratingsReviewsContainer {
+  @apply mb-4 flex flex-wrap items-center gap-4;
+}
+
+.ratingItem {
+  @apply flex items-center gap-1;
+}
+
+.starIcon {
+  @apply size-5 fill-amber-400 text-amber-400;
+}
+
+.ratingValue {
+  @apply font-semibold;
+}
+
+.reviewCountItem {
+  @apply flex items-center gap-1 text-card/80;
+}
+
+.reviewCountIcon {
+  @apply size-4;
+}
+
+.reviewCountText {
+  @apply text-sm;
+}
+
+/* Distance */
+.distanceContainer {
+  @apply mb-4 flex items-center gap-3;
+}
+
+.distanceBadge {
+  @apply flex items-center gap-2 rounded-full bg-card/20 px-3 py-1.5 backdrop-blur-sm;
+}
+
+.navigationIcon {
+  @apply size-4;
+}
+
+.distanceText {
+  @apply text-sm font-medium;
+}
+
+/* Amenities */
+.amenitiesContainer {
+  @apply mb-4 flex flex-wrap gap-2;
+}
+
+.amenityBadge {
+  @apply flex items-center gap-1 rounded-full bg-accent/80 px-3 py-1 text-xs text-accent-foreground;
+}
+
+.amenityIcon {
+  @apply size-3;
+}
+
+/* Review Button */
+.reviewButton {
+  @apply w-full rounded-xl bg-card/20 py-3 text-center font-medium backdrop-blur-sm transition-colors hover:bg-card/30 cursor-pointer;
+}

@@ -1,0 +1,107 @@
+@reference "../styles/globals.css";
+
+/* Sheet Container */
+.overlay {
+  @apply fixed inset-0 z-40 bg-foreground/50;
+}
+
+.sheetContainer {
+  @apply fixed inset-x-0 bottom-0 z-50 max-h-[80vh] overflow-hidden rounded-t-3xl bg-card shadow-2xl;
+}
+
+/* Handle */
+.handleBarContainer {
+  @apply flex justify-center pt-3;
+}
+
+.handleBar {
+  @apply h-1.5 w-12 rounded-full bg-muted;
+}
+
+/* Header */
+.header {
+  @apply flex items-center justify-between border-b border-border px-6 py-4;
+}
+
+.headerTextContainer {
+  /* No specific classes, just a container */
+}
+
+.restaurantName {
+  @apply text-xl font-bold text-card-foreground;
+}
+
+.restaurantType {
+  @apply text-sm text-muted-foreground;
+}
+
+.closeButton {
+  @apply rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted cursor-pointer;
+}
+
+.closeIcon {
+  @apply size-5;
+}
+
+/* Reviews Section */
+.reviewsContainer {
+  @apply max-h-[calc(80vh-120px)] overflow-y-auto p-6;
+}
+
+.reviewsList {
+  @apply space-y-4;
+}
+
+/* Review Item */
+.reviewItem {
+  @apply rounded-2xl bg-muted/50 p-4;
+}
+
+.reviewHeader {
+  @apply mb-2 flex items-center justify-between;
+}
+
+.reviewAuthorInfo {
+  @apply flex items-center gap-2;
+}
+
+.authorInitial {
+  @apply flex size-8 items-center justify-center rounded-full bg-primary text-sm font-medium text-primary-foreground;
+}
+
+.authorName {
+  @apply font-medium text-card-foreground;
+}
+
+.reviewSource {
+  @apply rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground;
+}
+
+.reviewRating {
+  @apply flex items-center gap-1;
+}
+
+.ratingIcon {
+  @apply size-4 fill-amber-400 text-amber-400;
+}
+
+.ratingValue {
+  @apply text-sm font-medium text-card-foreground;
+}
+
+.reviewContent {
+  @apply mb-2 text-sm leading-relaxed text-card-foreground;
+}
+
+.reviewDate {
+  @apply text-xs text-muted-foreground;
+}
+
+/* No Reviews */
+.noReviewsContainer {
+  @apply flex flex-col items-center justify-center py-12 text-center;
+}
+
+.noReviewsText {
+  @apply text-muted-foreground;
+}

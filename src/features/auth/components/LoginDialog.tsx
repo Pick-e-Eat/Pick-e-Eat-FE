@@ -1,4 +1,4 @@
-import styles from "./LoginDialog.module.scss";
+import styles from "./LoginDialog.module.css";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { LoginForm, type LoginFormValues } from "@/features/auth/components/LoginForm";
 
@@ -17,10 +17,10 @@ export function LoginDialog({ open, onOpenChange, onSubmit }: LoginDialogProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[400px]">
-        <DialogHeader>
-          <DialogTitle>로그인</DialogTitle>
-          <p className="text-sm text-muted-foreground">Pick-e-Eat 계정으로 로그인하세요</p>
+      <DialogContent className={styles.dialogContent}>
+        <DialogHeader className={styles.dialogHeader}>
+          <DialogTitle className={styles.dialogTitle}>로그인</DialogTitle>
+          <p className={styles.dialogDescription}>Pick-e-Eat 계정으로 로그인하세요</p>
         </DialogHeader>
         <LoginForm onSubmit={handleSubmit} onSuccess={handleSuccess} showSignupLink compact />
       </DialogContent>

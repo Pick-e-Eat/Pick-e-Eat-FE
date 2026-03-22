@@ -1,0 +1,19 @@
+@reference "../../../../styles/globals.css";
+
+/* Dialog Content */
+.dialogContent {
+  @apply sm:max-w-[400px];
+}
+
+/* Dialog Header */
+.dialogHeader {
+  /* No specific classes, just a container */
+}
+
+.dialogTitle {
+  /* No specific classes, just a container */
+}
+
+.dialogDescription {
+  @apply text-sm text-muted-foreground;
+}

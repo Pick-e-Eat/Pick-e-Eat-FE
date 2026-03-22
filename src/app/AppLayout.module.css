@@ -1,0 +1,9 @@
+@reference "../../styles/globals.css";
+
+.mainContainer {
+  @apply relative mx-auto w-full min-h-dvh max-w-[560px] bg-background sm:min-h-dvh;
+}
+
+.overlayRoot {
+  @apply pointer-events-none absolute inset-0 z-100 overflow-hidden;
+}

@@ -1,0 +1,29 @@
+@reference "../../../styles/globals.css";
+
+.mainContainer {
+  @apply relative flex h-dvh flex-col overflow-hidden bg-background;
+}
+
+.cardStackContainer {
+  @apply relative flex-1;
+}
+
+.cardWrapper {
+  @apply relative h-full;
+}
+
+.noRestaurantsContainer {
+  @apply flex h-full flex-col items-center justify-center text-center;
+}
+
+.noRestaurantsCard {
+  @apply rounded-3xl bg-card p-8 shadow-lg;
+}
+
+.noRestaurantsMessage {
+  @apply mb-4 text-lg font-medium text-card-foreground;
+}
+
+.startOverButton {
+  @apply rounded-xl bg-primary px-6 py-3 font-medium text-primary-foreground hover:bg-primary/90 cursor-pointer;
+}

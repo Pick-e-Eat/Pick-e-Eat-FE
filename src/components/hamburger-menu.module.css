@@ -1,0 +1,243 @@
+@reference "../styles/globals.css";
+
+/* Menu Container */
+.overlay {
+  @apply pointer-events-auto absolute inset-0 z-40 bg-foreground/50;
+}
+
+.menuContainer {
+  @apply pointer-events-auto absolute inset-y-0 left-0 z-50 w-80 overflow-y-auto bg-card shadow-2xl;
+}
+
+/* Header */
+.header {
+  @apply flex items-center justify-between border-b border-border p-4;
+}
+
+.headerTitle {
+  @apply text-xl font-bold text-card-foreground;
+}
+
+.closeButton {
+  @apply rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted cursor-pointer;
+}
+
+.closeIcon {
+  @apply size-5;
+}
+
+/* Content Body */
+.content {
+  @apply p-4;
+}
+
+/* Sections */
+.section {
+  @apply mb-6;
+}
+
+.sectionTitle {
+  @apply mb-2 text-sm font-medium text-muted-foreground;
+}
+
+.sectionToggleButton {
+  @apply mb-2 flex w-full items-center justify-between text-sm font-medium text-muted-foreground cursor-pointer;
+}
+
+.sectionToggleIcon {
+  @apply size-4;
+}
+
+.collapsibleSection {
+  @apply overflow-hidden;
+}
+
+/* Current Location */
+.locationButton {
+  @apply flex w-full items-center gap-3 rounded-xl bg-muted/50 p-4 text-left transition-colors hover:bg-muted cursor-pointer;
+}
+
+.locationIcon {
+  @apply size-5 text-primary;
+}
+
+.locationTextContainer {
+  @apply min-w-0 flex-1;
+}
+
+.locationAddress {
+  @apply font-medium text-card-foreground;
+}
+
+.locationHint {
+  @apply text-xs text-muted-foreground;
+}
+
+.chevronIcon {
+  @apply size-5 shrink-0 text-muted-foreground;
+}
+
+/* Search Range */
+.rangeOptionsContainer {
+  @apply flex gap-2 py-2;
+}
+
+.rangeOptionButton {
+  @apply flex-1 rounded-xl px-3 py-3 text-sm font-medium transition-colors cursor-pointer;
+}
+
+.rangeOptionButtonActive {
+  @apply bg-primary text-primary-foreground;
+}
+
+.rangeOptionButtonInactive {
+  @apply bg-muted text-muted-foreground hover:bg-muted/80;
+}
+
+.currentRangeDisplay {
+  @apply rounded-xl bg-muted/50 px-4 py-2 text-sm text-card-foreground;
+}
+
+/* Filters */
+.filterTogglesContainer {
+  @apply space-y-2 py-2;
+}
+
+.activeFiltersContainer {
+  @apply flex flex-wrap gap-2;
+}
+
+.activeFilterBadge {
+  @apply flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs text-primary;
+}
+
+.activeFilterIcon {
+  @apply size-3;
+}
+
+.noFiltersText {
+  @apply text-sm text-muted-foreground;
+}
+
+/* Saved Addresses */
+.addressHeader {
+  @apply mb-2 flex items-center justify-between;
+}
+
+.addAddressButton {
+  @apply rounded-full p-1 text-primary transition-colors hover:bg-primary/10 cursor-pointer;
+}
+
+.addAddressIcon {
+  @apply size-4;
+}
+
+.addressFormContainer {
+  @apply mb-3 overflow-hidden;
+}
+
+.addressForm {
+  @apply space-y-2 rounded-xl bg-muted/50 p-3;
+}
+
+.addressInput {
+  @apply w-full rounded-lg bg-card px-3 py-2 text-sm text-card-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary;
+}
+
+.saveAddressButton {
+  @apply flex w-full items-center justify-center gap-1 rounded-lg bg-primary py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 cursor-pointer;
+}
+
+.saveAddressIcon {
+  @apply size-4;
+}
+
+.addressList {
+  @apply space-y-2;
+}
+
+.addressItem {
+  @apply flex items-center gap-3 rounded-xl bg-muted/50 p-3;
+}
+
+.addressItemButton {
+  @apply min-w-0 flex-1 text-left;
+}
+
+.addressLabel {
+  @apply font-medium text-card-foreground;
+}
+
+.addressValue {
+  @apply text-xs text-muted-foreground;
+}
+
+.removeAddressButton {
+  @apply rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive cursor-pointer;
+}
+
+.removeAddressIcon {
+  @apply size-4;
+}
+
+.noAddressesText {
+  @apply py-4 text-center text-sm text-muted-foreground;
+}
+
+/* Actions */
+.actionsContainer {
+  @apply space-y-2;
+}
+
+.actionButton {
+  @apply flex w-full items-center gap-3 rounded-xl bg-muted/50 p-4 text-left transition-colors hover:bg-muted cursor-pointer;
+}
+
+.actionIcon {
+  @apply size-5 text-primary;
+}
+
+.actionLabel {
+  @apply font-medium text-card-foreground;
+}
+
+/* FilterToggle Component */
+.filterToggleButton {
+  @apply flex w-full items-center justify-between rounded-xl bg-muted/50 p-3 transition-colors hover:bg-muted;
+}
+
+.filterToggleLabelContainer {
+  @apply flex items-center gap-2;
+}
+
+.filterToggleIcon {
+  /* Base styles can go here if any */
+}
+
+.filterToggleIconActive {
+  @apply text-primary;
+}
+
+.filterToggleIconInactive {
+  @apply text-muted-foreground;
+}
+
+.filterToggleLabel {
+  @apply text-sm font-medium text-card-foreground;
+}
+
+.filterToggleState {
+  @apply rounded-full px-2 py-0.5 text-xs;
+}
+
+.filterToggleStateTrue {
+  @apply bg-primary text-primary-foreground;
+}
+
+.filterToggleStateFalse {
+  @apply bg-destructive/10 text-destructive;
+}
+
+.filterToggleStateNull {
+  @apply bg-muted text-muted-foreground;
+}
