@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import styles from "./HomeHeader.module.scss";
+import styles from "./HomeHeader.module.css";
 import { Menu, X } from "lucide-react";
+
 
 import { routes } from "@/shared/constants/routes";
 import { useResultsStore } from "@/shared/stores/results-store";
@@ -17,49 +18,27 @@ export function HomeHeader({ onMenuOpen, maxSelections }: HomeHeaderProps) {
   const { backgroundColor, textColor } = useHeaderColorStore();
 
   const headerStyle = {
-    backgroundColor: backgroundColor ? `${backgroundColor}CC` : "hsl(var(--card) / 0.8)",
-    color: textColor || "hsl(var(--card-foreground))",
-    transition: "background-color 0.5s ease, color 0.5s ease",
-  };
-  
-  const textPrimaryStyle = {
-    color: textColor || "hsl(var(--primary))",
-  };
+    "--header-bg": backgroundColor ? `${backgroundColor}CC` : undefined,
+    "--header-text": textColor || undefined,
+    "--header-text-primary": textColor || undefined,
+  } as React.CSSProperties;
 
   return (
-    <header
-      className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-3 backdrop-blur-lg"
-      style={headerStyle}
-    >
-      <button
-        type="button"
-        onClick={onMenuOpen}
-        className="rounded-full p-2 hover:bg-primary/10 cursor-pointer"
-        aria-label="메뉴 열기"
-        style={{ color: "inherit" }}
-      >
+    <header className={styles.header} style={headerStyle}>
+      <button type="button" onClick={onMenuOpen} className={styles.menuButton} aria-label="메뉴 열기">
         <Menu className="h-6 w-6" />
       </button>
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-        <h1 className="text-xl font-bold" style={textPrimaryStyle}>
-          Pick-e-Eat
-        </h1>
+
+      <div className={styles.titleContainer}>
+        <h1 className={styles.title}>Pick-e-Eat</h1>
       </div>
-      <div className="flex items-center gap-2">
-        <span
-          className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium"
-          style={textPrimaryStyle}
-        >
+
+      <div className={styles.rightSection}>
+        <span className={styles.selectionCount}>
           {results.length}/{maxSelections}
         </span>
         {results.length > 0 && (
-          <button
-            type="button"
-            onClick={() => navigate(routes.results)}
-            className="rounded-full p-2 hover:bg-destructive/10 cursor-pointer"
-            aria-label="결과 보기"
-            style={{ color: "inherit" }}
-          >
+          <button type="button" onClick={() => navigate(routes.results)} className={styles.closeButton} aria-label="결과 보기">
             <X className="h-5 w-5" />
           </button>
         )}

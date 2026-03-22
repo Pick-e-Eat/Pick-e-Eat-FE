@@ -1,0 +1,36 @@
+@reference "../../../styles/globals.css";
+
+.header {
+  @apply absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-3 backdrop-blur-lg;
+  background-color: var(--header-bg, hsl(var(--card) / 0.8));
+  color: var(--header-text, hsl(var(--card-foreground)));
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.menuButton {
+  @apply rounded-full p-2 hover:bg-primary/10 cursor-pointer;
+  color: inherit;
+}
+
+.titleContainer {
+  @apply absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2;
+}
+
+.title {
+  @apply text-xl font-bold;
+  color: var(--header-text-primary, hsl(var(--primary)));
+}
+
+.rightSection {
+  @apply flex items-center gap-2;
+}
+
+.selectionCount {
+  @apply rounded-full bg-primary/10 px-3 py-1 text-sm font-medium;
+  color: var(--header-text-primary, hsl(var(--primary)));
+}
+
+.closeButton {
+  @apply rounded-full p-2 hover:bg-destructive/10 cursor-pointer;
+  color: inherit;
+}
