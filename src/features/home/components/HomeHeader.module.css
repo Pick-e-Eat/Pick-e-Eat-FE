@@ -4,7 +4,9 @@
   @apply absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-3 backdrop-blur-lg;
   background-color: var(--header-bg, hsl(var(--card) / 0.8));
   color: var(--header-text, hsl(var(--card-foreground)));
-  transition: background-color 0.5s ease, color 0.5s ease;
+  transition:
+    background-color 0.5s ease,
+    color 0.5s ease;
 }
 
 .menuButton {

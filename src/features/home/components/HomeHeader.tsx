@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import styles from "./HomeHeader.module.css";
 import { Menu, X } from "lucide-react";
 
-
 import { routes } from "@/shared/constants/routes";
 import { useResultsStore } from "@/shared/stores/results-store";
 import { useHeaderColorStore } from "@/features/home/stores/header-color-store";
@@ -25,7 +24,12 @@ export function HomeHeader({ onMenuOpen, maxSelections }: HomeHeaderProps) {
 
   return (
     <header className={styles.header} style={headerStyle}>
-      <button type="button" onClick={onMenuOpen} className={styles.menuButton} aria-label="메뉴 열기">
+      <button
+        type="button"
+        onClick={onMenuOpen}
+        className={styles.menuButton}
+        aria-label="메뉴 열기"
+      >
         <Menu className="h-6 w-6" />
       </button>
 
@@ -38,7 +42,12 @@ export function HomeHeader({ onMenuOpen, maxSelections }: HomeHeaderProps) {
           {results.length}/{maxSelections}
         </span>
         {results.length > 0 && (
-          <button type="button" onClick={() => navigate(routes.results)} className={styles.closeButton} aria-label="결과 보기">
+          <button
+            type="button"
+            onClick={() => navigate(routes.results)}
+            className={styles.closeButton}
+            aria-label="결과 보기"
+          >
             <X className="h-5 w-5" />
           </button>
         )}

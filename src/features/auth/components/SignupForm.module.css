@@ -1,4 +1,4 @@
-@reference "../../../../styles/globals.css";
+@reference "../../../styles/globals.css";
 
 .form {
   /* The form itself can have external classes passed via `className` prop, so no direct styling here unless needed */

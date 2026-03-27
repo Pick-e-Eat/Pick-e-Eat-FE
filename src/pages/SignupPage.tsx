@@ -29,17 +29,10 @@ export function SignupPage() {
         <Card>
           <CardHeader className={styles.cardHeader}>
             <h1 className={styles.cardTitle}>Pick-e-Eat</h1>
-            <p className={styles.cardDescription}>
-              회원가입하고 맞춤 음식점을 추천받으세요
-            </p>
+            <p className={styles.cardDescription}>회원가입하고 맞춤 음식점을 추천받으세요</p>
           </CardHeader>
           <CardContent>
-            <SignupForm
-              onSubmit={handleSubmit}
-              showLoginLink
-              compact={false}
-              showDisplayName
-            />
+            <SignupForm onSubmit={handleSubmit} showLoginLink compact={false} showDisplayName />
           </CardContent>
         </Card>
       </div>

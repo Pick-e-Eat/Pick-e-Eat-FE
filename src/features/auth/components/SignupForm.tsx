@@ -24,7 +24,14 @@ interface SignupFormProps {
 
 const MIN_PASSWORD_LENGTH = 8;
 
-export function SignupForm({ onSubmit, onSuccess, showLoginLink = true, compact = false, showDisplayName = true, className }: SignupFormProps) {
+export function SignupForm({
+  onSubmit,
+  onSuccess,
+  showLoginLink = true,
+  compact = false,
+  showDisplayName = true,
+  className,
+}: SignupFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
@@ -79,22 +86,58 @@ export function SignupForm({ onSubmit, onSuccess, showLoginLink = true, compact 
         {showDisplayName && (
           <div className={styles.inputWrapper}>
             <Label htmlFor="signup-displayName">닉네임 (선택)</Label>
-            <Input id="signup-displayName" type="text" placeholder="사용할 이름" autoComplete="nickname" value={displayName} onChange={(e) => setDisplayName(e.target.value)} disabled={isSubmitting} />
+            <Input
+              id="signup-displayName"
+              type="text"
+              placeholder="사용할 이름"
+              autoComplete="nickname"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              disabled={isSubmitting}
+            />
           </div>
         )}
         <div className={styles.inputWrapper}>
           <Label htmlFor="signup-email">이메일</Label>
-          <Input id="signup-email" type="email" placeholder="example@email.com" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={isSubmitting} />
+          <Input
+            id="signup-email"
+            type="email"
+            placeholder="example@email.com"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={isSubmitting}
+          />
         </div>
         <div className={styles.inputWrapper}>
           <Label htmlFor="signup-password">비밀번호</Label>
-          <Input id="signup-password" type="password" placeholder={`${MIN_PASSWORD_LENGTH}자 이상`} autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isSubmitting} />
+          <Input
+            id="signup-password"
+            type="password"
+            placeholder={`${MIN_PASSWORD_LENGTH}자 이상`}
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={isSubmitting}
+          />
         </div>
         <div className={styles.inputWrapper}>
           <Label htmlFor="signup-passwordConfirm">비밀번호 확인</Label>
-          <Input id="signup-passwordConfirm" type="password" placeholder="비밀번호 다시 입력" autoComplete="new-password" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} disabled={isSubmitting} />
+          <Input
+            id="signup-passwordConfirm"
+            type="password"
+            placeholder="비밀번호 다시 입력"
+            autoComplete="new-password"
+            value={passwordConfirm}
+            onChange={(e) => setPasswordConfirm(e.target.value)}
+            disabled={isSubmitting}
+          />
         </div>
-        {error && <p className={styles.errorMessage} role="alert">{error}</p>}
+        {error && (
+          <p className={styles.errorMessage} role="alert">
+            {error}
+          </p>
+        )}
         <Button type="submit" className={styles.submitButton} disabled={isSubmitting}>
           {isSubmitting ? "가입 중…" : "회원가입"}
         </Button>

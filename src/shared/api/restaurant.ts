@@ -6,18 +6,18 @@ import type {
   TextSearchResponse,
 } from "../types/api.types";
 
-export const restaurantApi = {
-  searchNearby: async (
-    body: NearbySearchRequest,
-  ): Promise<NearbySearchResponse> => {
-    return await apiClient
-      .post("api/v1/restaurants/nearby", { json: body })
-      .json();
+export const restaurantAPI = {
+  searchNearby: async (body: NearbySearchRequest) => {
+    const response = await apiClient
+      .post("v1/restaurants/nearby", { json: body })
+      .json<NearbySearchResponse>();
+    return response;
   },
 
-  searchText: async (body: TextSearchRequest): Promise<TextSearchResponse> => {
-    return await apiClient
-      .post("api/v1/restaurants/search", { json: body })
-      .json();
+  searchText: async (body: TextSearchRequest) => {
+    const response = await apiClient
+      .post("v1/restaurants/search", { json: body })
+      .json<TextSearchResponse>();
+    return response;
   },
 };

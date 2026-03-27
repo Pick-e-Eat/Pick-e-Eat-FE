@@ -11,8 +11,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 5,
     distance: 85,
     tags: ["점심특선", "혼밥", "가성비"],
-    image:
-      "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=800&q=80",
     hasParking: true,
     hasGroupSeating: false,
     petFriendly: false,
@@ -20,8 +19,7 @@ export const mockRestaurants: Restaurant[] = [
       {
         id: "r1",
         author: "맛집탐험가",
-        content:
-          "돈까스가 정말 바삭바삭하고 맛있어요! 소스도 직접 만드신다고 하네요.",
+        content: "돈까스가 정말 바삭바삭하고 맛있어요! 소스도 직접 만드신다고 하네요.",
         rating: 5,
         date: "2024.01.15",
         source: "naver",
@@ -46,8 +44,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 8,
     distance: 150,
     tags: ["데이트", "분위기좋음", "와인"],
-    image:
-      "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=800&q=80",
     hasParking: true,
     hasGroupSeating: true,
     petFriendly: false,
@@ -80,8 +77,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 3,
     distance: 50,
     tags: ["매운맛", "푸짐함", "빠른배송"],
-    image:
-      "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800&q=80",
     hasParking: false,
     hasGroupSeating: true,
     petFriendly: false,
@@ -114,8 +110,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 7,
     distance: 120,
     tags: ["전통맛", "든든함", "반찬맛집"],
-    image:
-      "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=800&q=80",
     hasParking: true,
     hasGroupSeating: true,
     petFriendly: false,
@@ -148,8 +143,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 10,
     distance: 200,
     tags: ["신선함", "오마카세", "기념일"],
-    image:
-      "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800&q=80",
     hasParking: true,
     hasGroupSeating: false,
     petFriendly: false,
@@ -182,8 +176,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 6,
     distance: 100,
     tags: ["바삭함", "맥주", "야식"],
-    image:
-      "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=800&q=80",
     hasParking: false,
     hasGroupSeating: true,
     petFriendly: true,
@@ -216,8 +209,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 4,
     distance: 70,
     tags: ["건강식", "가벼운식사", "혼밥"],
-    image:
-      "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=800&q=80",
     hasParking: false,
     hasGroupSeating: false,
     petFriendly: true,
@@ -250,8 +242,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 9,
     distance: 180,
     tags: ["회식", "가족모임", "푸짐함"],
-    image:
-      "https://images.unsplash.com/photo-1590301157890-4810ed352733?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1590301157890-4810ed352733?w=800&q=80",
     hasParking: true,
     hasGroupSeating: true,
     petFriendly: false,
@@ -284,8 +275,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 5,
     distance: 90,
     tags: ["수제면", "전통맛", "든든함"],
-    image:
-      "https://images.unsplash.com/photo-1607013407627-6ee814329547?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1607013407627-6ee814329547?w=800&q=80",
     hasParking: false,
     hasGroupSeating: true,
     petFriendly: false,
@@ -318,8 +308,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 12,
     distance: 240,
     tags: ["이색음식", "매운맛", "데이트"],
-    image:
-      "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&q=80",
     hasParking: false,
     hasGroupSeating: false,
     petFriendly: true,
@@ -352,8 +341,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 8,
     distance: 160,
     tags: ["수제버거", "푸짐함", "맥주"],
-    image:
-      "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=80",
     hasParking: true,
     hasGroupSeating: true,
     petFriendly: false,
@@ -386,8 +374,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 7,
     distance: 130,
     tags: ["보양식", "전통맛", "여름특선"],
-    image:
-      "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=800&q=80",
     hasParking: false,
     hasGroupSeating: true,
     petFriendly: false,
@@ -420,8 +407,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 4,
     distance: 65,
     tags: ["야식", "소주", "회식"],
-    image:
-      "https://images.unsplash.com/photo-1529694157872-4e0c0f3b238b?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1529694157872-4e0c0f3b238b?w=800&q=80",
     hasParking: true,
     hasGroupSeating: true,
     petFriendly: false,
@@ -454,8 +440,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 6,
     distance: 95,
     tags: ["혼밥", "점심특선", "가성비"],
-    image:
-      "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=800&q=80",
     hasParking: false,
     hasGroupSeating: false,
     petFriendly: false,
@@ -488,8 +473,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 3,
     distance: 45,
     tags: ["매운맛", "가성비", "스낵"],
-    image:
-      "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=800&q=80",
     hasParking: false,
     hasGroupSeating: true,
     petFriendly: true,
@@ -522,8 +506,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 11,
     distance: 220,
     tags: ["특별한날", "코스요리", "분위기"],
-    image:
-      "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
     hasParking: true,
     hasGroupSeating: true,
     petFriendly: false,
@@ -556,8 +539,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 8,
     distance: 140,
     tags: ["매운맛", "이색음식", "쌀국수"],
-    image:
-      "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=800&q=80",
     hasParking: true,
     hasGroupSeating: true,
     petFriendly: false,
@@ -590,8 +572,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 5,
     distance: 80,
     tags: ["전통맛", "든든함", "날씨쌀쌀할때"],
-    image:
-      "https://images.unsplash.com/photo-1555126634-323283e090fa?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1555126634-323283e090fa?w=800&q=80",
     hasParking: false,
     hasGroupSeating: true,
     petFriendly: false,
@@ -624,8 +605,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 7,
     distance: 115,
     tags: ["데이트", "가족모임", "치즈"],
-    image:
-      "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80",
     hasParking: true,
     hasGroupSeating: true,
     petFriendly: true,
@@ -658,8 +638,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 6,
     distance: 98,
     tags: ["브런치", "인스타감성", "베이글"],
-    image:
-      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80",
     hasParking: true,
     hasGroupSeating: true,
     petFriendly: true,
@@ -692,8 +671,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 4,
     distance: 72,
     tags: ["치즈닭갈비", "푸짐함", "학생인기"],
-    image:
-      "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=800&q=80",
     hasParking: false,
     hasGroupSeating: true,
     petFriendly: false,
@@ -726,8 +704,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 9,
     distance: 175,
     tags: ["회", "신선함", "회식"],
-    image:
-      "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800&q=80",
     hasParking: true,
     hasGroupSeating: true,
     petFriendly: false,
@@ -760,8 +737,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 5,
     distance: 88,
     tags: ["뼈해장국", "푸짐함", "밤늦게"],
-    image:
-      "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=800&q=80",
     hasParking: true,
     hasGroupSeating: true,
     petFriendly: false,
@@ -794,8 +770,7 @@ export const mockRestaurants: Restaurant[] = [
     walkingTime: 3,
     distance: 52,
     tags: ["가벼운식사", "혼밥", "점심특선"],
-    image:
-      "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=800&q=80",
     hasParking: false,
     hasGroupSeating: false,
     petFriendly: true,

@@ -22,7 +22,13 @@ export function SignupDialog({ open, onOpenChange, onSubmit }: SignupDialogProps
           <DialogTitle className={styles.dialogTitle}>회원가입</DialogTitle>
           <p className={styles.dialogDescription}>Pick-e-Eat 계정을 만들어 보세요</p>
         </DialogHeader>
-        <SignupForm onSubmit={handleSubmit} onSuccess={handleSuccess} showLoginLink compact showDisplayName />
+        <SignupForm
+          onSubmit={handleSubmit}
+          onSuccess={handleSuccess}
+          showLoginLink
+          compact
+          showDisplayName
+        />
       </DialogContent>
     </Dialog>
   );

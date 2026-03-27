@@ -4,10 +4,9 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --font-sans: "Pretendard Variable", Pretendard, -apple-system,
-    BlinkMacSystemFont, system-ui, sans-serif;
-  --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo,
-    monospace;
+  --font-sans:
+    "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
 
   --background: oklch(0.98 0.005 75);
   --foreground: oklch(0.2 0.02 30);

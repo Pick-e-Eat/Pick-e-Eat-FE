@@ -19,7 +19,13 @@ interface LoginFormProps {
   className?: string;
 }
 
-export function LoginForm({ onSubmit, onSuccess, showSignupLink = true, compact = false, className }: LoginFormProps) {
+export function LoginForm({
+  onSubmit,
+  onSuccess,
+  showSignupLink = true,
+  compact = false,
+  className,
+}: LoginFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -80,7 +86,11 @@ export function LoginForm({ onSubmit, onSuccess, showSignupLink = true, compact 
             disabled={isSubmitting}
           />
         </div>
-        {error && <p className={styles.errorMessage} role="alert">{error}</p>}
+        {error && (
+          <p className={styles.errorMessage} role="alert">
+            {error}
+          </p>
+        )}
         <Button type="submit" className={styles.submitButton} disabled={isSubmitting}>
           {isSubmitting ? "로그인 중…" : "로그인"}
         </Button>

@@ -1,8 +1,19 @@
 import { useState, useEffect } from "react";
 import styles from "./swipe-card.module.css";
 import type { Restaurant } from "@/lib/types";
-import { motion, useMotionValue, useTransform, PanInfo, animate } from "framer-motion";
-import { Star, MessageSquare, FileText, Navigation, Car, Users, Dog, ThumbsUp, ThumbsDown, X } from "lucide-react";
+import { motion, useMotionValue, useTransform, type PanInfo, animate } from "framer-motion";
+import {
+  Star,
+  MessageSquare,
+  FileText,
+  Navigation,
+  Car,
+  Users,
+  Dog,
+  ThumbsUp,
+  ThumbsDown,
+  X,
+} from "lucide-react";
 import { FastAverageColor } from "fast-average-color";
 import { useHeaderColorStore } from "@/features/home/stores/header-color-store";
 import { cn } from "@/shared/utils/cn"; // Added cn import
@@ -22,7 +33,14 @@ interface SwipeCardProps {
   exitDirection?: "left" | "right" | null;
 }
 
-export function SwipeCard({ restaurant, onSwipe, onShowReviews, onStop, isTop = true, exitDirection = null }: SwipeCardProps) {
+export function SwipeCard({
+  restaurant,
+  onSwipe,
+  onShowReviews,
+  onStop,
+  isTop = true,
+  exitDirection = null,
+}: SwipeCardProps) {
   const [opacity, setOpacity] = useState(1);
   const [lockedDirection, setLockedDirection] = useState<"x" | "y" | null>(null);
   // Motion values for card's physical position on screen
@@ -80,8 +98,7 @@ export function SwipeCard({ restaurant, onSwipe, onShowReviews, onStop, isTop = 
   useEffect(() => {
     dragX.set(0);
     dragY.set(0);
-  }, [isTop, isExiting, dragX, dragY]);
-
+  }, [dragX, dragY]);
 
   const handleDragStart = () => {
     setLockedDirection(null); // Reset locked direction for a new drag
@@ -93,7 +110,7 @@ export function SwipeCard({ restaurant, onSwipe, onShowReviews, onStop, isTop = 
     dragY.set(0);
   };
 
-  const handleDrag = (_: any, info: PanInfo) => {
+  const handleDrag = (_: MouseEvent | TouchEvent, info: PanInfo) => {
     // Update gesture tracking motion values with raw offset
     dragX.set(info.offset.x);
     dragY.set(info.offset.y);
@@ -168,7 +185,7 @@ export function SwipeCard({ restaurant, onSwipe, onShowReviews, onStop, isTop = 
     <motion.div
       className={styles.cardWrapper}
       style={{ x, y, rotate, opacity }} // Card's actual position
-      drag={dragEnabled ? true : false} // Allow dragging in both directions initially
+      drag={!!dragEnabled} // Allow dragging in both directions initially
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
       dragElastic={{ top: 0.2, bottom: 0.2, left: 1, right: 1 }}
       onDragStart={handleDragStart}
@@ -180,7 +197,10 @@ export function SwipeCard({ restaurant, onSwipe, onShowReviews, onStop, isTop = 
       {/* Card Container */}
       <div className={styles.cardContainer}>
         {/* Background Image */}
-        <div className={styles.backgroundImage} style={{ backgroundImage: `url(${restaurant.image})` }} />
+        <div
+          className={styles.backgroundImage}
+          style={{ backgroundImage: `url(${restaurant.image})` }}
+        />
 
         {/* Gradient Overlay */}
         <div className={styles.gradientOverlay} />
@@ -230,7 +250,9 @@ export function SwipeCard({ restaurant, onSwipe, onShowReviews, onStop, isTop = 
             </div>
             <div className={styles.reviewCountItem}>
               <MessageSquare className={styles.reviewCountIcon} />
-              <span className={styles.reviewCountText}>리뷰 {restaurant.reviewCount.toLocaleString()}</span>
+              <span className={styles.reviewCountText}>
+                리뷰 {restaurant.reviewCount.toLocaleString()}
+              </span>
             </div>
             <div className={styles.reviewCountItem}>
               <FileText className={styles.reviewCountIcon} />

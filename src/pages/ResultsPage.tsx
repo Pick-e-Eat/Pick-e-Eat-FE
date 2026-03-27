@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 export function ResultsPage() {
   const navigate = useNavigate();
   const { results, resetResults } = useResultsStore();
-  
+
   const likedRestaurants = results.filter((r) => r.liked);
   const dislikedRestaurants = results.filter((r) => !r.liked);
 
@@ -38,9 +38,7 @@ export function ResultsPage() {
           <div className={styles.likedSection}>
             <div className={styles.sectionHeader}>
               <ThumbsUp className={styles.thumbsUpIcon} />
-              <h2 className={styles.sectionTitle}>
-                좋아요 ({likedRestaurants.length})
-              </h2>
+              <h2 className={styles.sectionTitle}>좋아요 ({likedRestaurants.length})</h2>
             </div>
             <div className={styles.likedList}>
               {likedRestaurants.map((result, index) => (
@@ -57,18 +55,12 @@ export function ResultsPage() {
                       style={{ backgroundImage: `url(${result.restaurant.image})` }}
                     />
                     <div className={styles.likedItemDetails}>
-                      <h3 className={styles.likedItemName}>
-                        {result.restaurant.name}
-                      </h3>
-                      <p className={styles.likedItemType}>
-                        {result.restaurant.type}
-                      </p>
+                      <h3 className={styles.likedItemName}>{result.restaurant.name}</h3>
+                      <p className={styles.likedItemType}>{result.restaurant.type}</p>
                       <div className={styles.likedItemMeta}>
                         <div className={styles.likedItemRating}>
                           <Star className={styles.starIcon} />
-                          <span className={styles.ratingValue}>
-                            {result.restaurant.rating}
-                          </span>
+                          <span className={styles.ratingValue}>{result.restaurant.rating}</span>
                         </div>
                         <span className={styles.walkingTime}>
                           도보 {result.restaurant.walkingTime}분
@@ -76,11 +68,7 @@ export function ResultsPage() {
                       </div>
                     </div>
                     <div className={styles.likedItemActions}>
-                      <button
-                        type="button"
-                        className={styles.navigationButton}
-                        aria-label="길찾기"
-                      >
+                      <button type="button" className={styles.navigationButton} aria-label="길찾기">
                         <Navigation className={styles.navigationIcon} />
                       </button>
                     </div>
@@ -96,9 +84,7 @@ export function ResultsPage() {
           <div className={styles.dislikedSection}>
             <div className={styles.sectionHeader}>
               <ThumbsDown className={styles.thumbsDownIcon} />
-              <h2 className={styles.sectionTitle}>
-                다음에 ({dislikedRestaurants.length})
-              </h2>
+              <h2 className={styles.sectionTitle}>다음에 ({dislikedRestaurants.length})</h2>
             </div>
             <div className={styles.dislikedList}>
               {dislikedRestaurants.map((result, index) => (
@@ -114,12 +100,8 @@ export function ResultsPage() {
                     style={{ backgroundImage: `url(${result.restaurant.image})` }}
                   />
                   <div className={styles.dislikedItemDetails}>
-                    <h3 className={styles.dislikedItemName}>
-                      {result.restaurant.name}
-                    </h3>
-                    <p className={styles.dislikedItemType}>
-                      {result.restaurant.type}
-                    </p>
+                    <h3 className={styles.dislikedItemName}>{result.restaurant.name}</h3>
+                    <p className={styles.dislikedItemType}>{result.restaurant.type}</p>
                   </div>
                 </motion.div>
               ))}
@@ -132,9 +114,7 @@ export function ResultsPage() {
           <div className={styles.emptyStateContainer}>
             <MapPin className={styles.emptyStateIcon} />
             <p className={styles.emptyStateTitle}>아직 결과가 없어요</p>
-            <p className={styles.emptyStateDescription}>
-              음식점을 스와이프해서 선택해주세요
-            </p>
+            <p className={styles.emptyStateDescription}>음식점을 스와이프해서 선택해주세요</p>
           </div>
         )}
       </div>
@@ -142,19 +122,11 @@ export function ResultsPage() {
       {/* Actions */}
       <div className={styles.actionsContainer}>
         <div className={styles.actionButtonsWrapper}>
-          <button
-            type="button"
-            onClick={handleReset}
-            className={styles.resetButton}
-          >
+          <button type="button" onClick={handleReset} className={styles.resetButton}>
             <RotateCcw className={styles.resetIcon} />
             처음부터
           </button>
-          <button
-            type="button"
-            onClick={handleContinue}
-            className={styles.continueButton}
-          >
+          <button type="button" onClick={handleContinue} className={styles.continueButton}>
             더 검색하기
           </button>
         </div>

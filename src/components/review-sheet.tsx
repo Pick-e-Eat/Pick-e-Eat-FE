@@ -49,7 +49,12 @@ export function ReviewSheet({ restaurant, isOpen, onClose }: ReviewSheetProps) {
                 <h3 className={styles.restaurantName}>{restaurant.name}</h3>
                 <p className={styles.restaurantType}>{restaurant.type}</p>
               </div>
-              <button type="button" onClick={onClose} className={styles.closeButton} aria-label="닫기">
+              <button
+                type="button"
+                onClick={onClose}
+                className={styles.closeButton}
+                aria-label="닫기"
+              >
                 <X className={styles.closeIcon} />
               </button>
             </div>

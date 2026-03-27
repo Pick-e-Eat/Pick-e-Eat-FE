@@ -4,7 +4,20 @@ import styles from "./hamburger-menu.module.css";
 import type { FilterSettings, SavedAddress } from "@/lib/types";
 import { LoginDialog } from "@/features/auth/components";
 import { APP_OVERLAY_ROOT_ID } from "@/app/AppLayout";
-import { X, MapPin, Car, Users, Dog, RefreshCw, History, CircleUserRound, Save, Plus, Trash2, ChevronRight } from "lucide-react";
+import {
+  X,
+  MapPin,
+  Car,
+  Users,
+  Dog,
+  RefreshCw,
+  History,
+  CircleUserRound,
+  Save,
+  Plus,
+  Trash2,
+  ChevronRight,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/shared/utils/cn";
 
@@ -34,7 +47,9 @@ export function HamburgerMenu({
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [newAddressLabel, setNewAddressLabel] = useState("");
   const [newAddressValue, setNewAddressValue] = useState("");
-  const [activeFilterSection, setActiveFilterSection] = useState<"range" | "amenities" | null>(null);
+  const [activeFilterSection, setActiveFilterSection] = useState<"range" | "amenities" | null>(
+    null,
+  );
   const [showLogin, setShowLogin] = useState(false);
 
   const handleAddAddress = () => {
@@ -57,7 +72,8 @@ export function HamburgerMenu({
     { value: 250, label: "250m" },
   ];
 
-  const overlayRoot = typeof document !== "undefined" ? document.getElementById(APP_OVERLAY_ROOT_ID) : null;
+  const overlayRoot =
+    typeof document !== "undefined" ? document.getElementById(APP_OVERLAY_ROOT_ID) : null;
 
   const menuContent = (
     <AnimatePresence>
@@ -80,7 +96,12 @@ export function HamburgerMenu({
             {/* Header */}
             <div className={styles.header}>
               <h2 className={styles.headerTitle}>설정</h2>
-              <button type="button" onClick={onClose} className={styles.closeButton} aria-label="닫기">
+              <button
+                type="button"
+                onClick={onClose}
+                className={styles.closeButton}
+                aria-label="닫기"
+              >
                 <X className={styles.closeIcon} />
               </button>
             </div>
@@ -105,7 +126,9 @@ export function HamburgerMenu({
                 <button
                   type="button"
                   className={styles.sectionToggleButton}
-                  onClick={() => setActiveFilterSection(activeFilterSection === "range" ? null : "range")}
+                  onClick={() =>
+                    setActiveFilterSection(activeFilterSection === "range" ? null : "range")
+                  }
                 >
                   <span>검색 범위</span>
                   <motion.span animate={{ rotate: activeFilterSection === "range" ? 90 : 0 }}>
@@ -125,7 +148,9 @@ export function HamburgerMenu({
                           <button
                             key={option.value}
                             type="button"
-                            onClick={() => onFilterChange({ ...filterSettings, searchRange: option.value })}
+                            onClick={() =>
+                              onFilterChange({ ...filterSettings, searchRange: option.value })
+                            }
                             className={cn(
                               styles.rangeOptionButton,
                               filterSettings.searchRange === option.value
@@ -141,7 +166,9 @@ export function HamburgerMenu({
                   )}
                 </AnimatePresence>
                 {activeFilterSection !== "range" && (
-                  <div className={styles.currentRangeDisplay}>현재: {filterSettings.searchRange}m</div>
+                  <div className={styles.currentRangeDisplay}>
+                    현재: {filterSettings.searchRange}m
+                  </div>
                 )}
               </div>
 
@@ -150,7 +177,9 @@ export function HamburgerMenu({
                 <button
                   type="button"
                   className={styles.sectionToggleButton}
-                  onClick={() => setActiveFilterSection(activeFilterSection === "amenities" ? null : "amenities")}
+                  onClick={() =>
+                    setActiveFilterSection(activeFilterSection === "amenities" ? null : "amenities")
+                  }
                 >
                   <span>필터</span>
                   <motion.span animate={{ rotate: activeFilterSection === "amenities" ? 90 : 0 }}>
@@ -176,7 +205,9 @@ export function HamburgerMenu({
                           icon={<Users className={styles.sectionToggleIcon} />}
                           label="단체석"
                           value={filterSettings.hasGroupSeating}
-                          onChange={(v) => onFilterChange({ ...filterSettings, hasGroupSeating: v })}
+                          onChange={(v) =>
+                            onFilterChange({ ...filterSettings, hasGroupSeating: v })
+                          }
                         />
                         <FilterToggle
                           icon={<Dog className={styles.sectionToggleIcon} />}
@@ -205,9 +236,11 @@ export function HamburgerMenu({
                         <Dog className={styles.activeFilterIcon} /> 반려동물
                       </span>
                     )}
-                    {!filterSettings.hasParking && !filterSettings.hasGroupSeating && !filterSettings.petFriendly && (
-                      <span className={styles.noFiltersText}>필터 없음</span>
-                    )}
+                    {!filterSettings.hasParking &&
+                      !filterSettings.hasGroupSeating &&
+                      !filterSettings.petFriendly && (
+                        <span className={styles.noFiltersText}>필터 없음</span>
+                      )}
                   </div>
                 )}
               </div>
@@ -248,7 +281,11 @@ export function HamburgerMenu({
                           onChange={(e) => setNewAddressValue(e.target.value)}
                           className={styles.addressInput}
                         />
-                        <button type="button" onClick={handleAddAddress} className={styles.saveAddressButton}>
+                        <button
+                          type="button"
+                          onClick={handleAddAddress}
+                          className={styles.saveAddressButton}
+                        >
                           <Save className={styles.saveAddressIcon} />
                           저장
                         </button>
@@ -260,7 +297,11 @@ export function HamburgerMenu({
                 <div className={styles.addressList}>
                   {savedAddresses.map((address) => (
                     <div key={address.id} className={styles.addressItem}>
-                      <button type="button" onClick={() => onSelectAddress(address)} className={styles.addressItemButton}>
+                      <button
+                        type="button"
+                        onClick={() => onSelectAddress(address)}
+                        className={styles.addressItemButton}
+                      >
                         <p className={styles.addressLabel}>{address.label}</p>
                         <p className={styles.addressValue}>{address.address}</p>
                       </button>
@@ -274,13 +315,19 @@ export function HamburgerMenu({
                       </button>
                     </div>
                   ))}
-                  {savedAddresses.length === 0 && <p className={styles.noAddressesText}>저장된 주소가 없습니다</p>}
+                  {savedAddresses.length === 0 && (
+                    <p className={styles.noAddressesText}>저장된 주소가 없습니다</p>
+                  )}
                 </div>
               </div>
 
               {/* Actions */}
               <div className={styles.actionsContainer}>
-                <button type="button" onClick={() => setShowLogin(true)} className={styles.actionButton}>
+                <button
+                  type="button"
+                  onClick={() => setShowLogin(true)}
+                  className={styles.actionButton}
+                >
                   <CircleUserRound className={styles.actionIcon} />
                   <span className={styles.actionLabel}>로그인</span>
                 </button>
@@ -303,7 +350,11 @@ export function HamburgerMenu({
   return (
     <>
       {overlayRoot ? createPortal(menuContent, overlayRoot) : null}
-      <LoginDialog open={showLogin} onOpenChange={setShowLogin} onSubmit={async (v) => console.log("Login", v)} />
+      <LoginDialog
+        open={showLogin}
+        onOpenChange={setShowLogin}
+        onSubmit={async (v) => console.log("Login", v)}
+      />
     </>
   );
 }

@@ -11,11 +11,7 @@ export function AppLayout() {
   return (
     <div className={styles.mainContainer}>
       <Outlet />
-      <div
-        id={APP_OVERLAY_ROOT_ID}
-        className={styles.overlayRoot}
-        aria-hidden
-      />
+      <div id={APP_OVERLAY_ROOT_ID} className={styles.overlayRoot} aria-hidden />
     </div>
   );
 }

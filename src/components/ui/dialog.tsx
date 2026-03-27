@@ -30,7 +30,7 @@ export const DialogContent = forwardRef<
       ref={ref}
       className={cn(
         "fixed left-1/2 top-1/2 z-[101] w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg border border-border bg-card p-6 text-card-foreground shadow-lg",
-        className
+        className,
       )}
       {...props}
     />
@@ -38,10 +38,7 @@ export const DialogContent = forwardRef<
 ));
 DialogContent.displayName = "DialogContent";
 
-export const DialogHeader = ({
-  className,
-  ...props
-}: ComponentPropsWithoutRef<"div">) => (
+export const DialogHeader = ({ className, ...props }: ComponentPropsWithoutRef<"div">) => (
   <div className={cn("mb-4 space-y-1", className)} {...props} />
 );
 
@@ -49,10 +46,6 @@ export const DialogTitle = forwardRef<
   ElementRef<typeof DialogPrimitive.Title>,
   ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
 >(({ className, ...props }, ref) => (
-  <DialogPrimitive.Title
-    ref={ref}
-    className={cn("text-lg font-semibold", className)}
-    {...props}
-  />
+  <DialogPrimitive.Title ref={ref} className={cn("text-lg font-semibold", className)} {...props} />
 ));
 DialogTitle.displayName = "DialogTitle";

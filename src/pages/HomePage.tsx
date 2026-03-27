@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styles from "./HomePage.module.css";
 import { routes } from "@/shared/constants/routes";
 import type { Restaurant, FilterSettings, SavedAddress, SwipeResult } from "@/lib/types";
-import { restaurantApi } from "@/shared/api/restaurant";
+import { restaurantAPI } from "@/shared/api/restaurant";
 import { useResultsStore } from "@/shared/stores/results-store";
 import { SwipeCard } from "@/components/swipe-card";
 import { ReviewSheet } from "@/components/review-sheet";
@@ -55,7 +55,7 @@ export function HomePage() {
       setError(null);
       try {
         const { latitude, longitude } = getCoordinatesFromAddress(currentLocation);
-        const response = await restaurantApi.searchNearby({
+        const response = await restaurantAPI.searchNearby({
           latitude,
           longitude,
           radius: filterSettings.searchRange as 50 | 100 | 250,
@@ -97,11 +97,17 @@ export function HomePage() {
   }, [currentLocation, filterSettings]);
 
   const filteredRestaurants = restaurants.filter((r) => {
-    if (filterSettings.hasParking !== null && r.has_parking !== filterSettings.hasParking) return false;
+    if (filterSettings.hasParking !== null && r.has_parking !== filterSettings.hasParking)
+      return false;
     // Assuming hasGroupSeating and petFriendly are not coming from API yet,
     // so keeping the local filter for now.
-    if (filterSettings.hasGroupSeating !== null && r.hasGroupSeating !== filterSettings.hasGroupSeating) return false;
-    if (filterSettings.petFriendly !== null && r.petFriendly !== filterSettings.petFriendly) return false;
+    if (
+      filterSettings.hasGroupSeating !== null &&
+      r.hasGroupSeating !== filterSettings.hasGroupSeating
+    )
+      return false;
+    if (filterSettings.petFriendly !== null && r.petFriendly !== filterSettings.petFriendly)
+      return false;
     if (r.distance_meters && r.distance_meters > filterSettings.searchRange) return false;
     return true;
   });
@@ -113,7 +119,10 @@ export function HomePage() {
     (direction: "left" | "right") => {
       if (!currentRestaurant) return;
       setExitDirection(direction);
-      const newResult: SwipeResult = { restaurant: currentRestaurant, liked: direction === "right" };
+      const newResult: SwipeResult = {
+        restaurant: currentRestaurant,
+        liked: direction === "right",
+      };
 
       setTimeout(() => {
         addResult(newResult);
@@ -133,41 +142,46 @@ export function HomePage() {
     setCurrentIndex(0);
     // Re-fetch restaurants when starting over
     const { latitude, longitude } = getCoordinatesFromAddress(currentLocation);
-    restaurantApi.searchNearby({
-      latitude,
-      longitude,
-      radius: filterSettings.searchRange as 50 | 100 | 250,
-    }).then(response => {
-      const fetchedRestaurants: Restaurant[] = response.restaurants.map((r) => ({
-        id: r.place_id,
-        name: r.name,
-        address: r.address,
-        latitude: r.latitude,
-        longitude: r.longitude,
-        rating: r.rating,
-        user_ratings_total: r.user_ratings_total,
-        photo_url: r.photo_url,
-        opening_now: r.opening_now,
-        cuisine_type: r.cuisine_type,
-        distance_meters: r.distance_meters,
-        walking_minutes: r.walking_minutes,
-        has_parking: r.has_parking,
-        blog_review_count: r.blog_review_count,
-        tags: r.tags,
-        type: "Unknown",
-        hasGroupSeating: null,
-        petFriendly: null,
-        reviews: [],
-      }));
-      setRestaurants(fetchedRestaurants);
-    }).catch(err => {
-      setError("Failed to fetch restaurants on start over.");
-      console.error(err);
-    });
+    restaurantAPI
+      .searchNearby({
+        latitude,
+        longitude,
+        radius: filterSettings.searchRange as 50 | 100 | 250,
+      })
+      .then((response) => {
+        const fetchedRestaurants: Restaurant[] = response.restaurants.map((r) => ({
+          id: r.place_id,
+          name: r.name,
+          address: r.address,
+          latitude: r.latitude,
+          longitude: r.longitude,
+          rating: r.rating,
+          user_ratings_total: r.user_ratings_total,
+          photo_url: r.photo_url,
+          opening_now: r.opening_now,
+          cuisine_type: r.cuisine_type,
+          distance_meters: r.distance_meters,
+          walking_minutes: r.walking_minutes,
+          has_parking: r.has_parking,
+          blog_review_count: r.blog_review_count,
+          tags: r.tags,
+          type: "Unknown",
+          hasGroupSeating: null,
+          petFriendly: null,
+          reviews: [],
+        }));
+        setRestaurants(fetchedRestaurants);
+      })
+      .catch((err) => {
+        setError("Failed to fetch restaurants on start over.");
+        console.error(err);
+      });
   };
 
-  const handleAddAddress = (address: SavedAddress) => setSavedAddresses((prev) => [...prev, address]);
-  const handleRemoveAddress = (id: string) => setSavedAddresses((prev) => prev.filter((a) => a.id !== id));
+  const handleAddAddress = (address: SavedAddress) =>
+    setSavedAddresses((prev) => [...prev, address]);
+  const handleRemoveAddress = (id: string) =>
+    setSavedAddresses((prev) => prev.filter((a) => a.id !== id));
   const handleSelectAddress = (address: SavedAddress) => {
     setCurrentLocation(address.address);
     setMenuOpen(false);
@@ -180,7 +194,10 @@ export function HomePage() {
       <div className={styles.cardStackContainer}>
         {isLoading && <div className={styles.loadingMessage}>Loading restaurants...</div>}
         {error && <div className={styles.errorMessage}>Error: {error}</div>}
-        {!isLoading && !error && filteredRestaurants.length > 0 && currentIndex < filteredRestaurants.length ? (
+        {!isLoading &&
+        !error &&
+        filteredRestaurants.length > 0 &&
+        currentIndex < filteredRestaurants.length ? (
           <div className={styles.cardWrapper}>
             <AnimatePresence>
               {[filteredRestaurants[currentIndex + 1], filteredRestaurants[currentIndex]]
@@ -202,11 +219,18 @@ export function HomePage() {
             </AnimatePresence>
           </div>
         ) : (
-          !isLoading && !error && (
+          !isLoading &&
+          !error && (
             <div className={styles.noRestaurantsContainer}>
-              <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className={styles.noRestaurantsCard}>
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className={styles.noRestaurantsCard}
+              >
                 <p className={styles.noRestaurantsMessage}>
-                  {filteredRestaurants.length === 0 ? "조건에 맞는 음식점이 없습니다" : "모든 음식점을 확인했어요!"}
+                  {filteredRestaurants.length === 0
+                    ? "조건에 맞는 음식점이 없습니다"
+                    : "모든 음식점을 확인했어요!"}
                 </p>
                 <button type="button" onClick={handleStartOver} className={styles.startOverButton}>
                   다시 시작하기
@@ -217,7 +241,11 @@ export function HomePage() {
         )}
       </div>
 
-      <ReviewSheet restaurant={currentRestaurant ?? null} isOpen={showReviews} onClose={() => setShowReviews(false)} />
+      <ReviewSheet
+        restaurant={currentRestaurant ?? null}
+        isOpen={showReviews}
+        onClose={() => setShowReviews(false)}
+      />
       <HamburgerMenu
         isOpen={menuOpen}
         onClose={() => setMenuOpen(false)}
@@ -232,4 +260,3 @@ export function HomePage() {
     </main>
   );
 }
-
