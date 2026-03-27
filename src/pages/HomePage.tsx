@@ -1,9 +1,9 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./HomePage.module.css";
 import { routes } from "@/shared/constants/routes";
 import type { Restaurant, FilterSettings, SavedAddress, SwipeResult } from "@/lib/types";
-import { mockRestaurants } from "@/lib/mock-data";
+import { restaurantApi } from "@/shared/api/restaurant";
 import { useResultsStore } from "@/shared/stores/results-store";
 import { SwipeCard } from "@/components/swipe-card";
 import { ReviewSheet } from "@/components/review-sheet";
@@ -18,7 +18,7 @@ export function HomePage() {
   const navigate = useNavigate();
   const { results, addResult, resetResults } = useResultsStore();
 
-  const [restaurants, setRestaurants] = useState<Restaurant[]>(mockRestaurants);
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showReviews, setShowReviews] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -34,12 +34,75 @@ export function HomePage() {
     { id: "2", label: "회사", address: "서울특별시 서초구 서초동 456-78", isDefault: false },
   ]);
   const [exitDirection, setExitDirection] = useState<"left" | "right" | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Dummy coordinates for now, will need to be replaced with actual geocoding
+  const getCoordinatesFromAddress = (address: string) => {
+    // This is a placeholder. In a real app, you'd use a geocoding service.
+    if (address.includes("강남구")) {
+      return { latitude: 37.5172, longitude: 127.0473 };
+    }
+    if (address.includes("서초구")) {
+      return { latitude: 37.4839, longitude: 127.0328 };
+    }
+    return { latitude: 37.5665, longitude: 126.978 }; // Default Seoul coordinates
+  };
+
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const { latitude, longitude } = getCoordinatesFromAddress(currentLocation);
+        const response = await restaurantApi.searchNearby({
+          latitude,
+          longitude,
+          radius: filterSettings.searchRange as 50 | 100 | 250,
+        });
+        // Map RestaurantResponse to local Restaurant type
+        const fetchedRestaurants: Restaurant[] = response.restaurants.map((r) => ({
+          id: r.place_id,
+          name: r.name,
+          address: r.address,
+          latitude: r.latitude,
+          longitude: r.longitude,
+          rating: r.rating,
+          user_ratings_total: r.user_ratings_total,
+          photo_url: r.photo_url,
+          opening_now: r.opening_now,
+          cuisine_type: r.cuisine_type,
+          distance_meters: r.distance_meters,
+          walking_minutes: r.walking_minutes,
+          has_parking: r.has_parking,
+          blog_review_count: r.blog_review_count,
+          tags: r.tags,
+          // Default values for fields not in API response
+          type: "Unknown", // Placeholder
+          hasGroupSeating: null, // Placeholder
+          petFriendly: null, // Placeholder
+          reviews: [], // Placeholder
+        }));
+        setRestaurants(fetchedRestaurants);
+        setCurrentIndex(0); // Reset index when new restaurants are fetched
+      } catch (err) {
+        setError("Failed to fetch restaurants.");
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRestaurants();
+  }, [currentLocation, filterSettings]);
 
   const filteredRestaurants = restaurants.filter((r) => {
-    if (filterSettings.hasParking !== null && r.hasParking !== filterSettings.hasParking) return false;
+    if (filterSettings.hasParking !== null && r.has_parking !== filterSettings.hasParking) return false;
+    // Assuming hasGroupSeating and petFriendly are not coming from API yet,
+    // so keeping the local filter for now.
     if (filterSettings.hasGroupSeating !== null && r.hasGroupSeating !== filterSettings.hasGroupSeating) return false;
     if (filterSettings.petFriendly !== null && r.petFriendly !== filterSettings.petFriendly) return false;
-    if (r.distance > filterSettings.searchRange) return false;
+    if (r.distance_meters && r.distance_meters > filterSettings.searchRange) return false;
     return true;
   });
 
@@ -68,6 +131,39 @@ export function HomePage() {
   const handleStartOver = () => {
     resetResults();
     setCurrentIndex(0);
+    // Re-fetch restaurants when starting over
+    const { latitude, longitude } = getCoordinatesFromAddress(currentLocation);
+    restaurantApi.searchNearby({
+      latitude,
+      longitude,
+      radius: filterSettings.searchRange as 50 | 100 | 250,
+    }).then(response => {
+      const fetchedRestaurants: Restaurant[] = response.restaurants.map((r) => ({
+        id: r.place_id,
+        name: r.name,
+        address: r.address,
+        latitude: r.latitude,
+        longitude: r.longitude,
+        rating: r.rating,
+        user_ratings_total: r.user_ratings_total,
+        photo_url: r.photo_url,
+        opening_now: r.opening_now,
+        cuisine_type: r.cuisine_type,
+        distance_meters: r.distance_meters,
+        walking_minutes: r.walking_minutes,
+        has_parking: r.has_parking,
+        blog_review_count: r.blog_review_count,
+        tags: r.tags,
+        type: "Unknown",
+        hasGroupSeating: null,
+        petFriendly: null,
+        reviews: [],
+      }));
+      setRestaurants(fetchedRestaurants);
+    }).catch(err => {
+      setError("Failed to fetch restaurants on start over.");
+      console.error(err);
+    });
   };
 
   const handleAddAddress = (address: SavedAddress) => setSavedAddresses((prev) => [...prev, address]);
@@ -82,7 +178,9 @@ export function HomePage() {
       <HomeHeader onMenuOpen={() => setMenuOpen(true)} maxSelections={MAX_SELECTIONS} />
 
       <div className={styles.cardStackContainer}>
-        {filteredRestaurants.length > 0 && currentIndex < filteredRestaurants.length ? (
+        {isLoading && <div className={styles.loadingMessage}>Loading restaurants...</div>}
+        {error && <div className={styles.errorMessage}>Error: {error}</div>}
+        {!isLoading && !error && filteredRestaurants.length > 0 && currentIndex < filteredRestaurants.length ? (
           <div className={styles.cardWrapper}>
             <AnimatePresence>
               {[filteredRestaurants[currentIndex + 1], filteredRestaurants[currentIndex]]
@@ -104,16 +202,18 @@ export function HomePage() {
             </AnimatePresence>
           </div>
         ) : (
-          <div className={styles.noRestaurantsContainer}>
-            <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className={styles.noRestaurantsCard}>
-              <p className={styles.noRestaurantsMessage}>
-                {filteredRestaurants.length === 0 ? "조건에 맞는 음식점이 없습니다" : "모든 음식점을 확인했어요!"}
-              </p>
-              <button type="button" onClick={handleStartOver} className={styles.startOverButton}>
-                다시 시작하기
-              </button>
-            </motion.div>
-          </div>
+          !isLoading && !error && (
+            <div className={styles.noRestaurantsContainer}>
+              <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className={styles.noRestaurantsCard}>
+                <p className={styles.noRestaurantsMessage}>
+                  {filteredRestaurants.length === 0 ? "조건에 맞는 음식점이 없습니다" : "모든 음식점을 확인했어요!"}
+                </p>
+                <button type="button" onClick={handleStartOver} className={styles.startOverButton}>
+                  다시 시작하기
+                </button>
+              </motion.div>
+            </div>
+          )
         )}
       </div>
 
@@ -132,3 +232,4 @@ export function HomePage() {
     </main>
   );
 }
+

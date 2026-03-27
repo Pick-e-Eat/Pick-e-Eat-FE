@@ -8,20 +8,27 @@ export interface Review {
 }
 
 export interface Restaurant {
-  id: string;
+  id: string; // Mapped from place_id
   name: string;
-  type: string;
-  rating: number;
-  reviewCount: number;
-  blogReviewCount: number;
-  walkingTime: number;
-  distance: number;
-  tags: string[];
-  image: string;
-  hasParking: boolean;
-  hasGroupSeating: boolean;
-  petFriendly: boolean;
-  reviews: Review[];
+  address?: string; // Added from RestaurantResponse
+  latitude: number; // Added from RestaurantResponse
+  longitude: number; // Added from RestaurantResponse
+  rating?: number | null; // Mapped from rating
+  user_ratings_total?: number | null; // Mapped from reviewCount
+  photo_url?: string | null; // Mapped from image
+  opening_now?: boolean | null; // Added from RestaurantResponse
+  cuisine_type?: string | null; // Added from RestaurantResponse
+  distance_meters?: number | null; // Mapped from distance
+  walking_minutes?: number | null; // Mapped from walkingTime
+  has_parking?: boolean | null; // Mapped from hasParking
+  blog_review_count?: number | null; // Mapped from blogReviewCount
+  tags?: string[]; // Mapped from tags
+
+  // Existing fields without direct API mapping, kept as optional
+  type?: string;
+  hasGroupSeating?: boolean | null;
+  petFriendly?: boolean | null;
+  reviews?: Review[];
 }
 
 export interface FilterSettings {
