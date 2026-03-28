@@ -76,8 +76,9 @@ export function SwipeCard({
   useEffect(() => {
     if (isTop) {
       const fac = new FastAverageColor();
+      if(!restaurant.photo_url) return () => resetColors();
       fac
-        .getColorAsync(restaurant.image, {
+        .getColorAsync(restaurant.photo_url, {
           crossOrigin: "anonymous",
         })
         .then((color) => {
@@ -92,7 +93,7 @@ export function SwipeCard({
         resetColors();
       };
     }
-  }, [isTop, restaurant.image, setColors, resetColors]);
+  }, [isTop, restaurant.photo_url, setColors, resetColors]);
 
   // Explicitly reset drag gesture motion values when card state changes due to non-drag events
   useEffect(() => {
@@ -199,7 +200,7 @@ export function SwipeCard({
         {/* Background Image */}
         <div
           className={styles.backgroundImage}
-          style={{ backgroundImage: `url(${restaurant.image})` }}
+          style={{ backgroundImage: `url(${restaurant.photo_url})` }}
         />
 
         {/* Gradient Overlay */}
@@ -228,7 +229,7 @@ export function SwipeCard({
         {/* Content */}
         <div className={styles.contentSection}>
           {/* Tags */}
-          {restaurant.tags.length > 0 && (
+          {restaurant.tags && restaurant.tags.length > 0 && (
             <div className={styles.tagsContainer}>
               {restaurant.tags.map((tag) => (
                 <span key={tag} className={styles.tag}>
@@ -251,12 +252,12 @@ export function SwipeCard({
             <div className={styles.reviewCountItem}>
               <MessageSquare className={styles.reviewCountIcon} />
               <span className={styles.reviewCountText}>
-                리뷰 {restaurant.reviewCount.toLocaleString()}
+                리뷰 {restaurant.blog_review_count}
               </span>
             </div>
             <div className={styles.reviewCountItem}>
               <FileText className={styles.reviewCountIcon} />
-              <span className={styles.reviewCountText}>블로그 {restaurant.blogReviewCount}</span>
+              <span className={styles.reviewCountText}>블로그 {restaurant.blog_review_count}</span>
             </div>
           </div>
 
@@ -265,15 +266,15 @@ export function SwipeCard({
             <div className={styles.distanceBadge}>
               <Navigation className={styles.navigationIcon} />
               <span className={styles.distanceText}>
-                도보 {restaurant.walkingTime}분 ({restaurant.distance}m)
+                도보 {restaurant.walking_minutes}분 ({restaurant.distance_meters}m)
               </span>
             </div>
           </div>
 
           {/* Amenities */}
-          {(restaurant.hasParking || restaurant.hasGroupSeating || restaurant.petFriendly) && (
+          {(restaurant.has_parking || restaurant.hasGroupSeating || restaurant.petFriendly) && (
             <div className={styles.amenitiesContainer}>
-              {restaurant.hasParking && (
+              {restaurant.has_parking && (
                 <span className={styles.amenityBadge}>
                   <Car className={styles.amenityIcon} /> 주차
                 </span>
