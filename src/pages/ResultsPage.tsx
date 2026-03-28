@@ -52,18 +52,18 @@ export function ResultsPage() {
                   <div className={styles.likedItemContent}>
                     <div
                       className={styles.likedItemImage}
-                      style={{ backgroundImage: `url(${result.restaurant.image})` }}
+                      style={{ backgroundImage: `url(${result.restaurant.photo_url})` }}
                     />
                     <div className={styles.likedItemDetails}>
                       <h3 className={styles.likedItemName}>{result.restaurant.name}</h3>
-                      <p className={styles.likedItemType}>{result.restaurant.type}</p>
+                      <p className={styles.likedItemType}>{result.restaurant.cuisine_type}</p>
                       <div className={styles.likedItemMeta}>
                         <div className={styles.likedItemRating}>
                           <Star className={styles.starIcon} />
                           <span className={styles.ratingValue}>{result.restaurant.rating}</span>
                         </div>
                         <span className={styles.walkingTime}>
-                          도보 {result.restaurant.walkingTime}분
+                          도보 {result.restaurant.walking_minutes}분
                         </span>
                       </div>
                     </div>
@@ -97,11 +97,11 @@ export function ResultsPage() {
                 >
                   <div
                     className={styles.dislikedItemImage}
-                    style={{ backgroundImage: `url(${result.restaurant.image})` }}
+                    style={{ backgroundImage: `url(${result.restaurant.photo_url})` }}
                   />
                   <div className={styles.dislikedItemDetails}>
                     <h3 className={styles.dislikedItemName}>{result.restaurant.name}</h3>
-                    <p className={styles.dislikedItemType}>{result.restaurant.type}</p>
+                    <p className={styles.dislikedItemType}>{result.restaurant.cuisine_type}</p>
                   </div>
                 </motion.div>
               ))}

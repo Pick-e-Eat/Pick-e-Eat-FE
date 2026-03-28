@@ -77,17 +77,17 @@ export function SwipeCard({
     if (isTop) {
       const fac = new FastAverageColor();
       if(!restaurant.photo_url) return () => resetColors();
-      fac
-        .getColorAsync(restaurant.photo_url, {
-          crossOrigin: "anonymous",
-        })
-        .then((color) => {
-          setColors(color.hex, color.isDark ? "#fff" : "#000");
-        })
-        .catch((e) => {
-          console.error("Failed to extract color:", e);
-          resetColors();
-        });
+      // fac
+      //   .getColorAsync(restaurant.photo_url, {
+      //     crossOrigin: "anonymous",
+      //   })
+      //   .then((color) => {
+      //     setColors(color.hex, color.isDark ? "#fff" : "#000");
+      //   })
+      //   .catch((e) => {
+      //     console.error("Failed to extract color:", e);
+      //     resetColors();
+      //   });
 
       return () => {
         resetColors();
@@ -241,7 +241,7 @@ export function SwipeCard({
 
           {/* Restaurant Name & Type */}
           <h2 className={styles.restaurantName}>{restaurant.name}</h2>
-          <p className={styles.restaurantType}>{restaurant.type}</p>
+          <p className={styles.restaurantType}>{restaurant.cuisine_type}</p>
 
           {/* Ratings & Reviews */}
           <div className={styles.ratingsReviewsContainer}>

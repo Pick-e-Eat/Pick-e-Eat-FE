@@ -25,7 +25,6 @@ export interface Restaurant {
   tags?: string[]; // Mapped from tags
 
   // Existing fields without direct API mapping, kept as optional
-  type?: string;
   hasGroupSeating?: boolean | null;
   petFriendly?: boolean | null;
   reviews?: Review[];
