@@ -2,6 +2,7 @@
 export const routes = {
   home: "/",
   results: "/results",
+  locationPicker: "/location-picker",
   auth: {
     login: "/login",
     signup: "/signup",

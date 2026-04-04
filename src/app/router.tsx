@@ -6,6 +6,7 @@ import { HomePage } from "@/pages/HomePage";
 import { LoginPage } from "@/pages/LoginPage";
 import { SignupPage } from "@/pages/SignupPage";
 import { ResultsPage } from "@/pages/ResultsPage";
+import { LocationPickerPage } from "@/pages/LocationPickerPage.tsx";
 
 export const appRouter = createBrowserRouter([
   {
@@ -13,6 +14,7 @@ export const appRouter = createBrowserRouter([
     children: [
       { path: routes.home, element: <HomePage /> },
       { path: routes.results, element: <ResultsPage /> },
+      { path: routes.locationPicker, element: <LocationPickerPage /> },
       { path: routes.auth.login, element: <LoginPage /> },
       { path: routes.auth.signup, element: <SignupPage /> },
     ],

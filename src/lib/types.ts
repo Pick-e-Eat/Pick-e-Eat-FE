@@ -42,6 +42,8 @@ export interface SavedAddress {
   label: string;
   address: string;
   isDefault: boolean;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface SwipeResult {

@@ -24,6 +24,7 @@ import { cn } from "@/shared/utils/cn";
 interface HamburgerMenuProps {
   isOpen: boolean;
   onClose: () => void;
+  onOpenLocationPicker: () => void;
   currentLocation: string;
   filterSettings: FilterSettings;
   onFilterChange: (settings: FilterSettings) => void;
@@ -36,6 +37,7 @@ interface HamburgerMenuProps {
 export function HamburgerMenu({
   isOpen,
   onClose,
+  onOpenLocationPicker,
   currentLocation,
   filterSettings,
   onFilterChange,
@@ -118,7 +120,7 @@ export function HamburgerMenu({
               {/* Current Location */}
               <div className={styles.section}>
                 <h3 className={styles.sectionTitle}>내 위치</h3>
-                <button type="button" className={styles.locationButton}>
+                <button type="button" className={styles.locationButton} onClick={onOpenLocationPicker}>
                   <MapPin className={styles.locationIcon} />
                   <div className={styles.locationTextContainer}>
                     <p className={styles.locationAddress}>{currentLocation}</p>
