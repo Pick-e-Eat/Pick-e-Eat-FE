@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import styles from "./HomeHeader.module.css";
-import { Menu, X } from "lucide-react";
+import { Menu } from "lucide-react";
 
 import { routes } from "@/shared/constants/routes";
 import { useResultsStore } from "@/shared/stores/results-store";
@@ -19,7 +19,6 @@ export function HomeHeader({ onMenuOpen, maxSelections }: HomeHeaderProps) {
   const headerStyle = {
     "--header-bg": backgroundColor ? `${backgroundColor}CC` : undefined,
     "--header-text": textColor || undefined,
-    "--header-text-primary": textColor || undefined,
   } as React.CSSProperties;
 
   return (
@@ -34,21 +33,26 @@ export function HomeHeader({ onMenuOpen, maxSelections }: HomeHeaderProps) {
       </button>
 
       <div className={styles.rightSection}>
-        <span className={styles.selectionCount}>
-          <span className={styles.selectionCurrent}>{results.length}</span>
-          <span className={styles.selectionSep} aria-hidden="true">
-            /
+        <div
+          className={styles.pickProgress}
+          aria-label={`고른 맛집 ${results.length}곳, 최대 ${maxSelections}곳`}
+        >
+          <span className={styles.pickProgressInner}>
+            <span className={styles.pickProgressCurrent}>{results.length}</span>
+            <span className={styles.pickProgressSep} aria-hidden="true">
+              /
+            </span>
+            <span className={styles.pickProgressMax}>{maxSelections}</span>
           </span>
-          <span className={styles.selectionMax}>{maxSelections}</span>
-        </span>
+        </div>
         {results.length > 0 && (
           <button
             type="button"
             onClick={() => navigate(routes.results)}
-            className={styles.closeButton}
-            aria-label="결과 보기"
+            className={styles.stopButton}
+            aria-label="중단하고 결과 화면으로 이동"
           >
-            <X className="h-5 w-5" />
+            중단하기
           </button>
         )}
       </div>

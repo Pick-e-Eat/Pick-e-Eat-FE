@@ -1,12 +1,12 @@
 @reference "../styles/globals.css";
 
-/* Sheet Container */
+/* AppLayout 오버레이 루트( max-w 컬럼 ) 안에서만 덮고 시트가 아래에서 올라옴 */
 .overlay {
-  @apply fixed inset-0 z-40 bg-foreground/50;
+  @apply pointer-events-auto absolute inset-0 z-40 bg-foreground/50;
 }
 
 .sheetContainer {
-  @apply fixed inset-x-0 bottom-0 z-50 max-h-[80vh] overflow-hidden rounded-t-3xl bg-card shadow-2xl;
+  @apply pointer-events-auto absolute inset-x-0 bottom-0 z-50 flex max-h-[85%] flex-col overflow-hidden rounded-t-3xl bg-card shadow-2xl;
 }
 
 /* Handle */
@@ -45,7 +45,7 @@
 
 /* Reviews Section */
 .reviewsContainer {
-  @apply max-h-[calc(80vh-120px)] overflow-y-auto p-6;
+  @apply min-h-0 flex-1 overflow-y-auto p-6;
 }
 
 .reviewsList {

@@ -47,28 +47,30 @@
   @apply overflow-hidden rounded-2xl border border-border bg-card shadow-sm;
 }
 
+/* 썸네일 | 본문 | 지도 — 동일 패딩·간격으로 텍스트 쏠림 제거 */
 .likedItemContent {
-  @apply flex;
+  @apply grid min-w-0 items-center gap-x-3 gap-y-1 p-3;
+  grid-template-columns: 6rem minmax(0, 1fr) auto;
 }
 
 .likedItemImage {
-  @apply h-24 w-24 shrink-0 bg-cover bg-center;
+  @apply h-24 w-24 shrink-0 rounded-xl bg-cover bg-center;
 }
 
 .likedItemDetails {
-  @apply flex flex-1 flex-col justify-center p-3;
+  @apply flex min-h-0 min-w-0 flex-col justify-center gap-0.5;
 }
 
 .likedItemName {
-  @apply font-semibold text-card-foreground;
+  @apply min-w-0 text-base font-semibold leading-snug text-card-foreground;
 }
 
 .likedItemType {
-  @apply text-xs text-muted-foreground;
+  @apply text-xs leading-normal text-muted-foreground;
 }
 
 .likedItemMeta {
-  @apply mt-1 flex items-center gap-2;
+  @apply flex flex-wrap items-center gap-x-2 gap-y-0.5 pt-0.5;
 }
 
 .likedItemRating {
@@ -87,16 +89,12 @@
   @apply text-xs text-muted-foreground;
 }
 
-.likedItemActions {
-  @apply flex flex-col items-center justify-center gap-2 p-3;
+.mapButton {
+  @apply ml-1 shrink-0 cursor-pointer rounded-full bg-accent p-2 text-secondary transition-colors hover:bg-primary/18 hover:text-primary;
 }
 
-.navigationButton {
-  @apply rounded-full bg-accent p-2 text-accent-foreground transition-colors hover:bg-accent/80 cursor-pointer;
-}
-
-.navigationIcon {
-  @apply size-4;
+.mapIcon {
+  @apply size-6;
 }
 
 /* Disliked Section */

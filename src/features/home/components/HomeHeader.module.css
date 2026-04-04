@@ -13,41 +13,34 @@
 }
 
 .menuButton {
-  @apply cursor-pointer rounded-full p-2 transition-colors hover:bg-primary/22;
-  color: inherit;
+  @apply cursor-pointer rounded-full p-2 text-muted-foreground transition-colors hover:bg-primary/22 hover:text-card-foreground;
 }
 
 .rightSection {
-  @apply flex items-center gap-2;
+  @apply flex items-center justify-end gap-2;
 }
 
-.selectionCount {
-  @apply inline-flex items-baseline gap-0.5 rounded-2xl px-3 py-1.5 tabular-nums;
-  background: linear-gradient(
-    160deg,
-    color-mix(in srgb, var(--primary) 16%, var(--card)) 0%,
-    color-mix(in srgb, var(--primary) 8%, var(--card)) 100%
-  );
-  border: 1px solid color-mix(in srgb, var(--primary) 22%, transparent);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+/* 한 줄 카운트: 라벨 없이 숫자만, 버튼과 높이·정렬 맞춤 */
+.pickProgress {
+  @apply flex h-9 items-center rounded-lg border-2 border-border bg-card/95 px-2.5 backdrop-blur-sm;
 }
 
-.selectionCurrent {
-  @apply text-[0.9375rem] font-semibold leading-none tracking-tight;
-  color: var(--header-text-primary, var(--primary));
+.pickProgressInner {
+  @apply flex items-center justify-center gap-1 tabular-nums leading-none;
 }
 
-.selectionSep {
-  @apply translate-y-px text-[0.7rem] font-medium leading-none opacity-40;
-  color: var(--header-text, var(--muted-foreground));
+.pickProgressCurrent {
+  @apply min-w-[1ch] text-center text-sm font-bold leading-none text-primary;
 }
 
-.selectionMax {
-  @apply text-xs font-medium leading-none opacity-70;
-  color: var(--header-text, var(--muted-foreground));
+.pickProgressSep {
+  @apply text-sm font-medium leading-none text-muted-foreground/55;
 }
 
-.closeButton {
-  @apply rounded-full p-2 hover:bg-destructive/10 cursor-pointer;
-  color: inherit;
+.pickProgressMax {
+  @apply min-w-[1ch] text-center text-sm font-bold leading-none text-card-foreground;
+}
+
+.stopButton {
+  @apply flex h-9 shrink-0 cursor-pointer items-center rounded-lg border-2 border-border bg-card/95 px-2.5 text-sm font-semibold leading-none text-card-foreground backdrop-blur-sm transition-colors hover:border-primary/35 hover:bg-primary/14;
 }

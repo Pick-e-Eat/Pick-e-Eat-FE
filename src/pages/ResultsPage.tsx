@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import styles from "./ResultsPage.module.css";
 import { routes } from "@/shared/constants/routes";
 import { useResultsStore } from "@/shared/stores/results-store";
-import { Star, MapPin, ThumbsUp, ThumbsDown, RotateCcw, Navigation } from "lucide-react";
+import { Star, MapPin, MapPinned, ThumbsUp, ThumbsDown, RotateCcw } from "lucide-react";
 import { motion } from "framer-motion";
 
 export function ResultsPage() {
@@ -19,6 +19,15 @@ export function ResultsPage() {
 
   const handleContinue = () => {
     navigate(routes.home);
+  };
+
+  const openInMaps = (latitude: number, longitude: number) => {
+    const q = encodeURIComponent(`${latitude},${longitude}`);
+    window.open(
+      `https://www.google.com/maps/search/?api=1&query=${q}`,
+      "_blank",
+      "noopener,noreferrer",
+    );
   };
 
   return (
@@ -67,11 +76,19 @@ export function ResultsPage() {
                         </span>
                       </div>
                     </div>
-                    <div className={styles.likedItemActions}>
-                      <button type="button" className={styles.navigationButton} aria-label="길찾기">
-                        <Navigation className={styles.navigationIcon} />
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      className={styles.mapButton}
+                      aria-label="지도에서 위치 열기"
+                      onClick={() =>
+                        openInMaps(
+                          result.restaurant.latitude,
+                          result.restaurant.longitude,
+                        )
+                      }
+                    >
+                      <MapPinned className={styles.mapIcon} />
+                    </button>
                   </div>
                 </motion.div>
               ))}

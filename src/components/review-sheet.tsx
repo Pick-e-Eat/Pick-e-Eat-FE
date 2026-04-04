@@ -1,4 +1,6 @@
 import type { Restaurant } from "@/lib/types";
+import { createPortal } from "react-dom";
+import { APP_OVERLAY_ROOT_ID } from "@/app/AppLayout";
 import styles from "./review-sheet.module.css";
 import { X, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,9 +19,12 @@ function sourceLabel(source: string) {
 }
 
 export function ReviewSheet({ restaurant, isOpen, onClose }: ReviewSheetProps) {
+  const overlayRoot =
+    typeof document !== "undefined" ? document.getElementById(APP_OVERLAY_ROOT_ID) : null;
+
   if (!restaurant) return null;
 
-  return (
+  const sheetContent = (
     <AnimatePresence>
       {isOpen && (
         <>
@@ -92,4 +97,6 @@ export function ReviewSheet({ restaurant, isOpen, onClose }: ReviewSheetProps) {
       )}
     </AnimatePresence>
   );
+
+  return overlayRoot ? createPortal(sheetContent, overlayRoot) : null;
 }
