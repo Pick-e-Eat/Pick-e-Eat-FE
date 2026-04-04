@@ -96,7 +96,13 @@ export function HamburgerMenu({
             {/* Header — 모달형: 중앙 타이틀 + 우측 닫기 */}
             <div className={styles.header}>
               <div className={styles.headerLead} aria-hidden />
-              <h2 className={styles.headerTitle}>설정</h2>
+              <h2 className={styles.headerWordmark} aria-label="Pick-e-Eat">
+                <span className={styles.headerWordPick}>Pick</span>
+                <span className={styles.headerWordGlue} aria-hidden="true">
+                  -e-
+                </span>
+                <span className={styles.headerWordEat}>Eat</span>
+              </h2>
               <button
                 type="button"
                 onClick={onClose}

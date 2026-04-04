@@ -1,0 +1,36 @@
+@reference "../styles/globals.css";
+
+.stack {
+  @apply flex flex-col items-center text-center -translate-y-18;
+}
+
+.tagline {
+  @apply order-first mb-1 max-w-[min(22rem,90vw)] text-[calc(1.125rem-1px)] font-semibold leading-snug tracking-[0.04em] text-white/88;
+  text-shadow: 0 1px 10px rgb(0 0 0 / 0.12);
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.38s ease,
+    transform 0.38s ease;
+}
+
+.taglineVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.wordmark {
+  @apply order-last flex flex-wrap items-baseline justify-center px-5;
+}
+
+.wordPick {
+  @apply text-[2.25rem] font-black tracking-[-0.045em] text-white;
+}
+
+.wordGlue {
+  @apply mx-1 translate-y-px text-[1.45rem] font-extralight tracking-[-0.03em] text-white/90;
+}
+
+.wordEat {
+  @apply text-[2.25rem] font-black tracking-[-0.045em] text-white;
+}

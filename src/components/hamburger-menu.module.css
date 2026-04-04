@@ -5,16 +5,9 @@
   @apply pointer-events-auto absolute inset-0 z-40 bg-black/35 backdrop-blur-[2px];
 }
 
-/* —— 패널: 좌측 카드 시트 (퀵오더형 둥근 흰 박스) —— */
+/* —— 패널: 좌측 전체 높이, 직각 네모 (화면 왼쪽에 붙음) —— */
 .menuContainer {
-  @apply pointer-events-auto absolute inset-y-0 left-0 z-50 flex w-[min(100%,20rem)] flex-col overflow-hidden bg-card;
-  margin-top: 0.65rem;
-  margin-bottom: 0.65rem;
-  margin-left: 0.65rem;
-  border-radius: 1.25rem;
-  box-shadow:
-    0 25px 50px -12px rgb(0 0 0 / 0.18),
-    0 0 0 1px color-mix(in srgb, var(--foreground) 6%, transparent);
+  @apply pointer-events-auto absolute inset-y-0 left-0 z-50 flex w-[min(100%,20rem)] flex-col overflow-hidden bg-card shadow-2xl;
 }
 
 /* —— 헤더 —— */
@@ -28,12 +21,25 @@
   @apply size-10;
 }
 
-.headerTitle {
-  @apply text-center text-lg font-bold tracking-tight text-card-foreground;
+/* 스플래시와 동일 워드마크 구조 — 색은 메뉴 본문(text-card-foreground)과 동일 톤 */
+.headerWordmark {
+  @apply m-0 flex flex-wrap items-baseline justify-center text-center text-card-foreground;
+}
+
+.headerWordPick {
+  @apply text-[1.35rem] font-black tracking-[-0.045em];
+}
+
+.headerWordGlue {
+  @apply mx-1 translate-y-px text-[0.95rem] font-extralight tracking-[-0.03em] text-card-foreground/68;
+}
+
+.headerWordEat {
+  @apply text-[1.35rem] font-black tracking-[-0.045em];
 }
 
 .closeButton {
-  @apply flex size-10 cursor-pointer items-center justify-center justify-self-end rounded-full text-muted-foreground transition-colors hover:bg-muted/70 hover:text-card-foreground;
+  @apply flex size-10 cursor-pointer items-center justify-center justify-self-end rounded-full text-muted-foreground transition-colors hover:bg-primary/22 hover:text-card-foreground;
 }
 
 .closeIcon {
@@ -54,7 +60,7 @@
 }
 
 .sectionToggleButton {
-  @apply mb-2 flex w-full cursor-pointer items-center justify-between rounded-xl border border-border bg-card px-4 py-3 text-left text-sm font-semibold text-card-foreground transition-colors hover:bg-muted/40;
+  @apply mb-2 flex w-full cursor-pointer items-center justify-between rounded-xl border border-border bg-card px-4 py-3 text-left text-sm font-semibold text-card-foreground transition-colors hover:border-primary/25 hover:bg-primary/14;
 }
 
 .sectionToggleIcon {
@@ -67,7 +73,7 @@
 
 /* —— 내 위치 —— */
 .locationButton {
-  @apply flex w-full cursor-pointer items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 text-left transition-colors hover:border-primary/35 hover:bg-muted/25;
+  @apply flex w-full cursor-pointer items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 text-left transition-colors hover:border-primary/45 hover:bg-primary/14;
 }
 
 .locationIcon {
@@ -104,7 +110,7 @@
 }
 
 .rangeOptionButtonInactive {
-  @apply border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-card-foreground;
+  @apply border-border bg-card text-muted-foreground hover:border-primary/55 hover:bg-primary/12 hover:text-card-foreground;
 }
 
 .currentRangeDisplay {
@@ -138,7 +144,7 @@
 }
 
 .addAddressButton {
-  @apply flex size-8 cursor-pointer items-center justify-center rounded-full border border-border bg-card text-primary transition-colors hover:border-primary/50 hover:bg-primary/8;
+  @apply flex size-8 cursor-pointer items-center justify-center rounded-full border border-border bg-card text-primary transition-colors hover:border-primary/60 hover:bg-primary/20;
 }
 
 .addAddressIcon {
@@ -174,7 +180,7 @@
 }
 
 .addressItemButton {
-  @apply min-w-0 flex-1 cursor-pointer px-4 py-3.5 text-left transition-colors hover:bg-muted/25;
+  @apply min-w-0 flex-1 cursor-pointer px-4 py-3.5 text-left transition-colors hover:bg-primary/14;
 }
 
 .addressLabel {
@@ -186,7 +192,7 @@
 }
 
 .removeAddressButton {
-  @apply flex w-11 shrink-0 cursor-pointer items-center justify-center border-l border-border/60 text-muted-foreground transition-colors hover:bg-destructive/8 hover:text-destructive;
+  @apply flex w-11 shrink-0 cursor-pointer items-center justify-center border-l border-border/60 text-muted-foreground transition-colors hover:bg-destructive/15 hover:text-destructive;
 }
 
 .removeAddressIcon {
@@ -203,7 +209,7 @@
 }
 
 .actionRow {
-  @apply flex w-full cursor-pointer items-center gap-3 border-b border-border/80 px-4 py-3.5 text-left transition-colors last:border-b-0 hover:bg-muted/25;
+  @apply flex w-full cursor-pointer items-center gap-3 border-b border-border/80 px-4 py-3.5 text-left transition-colors last:border-b-0 hover:bg-primary/14;
 }
 
 .actionIcon {
@@ -220,7 +226,7 @@
 
 /* —— FilterToggle 행 —— */
 .filterToggleButton {
-  @apply flex w-full cursor-pointer items-center justify-between gap-3 px-4 py-3.5 text-left transition-colors hover:bg-muted/20;
+  @apply flex w-full cursor-pointer items-center justify-between gap-3 px-4 py-3.5 text-left transition-colors hover:bg-primary/14;
 }
 
 .filterToggleLabelContainer {

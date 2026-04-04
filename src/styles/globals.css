@@ -33,6 +33,9 @@
   --unlike: #c62828;
   /* 데스크톱 앱 컬럼 바깥 */
   --app-canvas: #ffffff;
+  /* 로고 워드마크(카드 위): 본문과 동일 --card-foreground, 가운데 글자만 같은 색에 투명도 */
+  --wordmark-text: var(--card-foreground);
+  --wordmark-text-muted: color-mix(in srgb, var(--card-foreground) 68%, transparent);
 }
 
 .dark {
@@ -58,6 +61,8 @@
   --like: #66bb6a;
   --unlike: #e57373;
   --app-canvas: #1a1816;
+  --wordmark-text: var(--card-foreground);
+  --wordmark-text-muted: color-mix(in srgb, var(--card-foreground) 68%, transparent);
 }
 
 @theme inline {
@@ -82,6 +87,8 @@
   --color-ring: var(--ring);
   --color-like: var(--like);
   --color-unlike: var(--unlike);
+  --color-wordmark-text: var(--wordmark-text);
+  --color-wordmark-text-muted: var(--wordmark-text-muted);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
