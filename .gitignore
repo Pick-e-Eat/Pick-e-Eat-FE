@@ -38,3 +38,6 @@ storybook-static/
 
 # Misc
 *.tsbuildinfo
+
+# dev
+heera*
