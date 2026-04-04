@@ -33,13 +33,13 @@ export function HomeHeader({ onMenuOpen, maxSelections }: HomeHeaderProps) {
         <Menu className="h-6 w-6" />
       </button>
 
-      <div className={styles.titleContainer}>
-        <h1 className={styles.title}>Pick-e-Eat</h1>
-      </div>
-
       <div className={styles.rightSection}>
         <span className={styles.selectionCount}>
-          {results.length}/{maxSelections}
+          <span className={styles.selectionCurrent}>{results.length}</span>
+          <span className={styles.selectionSep} aria-hidden="true">
+            /
+          </span>
+          <span className={styles.selectionMax}>{maxSelections}</span>
         </span>
         {results.length > 0 && (
           <button

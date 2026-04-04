@@ -2,8 +2,11 @@
 
 .header {
   @apply absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-3 backdrop-blur-lg;
-  background-color: var(--header-bg, hsl(var(--card) / 0.8));
-  color: var(--header-text, hsl(var(--card-foreground)));
+  background-color: var(
+    --header-bg,
+    color-mix(in srgb, var(--card) 80%, transparent)
+  );
+  color: var(--header-text, var(--card-foreground));
   transition:
     background-color 0.5s ease,
     color 0.5s ease;
@@ -14,22 +17,34 @@
   color: inherit;
 }
 
-.titleContainer {
-  @apply absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2;
-}
-
-.title {
-  @apply text-xl font-bold;
-  color: var(--header-text-primary, hsl(var(--primary)));
-}
-
 .rightSection {
   @apply flex items-center gap-2;
 }
 
 .selectionCount {
-  @apply rounded-full bg-primary/10 px-3 py-1 text-sm font-medium;
-  color: var(--header-text-primary, hsl(var(--primary)));
+  @apply inline-flex items-baseline gap-0.5 rounded-2xl px-3 py-1.5 tabular-nums;
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--primary) 16%, var(--card)) 0%,
+    color-mix(in srgb, var(--primary) 8%, var(--card)) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--primary) 22%, transparent);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+}
+
+.selectionCurrent {
+  @apply text-[0.9375rem] font-semibold leading-none tracking-tight;
+  color: var(--header-text-primary, var(--primary));
+}
+
+.selectionSep {
+  @apply translate-y-px text-[0.7rem] font-medium leading-none opacity-40;
+  color: var(--header-text, var(--muted-foreground));
+}
+
+.selectionMax {
+  @apply text-xs font-medium leading-none opacity-70;
+  color: var(--header-text, var(--muted-foreground));
 }
 
 .closeButton {

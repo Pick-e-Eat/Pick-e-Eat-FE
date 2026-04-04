@@ -8,52 +8,56 @@
     "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
 
-  --background: oklch(0.98 0.005 75);
-  --foreground: oklch(0.2 0.02 30);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.02 30);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.02 30);
-  --primary: oklch(0.65 0.2 25);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.96 0.01 75);
-  --secondary-foreground: oklch(0.3 0.02 30);
-  --muted: oklch(0.94 0.01 75);
-  --muted-foreground: oklch(0.5 0.02 30);
-  --accent: oklch(0.55 0.15 145);
-  --accent-foreground: oklch(1 0 0);
-  --destructive: oklch(0.55 0.2 25);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.9 0.01 75);
-  --input: oklch(0.92 0.01 75);
-  --ring: oklch(0.65 0.2 25);
+  /* Amber + brown brand, warm neutrals */
+  --background: #faf8f5;
+  --foreground: #1c1c1c;
+  --card: #ffffff;
+  --card-foreground: #111111;
+  --popover: #ffffff;
+  --popover-foreground: #111111;
+  --primary: #ffb300;
+  --primary-foreground: #111111;
+  --secondary: #8a6a4f;
+  --secondary-foreground: #ffffff;
+  --muted: #f0ebe4;
+  --muted-foreground: #555555;
+  --accent: #e8dfd6;
+  --accent-foreground: #1c1c1c;
+  --destructive: #c62828;
+  --destructive-foreground: #ffffff;
+  --border: #e6dfd6;
+  --input: #ebe4dc;
+  --ring: #ffb300;
   --radius: 1rem;
-  --like: oklch(0.55 0.15 145);
-  --unlike: oklch(0.55 0.2 25);
+  --like: #2e7d32;
+  --unlike: #c62828;
+  /* 데스크톱 앱 컬럼 바깥 */
+  --app-canvas: #ffffff;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
-  --like: oklch(0.55 0.15 145);
-  --unlike: oklch(0.55 0.2 25);
+  --background: #1a1816;
+  --foreground: #ffffff;
+  --card: #242220;
+  --card-foreground: #ffffff;
+  --popover: #242220;
+  --popover-foreground: #ffffff;
+  --primary: #ffb300;
+  --primary-foreground: #111111;
+  --secondary: #8a6a4f;
+  --secondary-foreground: #ffffff;
+  --muted: #2e2a26;
+  --muted-foreground: #b0b0b0;
+  --accent: #3d3630;
+  --accent-foreground: #ffffff;
+  --destructive: #e57373;
+  --destructive-foreground: #1a1816;
+  --border: #3d3834;
+  --input: #3d3834;
+  --ring: #ffb300;
+  --like: #66bb6a;
+  --unlike: #e57373;
+  --app-canvas: #1a1816;
 }
 
 @theme inline {
@@ -90,14 +94,20 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    background-color: var(--background);
+  }
   body {
     font-family: var(--font-sans);
     @apply bg-background text-foreground min-h-dvh antialiased;
   }
-  /* 데스크톱: 앱이 가운데 올 때 좌우 여백 구분용 배경 */
+  /* 데스크톱: 앱 컬럼 바깥 캔버스 (스크롤 바운스 시에도 동일 톤) */
   @media (min-width: 640px) {
+    html {
+      background-color: var(--app-canvas);
+    }
     body {
-      @apply bg-muted;
+      background-color: var(--app-canvas);
     }
   }
   a {

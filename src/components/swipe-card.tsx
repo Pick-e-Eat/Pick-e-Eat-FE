@@ -217,7 +217,7 @@ export function SwipeCard({
           className={styles.actionIconReview}
           style={{
             opacity: reviewOpacity,
-            color: backgroundColor || "hsl(var(--primary))",
+            color: backgroundColor || "var(--primary)",
           }}
         >
           <MessageSquare className={cn(styles.messageSquareIcon, "fill-current stroke-none")} />

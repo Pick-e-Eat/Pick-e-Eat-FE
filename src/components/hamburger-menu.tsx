@@ -93,8 +93,9 @@ export function HamburgerMenu({
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
             className={styles.menuContainer}
           >
-            {/* Header */}
+            {/* Header — 모달형: 중앙 타이틀 + 우측 닫기 */}
             <div className={styles.header}>
+              <div className={styles.headerLead} aria-hidden />
               <h2 className={styles.headerTitle}>설정</h2>
               <button
                 type="button"
@@ -322,22 +323,25 @@ export function HamburgerMenu({
               </div>
 
               {/* Actions */}
-              <div className={styles.actionsContainer}>
+              <div className={styles.actionsCard}>
                 <button
                   type="button"
                   onClick={() => setShowLogin(true)}
-                  className={styles.actionButton}
+                  className={styles.actionRow}
                 >
                   <CircleUserRound className={styles.actionIcon} />
                   <span className={styles.actionLabel}>로그인</span>
+                  <ChevronRight className={styles.actionChevron} />
                 </button>
-                <button type="button" className={styles.actionButton}>
+                <button type="button" className={styles.actionRow}>
                   <RefreshCw className={styles.actionIcon} />
                   <span className={styles.actionLabel}>동기화</span>
+                  <ChevronRight className={styles.actionChevron} />
                 </button>
-                <button type="button" className={styles.actionButton}>
+                <button type="button" className={styles.actionRow}>
                   <History className={styles.actionIcon} />
                   <span className={styles.actionLabel}>히스토리</span>
+                  <ChevronRight className={styles.actionChevron} />
                 </button>
               </div>
             </div>
