@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { queryClient } from "./query-client";
 
+// 테스트 코드 //
 interface AppProvidersProps {
   children: ReactNode;
 }
