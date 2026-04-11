@@ -6,6 +6,10 @@ import type { Restaurant, FilterSettings, SavedAddress, SwipeResult } from "@/li
 import { restaurantAPI } from "@/shared/api/restaurant";
 import { useResultsStore } from "@/shared/stores/results-store";
 import { useNearbyQueryStore } from "@/shared/stores/nearby-query-store";
+import {
+  useSavedAddressesStore,
+  type SavedAddressWithCoordinates,
+} from "@/shared/stores/saved-addresses-store";
 import { SwipeCard } from "@/components/swipe-card";
 import { ReviewSheet } from "@/components/review-sheet";
 import { HamburgerMenu } from "@/components/hamburger-menu";
@@ -14,12 +18,14 @@ import { ThumbsDown, ThumbsUp } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 const MAX_SELECTIONS = 10;
-type SavedAddressWithCoordinates = SavedAddress & { latitude?: number; longitude?: number };
 
 export function HomePage() {
   const navigate = useNavigate();
   const { results, addResult, resetResults } = useResultsStore();
   const { nearbyQuery, setCoordinates, setAddress, setRadius } = useNearbyQueryStore();
+  const savedAddresses = useSavedAddressesStore((s) => s.addresses);
+  const addSavedAddress = useSavedAddressesStore((s) => s.addAddress);
+  const removeSavedAddress = useSavedAddressesStore((s) => s.removeAddress);
 
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -32,24 +38,6 @@ export function HomePage() {
     hasGroupSeating: null,
     petFriendly: null,
   });
-  const [savedAddresses, setSavedAddresses] = useState<SavedAddressWithCoordinates[]>([
-    {
-      id: "1",
-      label: "집",
-      address: "서울특별시 강남구 역삼동 123-45",
-      isDefault: true,
-      latitude: 37.5172,
-      longitude: 127.0473,
-    },
-    {
-      id: "2",
-      label: "회사",
-      address: "서울특별시 서초구 서초동 456-78",
-      isDefault: false,
-      latitude: 37.4839,
-      longitude: 127.0328,
-    },
-  ]);
   const [exitDirection, setExitDirection] = useState<"left" | "right" | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -188,9 +176,8 @@ export function HomePage() {
   };
 
   const handleAddAddress = (address: SavedAddress) =>
-    setSavedAddresses((prev) => [...prev, address]);
-  const handleRemoveAddress = (id: string) =>
-    setSavedAddresses((prev) => prev.filter((a) => a.id !== id));
+    addSavedAddress(address as SavedAddressWithCoordinates);
+  const handleRemoveAddress = (id: string) => removeSavedAddress(id);
   const handleSelectAddress = async (address: SavedAddress) => {
     const selectedAddress = address as SavedAddressWithCoordinates;
     setAddress(address.address);

@@ -1,7 +1,7 @@
 @reference "../styles/globals.css";
 
 .stack {
-  @apply flex flex-col items-center text-center -translate-y-18;
+  @apply flex flex-col items-center text-center -translate-y-[8rem];
 }
 
 .tagline {

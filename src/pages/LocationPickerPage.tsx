@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import styles from "./LocationPickerPage.module.css";
 import type { LocationResult } from "@/shared/types/api.types";
 import { useNearbyQueryStore } from "@/shared/stores/nearby-query-store";
+import { useSavedAddressesStore } from "@/shared/stores/saved-addresses-store";
 import { loadGoogleMapsSdk } from "@/shared/utils/load-google-maps";
 
 type LatLng = { lat: number; lng: number };
@@ -19,7 +20,8 @@ const pickLocationLabelFromGeocodeResult = (result: any): string | null => {
     return result.formatted_address.trim();
   }
 
-  const components: Array<{ long_name?: string; types?: string[] }> = result.address_components ?? [];
+  const components: Array<{ long_name?: string; types?: string[] }> =
+    result.address_components ?? [];
   const findByType = (type: string) =>
     components.find((component) => component.types?.includes(type))?.long_name;
 
@@ -62,6 +64,7 @@ const buildSearchCandidateQueries = (query: string, selectedAddress: string): st
 export function LocationPickerPage() {
   const navigate = useNavigate();
   const { nearbyQuery, setCoordinates, setAddress } = useNearbyQueryStore();
+  const addSavedAddress = useSavedAddressesStore((s) => s.addAddress);
   const [selectedPosition, setSelectedPosition] = useState<LatLng>({
     lat: nearbyQuery.latitude,
     lng: nearbyQuery.longitude,
@@ -298,9 +301,18 @@ export function LocationPickerPage() {
   const handleConfirmLocation = () => {
     if (isConfirming) return;
     setIsConfirming(true);
+    const resolved = selectedAddress || "선택한 위치";
     setCoordinates(selectedPosition.lat, selectedPosition.lng);
-    setAddress(selectedAddress || "선택한 위치");
-    const appliedLocationLabel = (selectedAddress || "선택한 위치").replace(/^대한민국\s*/, "").trim();
+    setAddress(resolved);
+    addSavedAddress({
+      id: `map-${Date.now()}`,
+      label: "지도에서 선택",
+      address: resolved,
+      latitude: selectedPosition.lat,
+      longitude: selectedPosition.lng,
+      isDefault: false,
+    });
+    const appliedLocationLabel = resolved.replace(/^대한민국\s*/, "").trim();
     const shortLabel =
       appliedLocationLabel.length > 18 ? `${appliedLocationLabel.slice(0, 18)}...` : appliedLocationLabel;
     toast.success(

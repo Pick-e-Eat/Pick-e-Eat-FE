@@ -5,10 +5,10 @@ import styles from "./splash-screen.module.css";
 /** Tailwind `sm`과 동일: 이 너비 미만이면 모바일 레이아웃으로 간주 */
 const MOBILE_MEDIA = "(max-width: 639px)";
 
-const DISPLAY_MS = 2000;
+const DISPLAY_MS = 3000;
 const FADE_MS = 350;
-/** 로고 워드마크가 보인 뒤, 위쪽 문구가 나타나기까지 */
-const TAGLINE_DELAY_MS = 240;
+/** 워드마크와 함께 화면이 뜬 뒤, 위쪽 문구가 나타나기까지 */
+const TAGLINE_DELAY_MS = 800;
 
 function isMobileViewport(): boolean {
   return typeof window !== "undefined" && window.matchMedia(MOBILE_MEDIA).matches;
@@ -81,9 +81,7 @@ export function SplashScreen() {
       aria-label="Pick-e-Eat, 랜덤 맛집 추천서비스"
     >
       <div className={styles.stack}>
-        <p
-          className={cn(styles.tagline, taglineVisible && styles.taglineVisible)}
-        >
+        <p className={cn(styles.tagline, taglineVisible && styles.taglineVisible)}>
           랜덤 맛집 추천서비스
         </p>
         <h1 className={styles.wordmark} aria-label="Pick-e-Eat">
