@@ -1,19 +1,64 @@
+import { ArrowLeft, Crosshair, Search } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Crosshair, Search } from "lucide-react";
 import { toast } from "sonner";
-import styles from "./LocationPickerPage.module.css";
-import type { LocationResult } from "@/shared/types/api.types";
+import { SavedAddressLimitDialog } from "@/components/saved-address-limit-dialog";
 import { useNearbyQueryStore } from "@/shared/stores/nearby-query-store";
 import { useSavedAddressesStore } from "@/shared/stores/saved-addresses-store";
+import type { LocationResult } from "@/shared/types/api.types";
 import { loadGoogleMapsSdk } from "@/shared/utils/load-google-maps";
+import styles from "./LocationPickerPage.module.css";
 
 type LatLng = { lat: number; lng: number };
-type GoogleMarkerLike = {
-  position?: LatLng;
+
+type GeocodeComponent = {
+  long_name?: string;
+  types?: string[];
 };
 
-const pickLocationLabelFromGeocodeResult = (result: any): string | null => {
+type GeocodeResultLike = {
+  formatted_address?: string;
+  address_components?: GeocodeComponent[];
+  place_id?: string;
+  geometry?: {
+    location?: {
+      lat: () => number;
+      lng: () => number;
+    };
+  };
+};
+
+type GoogleMapInstance = {
+  panTo: (pos: LatLng) => void;
+  addListener: (event: string, handler: (e: MapClickEvent) => void) => { remove: () => void };
+};
+
+type MapClickEvent = {
+  latLng?: {
+    lat: () => number;
+    lng: () => number;
+  };
+};
+
+type AdvancedMarkerInstance = {
+  position: LatLng | null;
+};
+
+type GeocoderRequest = {
+  location?: LatLng;
+  address?: string;
+  language?: string;
+  region?: string;
+  bounds?: { north: number; south: number; east: number; west: number };
+};
+
+type GeocoderInstance = {
+  geocode: (req: GeocoderRequest) => Promise<{ results?: GeocodeResultLike[] }>;
+};
+
+const pickLocationLabelFromGeocodeResult = (
+  result: GeocodeResultLike | null | undefined,
+): string | null => {
   if (!result) return null;
 
   if (typeof result.formatted_address === "string" && result.formatted_address.trim()) {
@@ -76,11 +121,12 @@ export function LocationPickerPage() {
   const [isSearching, setIsSearching] = useState(false);
   const [isResolvingAddress, setIsResolvingAddress] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
+  const [savedAddressLimitOpen, setSavedAddressLimitOpen] = useState(false);
 
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<any>(null);
-  const markerRef = useRef<GoogleMarkerLike | null>(null);
-  const geocoderRef = useRef<any>(null);
+  const mapRef = useRef<GoogleMapInstance | null>(null);
+  const markerRef = useRef<AdvancedMarkerInstance | null>(null);
+  const geocoderRef = useRef<GeocoderInstance | null>(null);
   const geocodeRequestIdRef = useRef(0);
 
   const moveMarker = useCallback((nextPos: LatLng, panMap: boolean) => {
@@ -98,7 +144,7 @@ export function LocationPickerPage() {
 
     const requestId = ++geocodeRequestIdRef.current;
     if (!geocoderRef.current) {
-      geocoderRef.current = new window.google.maps.Geocoder();
+      geocoderRef.current = new window.google.maps.Geocoder() as GeocoderInstance;
     }
 
     setIsResolvingAddress(true);
@@ -135,9 +181,15 @@ export function LocationPickerPage() {
         const mapsApi = window.google.maps;
         const mapsLib = mapsApi.importLibrary ? await mapsApi.importLibrary("maps") : null;
         const markerLib = mapsApi.importLibrary ? await mapsApi.importLibrary("marker") : null;
-        const MapCtor = (mapsLib as { Map?: any } | null)?.Map ?? mapsApi.Map;
-        const AdvancedMarkerCtor =
-          (markerLib as { AdvancedMarkerElement?: any } | null)?.AdvancedMarkerElement ?? null;
+        type MapLib = { Map?: new (el: HTMLElement, opts: object) => GoogleMapInstance };
+        type MarkerLib = {
+          AdvancedMarkerElement?: new (opts: {
+            position: LatLng;
+            map: GoogleMapInstance;
+          }) => AdvancedMarkerInstance;
+        };
+        const MapCtor = (mapsLib as MapLib | null)?.Map ?? mapsApi.Map;
+        const AdvancedMarkerCtor = (markerLib as MarkerLib | null)?.AdvancedMarkerElement ?? null;
 
         if (typeof MapCtor !== "function") {
           throw new Error("Google Maps Map 생성자를 불러오지 못했습니다.");
@@ -158,8 +210,8 @@ export function LocationPickerPage() {
           map,
         });
 
-        clickListener = map.addListener("click", (event: any) => {
-          const latLng = event?.latLng;
+        clickListener = map.addListener("click", (event: MapClickEvent) => {
+          const latLng = event.latLng;
           if (!latLng) return;
           const nextPos = { lat: latLng.lat(), lng: latLng.lng() };
           moveMarker(nextPos, false);
@@ -207,7 +259,7 @@ export function LocationPickerPage() {
       }
 
       if (!geocoderRef.current) {
-        geocoderRef.current = new window.google.maps.Geocoder();
+        geocoderRef.current = new window.google.maps.Geocoder() as GeocoderInstance;
       }
 
       const candidateQueries = buildSearchCandidateQueries(query, selectedAddress);
@@ -219,7 +271,7 @@ export function LocationPickerPage() {
         west: selectedPosition.lng - biasDelta,
       };
 
-      let geocodeResults: any[] = [];
+      let geocodeResults: GeocodeResultLike[] = [];
       for (const candidateQuery of candidateQueries) {
         try {
           const response = await geocoderRef.current.geocode({
@@ -237,7 +289,7 @@ export function LocationPickerPage() {
         }
       }
 
-      const locations: LocationResult[] = geocodeResults.slice(0, 5).map((result: any) => {
+      const locations: LocationResult[] = geocodeResults.slice(0, 5).map((result) => {
         const lat = result.geometry?.location?.lat?.();
         const lng = result.geometry?.location?.lng?.();
         return {
@@ -304,7 +356,7 @@ export function LocationPickerPage() {
     const resolved = selectedAddress || "선택한 위치";
     setCoordinates(selectedPosition.lat, selectedPosition.lng);
     setAddress(resolved);
-    addSavedAddress({
+    const result = addSavedAddress({
       id: `map-${Date.now()}`,
       label: "지도에서 선택",
       address: resolved,
@@ -312,6 +364,20 @@ export function LocationPickerPage() {
       longitude: selectedPosition.lng,
       isDefault: false,
     });
+
+    if (result === "limit") {
+      setIsConfirming(false);
+      setSavedAddressLimitOpen(true);
+      return;
+    }
+
+    if (result === "duplicate") {
+      setIsConfirming(false);
+      toast.message("이미 저장된 위치예요. 검색 위치만 바꿨어요.");
+      window.setTimeout(() => navigate(-1), 120);
+      return;
+    }
+
     const appliedLocationLabel = resolved.replace(/^대한민국\s*/, "").trim();
     const shortLabel =
       appliedLocationLabel.length > 18
@@ -401,6 +467,12 @@ export function LocationPickerPage() {
           {isConfirming ? "적용 중..." : "이 위치로 설정"}
         </button>
       </section>
+
+      <SavedAddressLimitDialog
+        open={savedAddressLimitOpen}
+        onOpenChange={setSavedAddressLimitOpen}
+        onCloseComplete={() => navigate(-1)}
+      />
     </main>
   );
 }
