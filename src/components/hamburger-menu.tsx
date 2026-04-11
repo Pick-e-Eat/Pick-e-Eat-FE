@@ -29,7 +29,8 @@ interface HamburgerMenuProps {
   filterSettings: FilterSettings;
   onFilterChange: (settings: FilterSettings) => void;
   savedAddresses: SavedAddress[];
-  onAddAddress: (address: SavedAddress) => void;
+  /** 저장 성공 시 true, 저장 안 됨(한도 등)이면 false */
+  onAddAddress: (address: SavedAddress) => boolean;
   onRemoveAddress: (id: string) => void;
   onSelectAddress: (address: SavedAddress) => void;
 }
@@ -56,15 +57,17 @@ export function HamburgerMenu({
 
   const handleAddAddress = () => {
     if (newAddressLabel.trim() && newAddressValue.trim()) {
-      onAddAddress({
+      const added = onAddAddress({
         id: Date.now().toString(),
         label: newAddressLabel.trim(),
         address: newAddressValue.trim(),
         isDefault: savedAddresses.length === 0,
       });
-      setNewAddressLabel("");
-      setNewAddressValue("");
-      setShowAddressForm(false);
+      if (added) {
+        setNewAddressLabel("");
+        setNewAddressValue("");
+        setShowAddressForm(false);
+      }
     }
   };
 

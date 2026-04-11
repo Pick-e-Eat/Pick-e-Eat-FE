@@ -14,6 +14,7 @@ import { SwipeCard } from "@/components/swipe-card";
 import { ReviewSheet } from "@/components/review-sheet";
 import { HamburgerMenu } from "@/components/hamburger-menu";
 import { HomeHeader } from "@/features/home/components/HomeHeader";
+import { SavedAddressLimitDialog } from "@/components/saved-address-limit-dialog";
 import { ThumbsDown, ThumbsUp } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -41,6 +42,7 @@ export function HomePage() {
   const [exitDirection, setExitDirection] = useState<"left" | "right" | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [savedAddressLimitOpen, setSavedAddressLimitOpen] = useState(false);
 
   useEffect(() => {
     setFilterSettings((prev) =>
@@ -175,8 +177,14 @@ export function HomePage() {
       });
   };
 
-  const handleAddAddress = (address: SavedAddress) =>
-    addSavedAddress(address as SavedAddressWithCoordinates);
+  const handleAddAddress = (address: SavedAddress) => {
+    const result = addSavedAddress(address as SavedAddressWithCoordinates);
+    if (result === "limit") {
+      setSavedAddressLimitOpen(true);
+      return false;
+    }
+    return result === "ok";
+  };
   const handleRemoveAddress = (id: string) => removeSavedAddress(id);
   const handleSelectAddress = async (address: SavedAddress) => {
     const selectedAddress = address as SavedAddressWithCoordinates;
@@ -283,6 +291,10 @@ export function HomePage() {
         onAddAddress={handleAddAddress}
         onRemoveAddress={handleRemoveAddress}
         onSelectAddress={handleSelectAddress}
+      />
+      <SavedAddressLimitDialog
+        open={savedAddressLimitOpen}
+        onOpenChange={setSavedAddressLimitOpen}
       />
     </main>
   );

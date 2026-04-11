@@ -7,24 +7,10 @@ export type SavedAddressWithCoordinates = SavedAddress & {
   longitude?: number;
 };
 
-const SEED_ADDRESSES: SavedAddressWithCoordinates[] = [
-  {
-    id: "1",
-    label: "집",
-    address: "서울특별시 강남구 역삼동 123-45",
-    isDefault: true,
-    latitude: 37.5172,
-    longitude: 127.0473,
-  },
-  {
-    id: "2",
-    label: "회사",
-    address: "서울특별시 서초구 서초동 456-78",
-    isDefault: false,
-    latitude: 37.4839,
-    longitude: 127.0328,
-  },
-];
+/** 저장된 주소 최대 개수 */
+export const MAX_SAVED_ADDRESSES = 3;
+
+export type AddSavedAddressResult = "ok" | "limit" | "duplicate";
 
 function coordsKey(lat: number, lng: number) {
   return `${Math.round(lat * 1e5) / 1e5},${Math.round(lng * 1e5) / 1e5}`;
@@ -32,35 +18,41 @@ function coordsKey(lat: number, lng: number) {
 
 interface SavedAddressesState {
   addresses: SavedAddressWithCoordinates[];
-  addAddress: (address: SavedAddressWithCoordinates) => void;
+  addAddress: (address: SavedAddressWithCoordinates) => AddSavedAddressResult;
   removeAddress: (id: string) => void;
 }
 
 export const useSavedAddressesStore = create<SavedAddressesState>()(
   persist(
-    (set) => ({
-      addresses: SEED_ADDRESSES,
-      addAddress: (address) =>
-        set((state) => {
-          const { latitude: lat, longitude: lng } = address;
-          if (typeof lat === "number" && typeof lng === "number") {
-            const key = coordsKey(lat, lng);
-            const dup = state.addresses.some(
-              (a) =>
-                typeof a.latitude === "number" &&
-                typeof a.longitude === "number" &&
-                coordsKey(a.latitude, a.longitude) === key,
-            );
-            if (dup) return state;
-          }
-          const next = [...state.addresses, address];
+    (set, get) => ({
+      addresses: [],
+      addAddress: (address) => {
+        const state = get();
+        if (state.addresses.length >= MAX_SAVED_ADDRESSES) {
+          return "limit";
+        }
+        const { latitude: lat, longitude: lng } = address;
+        if (typeof lat === "number" && typeof lng === "number") {
+          const key = coordsKey(lat, lng);
+          const dup = state.addresses.some(
+            (a) =>
+              typeof a.latitude === "number" &&
+              typeof a.longitude === "number" &&
+              coordsKey(a.latitude, a.longitude) === key,
+          );
+          if (dup) return "duplicate";
+        }
+        set((s) => {
+          const next = [...s.addresses, address];
           if (address.isDefault) {
             return {
               addresses: next.map((a) => (a.id === address.id ? a : { ...a, isDefault: false })),
             };
           }
           return { addresses: next };
-        }),
+        });
+        return "ok";
+      },
       removeAddress: (id) =>
         set((state) => {
           const addresses = state.addresses.filter((a) => a.id !== id);
@@ -73,7 +65,7 @@ export const useSavedAddressesStore = create<SavedAddressesState>()(
         }),
     }),
     {
-      name: "saved-addresses-store",
+      name: "saved-addresses-store-v2",
       storage: createJSONStorage(() => localStorage),
     },
   ),
