@@ -1,12 +1,6 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-
-const MESSAGE = "저장되는 주소는 최대 3개까지입니다.";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { MAX_SAVED_ADDRESSES } from "@/shared/stores/saved-addresses-store";
 
 type SavedAddressLimitDialogProps = {
   open: boolean;
@@ -32,7 +26,7 @@ export function SavedAddressLimitDialog({
       <DialogContent className="sm:max-w-sm" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle className="text-center text-base font-medium leading-snug">
-            {MESSAGE}
+            저장되는 주소는 최대 {MAX_SAVED_ADDRESSES}개까지입니다.
           </DialogTitle>
         </DialogHeader>
         <div className="flex justify-center pt-2">

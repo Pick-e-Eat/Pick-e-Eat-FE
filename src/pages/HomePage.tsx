@@ -1,22 +1,22 @@
-import { useState, useCallback, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import styles from "./HomePage.module.css";
-import { routes } from "@/shared/constants/routes";
-import type { Restaurant, FilterSettings, SavedAddress, SwipeResult } from "@/lib/types";
-import { restaurantAPI } from "@/shared/api/restaurant";
-import { useResultsStore } from "@/shared/stores/results-store";
-import { useNearbyQueryStore } from "@/shared/stores/nearby-query-store";
-import {
-  useSavedAddressesStore,
-  type SavedAddressWithCoordinates,
-} from "@/shared/stores/saved-addresses-store";
-import { SwipeCard } from "@/components/swipe-card";
-import { ReviewSheet } from "@/components/review-sheet";
-import { HamburgerMenu } from "@/components/hamburger-menu";
-import { HomeHeader } from "@/features/home/components/HomeHeader";
-import { SavedAddressLimitDialog } from "@/components/saved-address-limit-dialog";
-import { ThumbsDown, ThumbsUp } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+import { ThumbsDown, ThumbsUp } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { HamburgerMenu } from "@/components/hamburger-menu";
+import { ReviewSheet } from "@/components/review-sheet";
+import { SavedAddressLimitDialog } from "@/components/saved-address-limit-dialog";
+import { SwipeCard } from "@/components/swipe-card";
+import { HomeHeader } from "@/features/home/components/HomeHeader";
+import type { FilterSettings, Restaurant, SavedAddress, SwipeResult } from "@/lib/types";
+import { restaurantAPI } from "@/shared/api/restaurant";
+import { routes } from "@/shared/constants/routes";
+import { useNearbyQueryStore } from "@/shared/stores/nearby-query-store";
+import { useResultsStore } from "@/shared/stores/results-store";
+import {
+  type SavedAddressWithCoordinates,
+  useSavedAddressesStore,
+} from "@/shared/stores/saved-addresses-store";
+import styles from "./HomePage.module.css";
 
 const MAX_SELECTIONS = 10;
 
@@ -285,10 +285,13 @@ export function HomePage() {
         onClose={() => setMenuOpen(false)}
         onOpenLocationPicker={handleOpenLocationPicker}
         currentLocation={currentLocation}
+        addressSearchBiasLat={nearbyQuery.latitude}
+        addressSearchBiasLng={nearbyQuery.longitude}
         filterSettings={filterSettings}
         onFilterChange={handleFilterChange}
         savedAddresses={savedAddresses}
         onAddAddress={handleAddAddress}
+        onSavedAddressLimit={() => setSavedAddressLimitOpen(true)}
         onRemoveAddress={handleRemoveAddress}
         onSelectAddress={handleSelectAddress}
       />

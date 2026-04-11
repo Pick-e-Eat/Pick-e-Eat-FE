@@ -2,31 +2,17 @@ import { ArrowLeft, Crosshair, Search } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { SavedAddressLimitDialog } from "@/components/saved-address-limit-dialog";
 import { useNearbyQueryStore } from "@/shared/stores/nearby-query-store";
-import { useSavedAddressesStore } from "@/shared/stores/saved-addresses-store";
 import type { LocationResult } from "@/shared/types/api.types";
+import {
+  type GoogleGeocoderLike,
+  pickLocationLabelFromGeocodeResult,
+  searchAddressWithGoogleGeocoder,
+} from "@/shared/utils/google-geocode-address-search";
 import { loadGoogleMapsSdk } from "@/shared/utils/load-google-maps";
 import styles from "./LocationPickerPage.module.css";
 
 type LatLng = { lat: number; lng: number };
-
-type GeocodeComponent = {
-  long_name?: string;
-  types?: string[];
-};
-
-type GeocodeResultLike = {
-  formatted_address?: string;
-  address_components?: GeocodeComponent[];
-  place_id?: string;
-  geometry?: {
-    location?: {
-      lat: () => number;
-      lng: () => number;
-    };
-  };
-};
 
 type GoogleMapInstance = {
   panTo: (pos: LatLng) => void;
@@ -44,72 +30,9 @@ type AdvancedMarkerInstance = {
   position: LatLng | null;
 };
 
-type GeocoderRequest = {
-  location?: LatLng;
-  address?: string;
-  language?: string;
-  region?: string;
-  bounds?: { north: number; south: number; east: number; west: number };
-};
-
-type GeocoderInstance = {
-  geocode: (req: GeocoderRequest) => Promise<{ results?: GeocodeResultLike[] }>;
-};
-
-const pickLocationLabelFromGeocodeResult = (
-  result: GeocodeResultLike | null | undefined,
-): string | null => {
-  if (!result) return null;
-
-  if (typeof result.formatted_address === "string" && result.formatted_address.trim()) {
-    return result.formatted_address.trim();
-  }
-
-  const components: Array<{ long_name?: string; types?: string[] }> =
-    result.address_components ?? [];
-  const findByType = (type: string) =>
-    components.find((component) => component.types?.includes(type))?.long_name;
-
-  const dong =
-    findByType("sublocality_level_4") ??
-    findByType("sublocality_level_3") ??
-    findByType("sublocality_level_2") ??
-    findByType("sublocality_level_1");
-  if (dong) return dong;
-
-  return result.formatted_address ?? null;
-};
-
-const buildSearchCandidateQueries = (query: string, selectedAddress: string): string[] => {
-  const normalizedAddress = selectedAddress.replace(/^대한민국\s*/, "").trim();
-  const addressParts = normalizedAddress.split(/\s+/).filter(Boolean).slice(0, 3);
-  const contextualPrefixes: string[] = [];
-
-  if (addressParts.length >= 1) {
-    contextualPrefixes.push(addressParts[0]);
-  }
-  if (addressParts.length >= 2) {
-    contextualPrefixes.push(addressParts.slice(0, 2).join(" "));
-  }
-  if (addressParts.length >= 3) {
-    contextualPrefixes.push(addressParts.slice(0, 3).join(" "));
-  }
-
-  return Array.from(
-    new Set([
-      query,
-      ...contextualPrefixes.map((prefix) => `${prefix} ${query}`),
-      `대한민국 ${query}`,
-      `서울 ${query}`,
-      `부산 ${query}`,
-    ]),
-  );
-};
-
 export function LocationPickerPage() {
   const navigate = useNavigate();
   const { nearbyQuery, setCoordinates, setAddress } = useNearbyQueryStore();
-  const addSavedAddress = useSavedAddressesStore((s) => s.addAddress);
   const [selectedPosition, setSelectedPosition] = useState<LatLng>({
     lat: nearbyQuery.latitude,
     lng: nearbyQuery.longitude,
@@ -121,12 +44,11 @@ export function LocationPickerPage() {
   const [isSearching, setIsSearching] = useState(false);
   const [isResolvingAddress, setIsResolvingAddress] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
-  const [savedAddressLimitOpen, setSavedAddressLimitOpen] = useState(false);
 
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<GoogleMapInstance | null>(null);
   const markerRef = useRef<AdvancedMarkerInstance | null>(null);
-  const geocoderRef = useRef<GeocoderInstance | null>(null);
+  const geocoderRef = useRef<GoogleGeocoderLike | null>(null);
   const geocodeRequestIdRef = useRef(0);
 
   const moveMarker = useCallback((nextPos: LatLng, panMap: boolean) => {
@@ -144,7 +66,7 @@ export function LocationPickerPage() {
 
     const requestId = ++geocodeRequestIdRef.current;
     if (!geocoderRef.current) {
-      geocoderRef.current = new window.google.maps.Geocoder() as GeocoderInstance;
+      geocoderRef.current = new window.google.maps.Geocoder() as GoogleGeocoderLike;
     }
 
     setIsResolvingAddress(true);
@@ -253,54 +175,12 @@ export function LocationPickerPage() {
     }
     setIsSearching(true);
     try {
-      await loadGoogleMapsSdk();
-      if (!window.google?.maps) {
-        throw new Error("Google Maps SDK가 준비되지 않았습니다.");
-      }
-
-      if (!geocoderRef.current) {
-        geocoderRef.current = new window.google.maps.Geocoder() as GeocoderInstance;
-      }
-
-      const candidateQueries = buildSearchCandidateQueries(query, selectedAddress);
-      const biasDelta = 0.2;
-      const biasBounds = {
-        north: selectedPosition.lat + biasDelta,
-        south: selectedPosition.lat - biasDelta,
-        east: selectedPosition.lng + biasDelta,
-        west: selectedPosition.lng - biasDelta,
-      };
-
-      let geocodeResults: GeocodeResultLike[] = [];
-      for (const candidateQuery of candidateQueries) {
-        try {
-          const response = await geocoderRef.current.geocode({
-            address: candidateQuery,
-            language: "ko",
-            region: "KR",
-            bounds: biasBounds,
-          });
-          geocodeResults = response?.results ?? [];
-          if (geocodeResults.length > 0) {
-            break;
-          }
-        } catch {
-          geocodeResults = [];
-        }
-      }
-
-      const locations: LocationResult[] = geocodeResults.slice(0, 5).map((result) => {
-        const lat = result.geometry?.location?.lat?.();
-        const lng = result.geometry?.location?.lng?.();
-        return {
-          place_id: result.place_id ?? `${lat}-${lng}`,
-          name: pickLocationLabelFromGeocodeResult(result) ?? query,
-          address: result.formatted_address ?? "",
-          latitude: typeof lat === "number" ? lat : 0,
-          longitude: typeof lng === "number" ? lng : 0,
-        };
+      const locations = await searchAddressWithGoogleGeocoder({
+        query,
+        contextAddress: selectedAddress,
+        biasLat: selectedPosition.lat,
+        biasLng: selectedPosition.lng,
       });
-
       setSearchResults(locations);
       if (locations.length === 0) {
         toast.message("검색 결과가 없습니다.");
@@ -356,27 +236,6 @@ export function LocationPickerPage() {
     const resolved = selectedAddress || "선택한 위치";
     setCoordinates(selectedPosition.lat, selectedPosition.lng);
     setAddress(resolved);
-    const result = addSavedAddress({
-      id: `map-${Date.now()}`,
-      label: "지도에서 선택",
-      address: resolved,
-      latitude: selectedPosition.lat,
-      longitude: selectedPosition.lng,
-      isDefault: false,
-    });
-
-    if (result === "limit") {
-      setIsConfirming(false);
-      setSavedAddressLimitOpen(true);
-      return;
-    }
-
-    if (result === "duplicate") {
-      setIsConfirming(false);
-      toast.message("이미 저장된 위치예요. 검색 위치만 바꿨어요.");
-      window.setTimeout(() => navigate(-1), 120);
-      return;
-    }
 
     const appliedLocationLabel = resolved.replace(/^대한민국\s*/, "").trim();
     const shortLabel =
@@ -467,12 +326,6 @@ export function LocationPickerPage() {
           {isConfirming ? "적용 중..." : "이 위치로 설정"}
         </button>
       </section>
-
-      <SavedAddressLimitDialog
-        open={savedAddressLimitOpen}
-        onOpenChange={setSavedAddressLimitOpen}
-        onCloseComplete={() => navigate(-1)}
-      />
     </main>
   );
 }
