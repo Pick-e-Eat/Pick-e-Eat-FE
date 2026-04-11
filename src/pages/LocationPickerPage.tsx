@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Crosshair, Search } from "lucide-react";
 import { toast } from "sonner";
 import styles from "./LocationPickerPage.module.css";
-import { restaurantAPI } from "@/shared/api/restaurant";
 import type { LocationResult } from "@/shared/types/api.types";
 import { useNearbyQueryStore } from "@/shared/stores/nearby-query-store";
 import { loadGoogleMapsSdk } from "@/shared/utils/load-google-maps";
@@ -13,7 +12,7 @@ type GoogleMarkerLike = {
   position?: LatLng;
 };
 
-function pickLocationLabelFromGeocodeResult(result: any): string | null {
+const pickLocationLabelFromGeocodeResult = (result: any): string | null => {
   if (!result) return null;
 
   if (typeof result.formatted_address === "string" && result.formatted_address.trim()) {
@@ -32,6 +31,32 @@ function pickLocationLabelFromGeocodeResult(result: any): string | null {
   if (dong) return dong;
 
   return result.formatted_address ?? null;
+}
+
+const buildSearchCandidateQueries = (query: string, selectedAddress: string): string[] => {
+  const normalizedAddress = selectedAddress.replace(/^대한민국\s*/, "").trim();
+  const addressParts = normalizedAddress.split(/\s+/).filter(Boolean).slice(0, 3);
+  const contextualPrefixes: string[] = [];
+
+  if (addressParts.length >= 1) {
+    contextualPrefixes.push(addressParts[0]);
+  }
+  if (addressParts.length >= 2) {
+    contextualPrefixes.push(addressParts.slice(0, 2).join(" "));
+  }
+  if (addressParts.length >= 3) {
+    contextualPrefixes.push(addressParts.slice(0, 3).join(" "));
+  }
+
+  return Array.from(
+    new Set([
+      query,
+      ...contextualPrefixes.map((prefix) => `${prefix} ${query}`),
+      `대한민국 ${query}`,
+      `서울 ${query}`,
+      `부산 ${query}`,
+    ]),
+  );
 }
 
 export function LocationPickerPage() {
@@ -165,15 +190,63 @@ export function LocationPickerPage() {
   }, [moveMarker, nearbyQuery.latitude, nearbyQuery.longitude, resolveAddressFromLatLng]);
 
   const handleSearchLocation = async () => {
-    if (!searchQuery.trim()) {
+    const query = searchQuery.trim();
+    if (!query) {
       toast.error("검색어를 입력해 주세요.");
       return;
     }
     setIsSearching(true);
     try {
-      const response = await restaurantAPI.searchText({ query: searchQuery.trim() });
-      setSearchResults(response.locations);
-      if (response.locations.length === 0) {
+      await loadGoogleMapsSdk();
+      if (!window.google?.maps) {
+        throw new Error("Google Maps SDK가 준비되지 않았습니다.");
+      }
+
+      if (!geocoderRef.current) {
+        geocoderRef.current = new window.google.maps.Geocoder();
+      }
+
+      const candidateQueries = buildSearchCandidateQueries(query, selectedAddress);
+      const biasDelta = 0.2;
+      const biasBounds = {
+        north: selectedPosition.lat + biasDelta,
+        south: selectedPosition.lat - biasDelta,
+        east: selectedPosition.lng + biasDelta,
+        west: selectedPosition.lng - biasDelta,
+      };
+
+      let geocodeResults: any[] = [];
+      for (const candidateQuery of candidateQueries) {
+        try {
+          const response = await geocoderRef.current.geocode({
+            address: candidateQuery,
+            language: "ko",
+            region: "KR",
+            bounds: biasBounds,
+          });
+          geocodeResults = response?.results ?? [];
+          if (geocodeResults.length > 0) {
+            break;
+          }
+        } catch {
+          geocodeResults = [];
+        }
+      }
+
+      const locations: LocationResult[] = geocodeResults.slice(0, 5).map((result: any) => {
+        const lat = result.geometry?.location?.lat?.();
+        const lng = result.geometry?.location?.lng?.();
+        return {
+          place_id: result.place_id ?? `${lat}-${lng}`,
+          name: pickLocationLabelFromGeocodeResult(result) ?? query,
+          address: result.formatted_address ?? "",
+          latitude: typeof lat === "number" ? lat : 0,
+          longitude: typeof lng === "number" ? lng : 0,
+        };
+      });
+
+      setSearchResults(locations);
+      if (locations.length === 0) {
         toast.message("검색 결과가 없습니다.");
       }
     } catch (error) {
