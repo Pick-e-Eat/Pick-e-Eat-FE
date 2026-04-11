@@ -72,6 +72,7 @@ export function LocationPickerPage() {
   const [isLoadingMap, setIsLoadingMap] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
   const [isResolvingAddress, setIsResolvingAddress] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
 
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<any>(null);
@@ -295,9 +296,23 @@ export function LocationPickerPage() {
   };
 
   const handleConfirmLocation = () => {
+    if (isConfirming) return;
+    setIsConfirming(true);
     setCoordinates(selectedPosition.lat, selectedPosition.lng);
     setAddress(selectedAddress || "선택한 위치");
-    navigate(-1);
+    const appliedLocationLabel = (selectedAddress || "선택한 위치").replace(/^대한민국\s*/, "").trim();
+    const shortLabel =
+      appliedLocationLabel.length > 18 ? `${appliedLocationLabel.slice(0, 18)}...` : appliedLocationLabel;
+    toast.success(
+      <>
+        위치를 적용했어요.
+        <br />
+        위치: {shortLabel}
+      </>,
+    );
+    window.setTimeout(() => {
+      navigate(-1);
+    }, 120);
   };
 
   return (
@@ -363,8 +378,13 @@ export function LocationPickerPage() {
             ? "위치 이름을 확인하는 중..."
             : "지도를 탭하거나 검색/GPS로 위치를 선택해 주세요."}
         </p>
-        <button type="button" className={styles.confirmButton} onClick={handleConfirmLocation}>
-          이 위치로 설정
+        <button
+          type="button"
+          className={styles.confirmButton}
+          onClick={handleConfirmLocation}
+          disabled={isConfirming}
+        >
+          {isConfirming ? "적용 중..." : "이 위치로 설정"}
         </button>
       </section>
     </main>
