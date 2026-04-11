@@ -187,9 +187,9 @@ export function HamburgerMenu({
     }
   };
 
-  const searchRangeOptions: Array<{ value: 50 | 100 | 250; label: string }> = [
+  const searchRangeOptions: Array<{ value: 50 | 100 | 250; label: string; sub?: string }> = [
     { value: 50, label: "50m" },
-    { value: 100, label: "100m (기본)" },
+    { value: 100, label: "100m", sub: "(기본)" },
     { value: 250, label: "250m" },
   ];
 
@@ -204,6 +204,7 @@ export function HamburgerMenu({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
             className={styles.overlay}
             onClick={onClose}
           />
@@ -211,7 +212,7 @@ export function HamburgerMenu({
             initial={{ x: "-100%" }}
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
-            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+            transition={{ type: "tween", duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
             className={styles.menuContainer}
           >
             {/* Header — 모달형: 중앙 타이틀 + 우측 닫기 */}
@@ -290,7 +291,10 @@ export function HamburgerMenu({
                                 : styles.rangeOptionButtonInactive,
                             )}
                           >
-                            {option.label}
+                            <span>{option.label}</span>
+                            {option.sub ? (
+                              <span className={styles.rangeOptionSub}>{option.sub}</span>
+                            ) : null}
                           </button>
                         ))}
                       </div>
