@@ -1,11 +1,11 @@
 @reference "../styles/globals.css";
 
 .pageContainer {
-  @apply flex h-dvh flex-col bg-background;
+  @apply h-dvh overflow-hidden bg-background;
 }
 
 .header {
-  @apply flex items-center gap-3 border-b border-border px-4 py-3;
+  @apply absolute left-0 right-0 top-0 z-30 flex items-center gap-3 border-b border-border bg-background px-4 py-3;
 }
 
 .title {
@@ -21,23 +21,23 @@
 }
 
 .searchBarSection {
-  @apply flex gap-2 border-b border-border px-4 py-3;
+  @apply absolute left-3 right-3 top-[4.3rem] z-30 flex gap-2;
 }
 
 .searchInput {
-  @apply w-full rounded-xl bg-muted px-3 py-2 text-sm text-card-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary;
+  @apply w-full rounded-xl border border-border/70 bg-card/95 px-3 py-2 text-sm text-card-foreground placeholder:text-muted-foreground shadow-sm backdrop-blur focus:outline-none focus:ring-2 focus:ring-primary;
 }
 
 .searchButton {
-  @apply rounded-xl bg-primary px-3 text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer;
+  @apply rounded-xl bg-primary px-3 text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer;
 }
 
 .searchResults {
-  @apply max-h-44 overflow-y-auto border-b border-border bg-card;
+  @apply absolute left-3 right-3 top-[7.7rem] z-30 max-h-52 overflow-y-auto rounded-2xl border border-border/70 bg-card/95 shadow-md backdrop-blur;
 }
 
 .searchResultItem {
-  @apply block w-full border-b border-border px-4 py-3 text-left transition-colors hover:bg-muted cursor-pointer;
+  @apply block w-full border-b border-border/70 px-4 py-3 text-left transition-colors hover:bg-muted cursor-pointer;
 }
 
 .searchResultName {
@@ -49,7 +49,7 @@
 }
 
 .mapSection {
-  @apply relative flex-1;
+  @apply relative h-full w-full;
 }
 
 .mapContainer {
@@ -57,23 +57,31 @@
 }
 
 .mapLoadingOverlay {
-  @apply absolute inset-0 z-10 flex items-center justify-center bg-background/80 text-sm text-muted-foreground;
+  @apply absolute inset-0 z-20 flex items-center justify-center bg-background/70 text-sm text-muted-foreground;
 }
 
 .gpsButton {
   @apply absolute right-4 top-4 z-20 rounded-full bg-card p-3 text-card-foreground shadow-md transition-colors hover:bg-muted cursor-pointer;
 }
 
+.mapActionButtons {
+  @apply absolute right-3 top-1/2 z-30 flex -translate-y-1/2 flex-col gap-2;
+}
+
+.mapActionButton {
+  @apply rounded-full border border-border/70 bg-card/95 p-2.5 text-card-foreground shadow-md transition-colors hover:bg-muted cursor-pointer;
+}
+
 .bottomSheet {
-  @apply h-72 rounded-t-3xl border-t border-border bg-card p-4;
+  @apply absolute bottom-0 left-0 right-0 z-30 rounded-t-3xl border-t border-border bg-card/95 px-4 pb-5 pt-4 shadow-[0_-8px_24px_rgba(0,0,0,0.12)] backdrop-blur;
 }
 
 .selectedAddress {
-  @apply text-sm font-semibold text-card-foreground;
+  @apply line-clamp-2 text-sm font-semibold text-card-foreground;
 }
 
 .metaText {
-  @apply mt-1 mb-3 text-xs text-muted-foreground;
+  @apply mb-3 mt-1 text-xs text-muted-foreground;
 }
 
 .confirmButton {

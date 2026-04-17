@@ -40,13 +40,36 @@ export function pickLocationLabelFromGeocodeResult(
 ): string | null {
   if (!result) return null;
 
-  if (typeof result.formatted_address === "string" && result.formatted_address.trim()) {
-    return result.formatted_address.trim();
-  }
-
   const components: GeocodeComponent[] = result.address_components ?? [];
   const findByType = (type: string) =>
     components.find((component) => component.types?.includes(type))?.long_name;
+
+  const normalizedFormattedAddress =
+    typeof result.formatted_address === "string"
+      ? result.formatted_address.replace(/^대한민국\s*/, "").trim()
+      : "";
+  const route = findByType("route");
+  const streetNumber = findByType("street_number");
+  const premise = findByType("premise");
+  const roadAddressNumber = streetNumber || premise;
+  const cityOrProvince = findByType("administrative_area_level_1");
+  const district = findByType("administrative_area_level_2");
+  const neighborhood = findByType("administrative_area_level_3");
+
+  if (route) {
+    return [cityOrProvince, district, neighborhood, [route, roadAddressNumber].filter(Boolean).join(" ")]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+  }
+
+  if (/(?:로|길)\s*\d*/.test(normalizedFormattedAddress)) {
+    return normalizedFormattedAddress;
+  }
+
+  if (normalizedFormattedAddress) {
+    return normalizedFormattedAddress;
+  }
 
   const dong =
     findByType("sublocality_level_4") ??
@@ -133,10 +156,11 @@ export async function searchAddressWithGoogleGeocoder(options: {
   return geocodeResults.slice(0, 5).map((result) => {
     const lat = result.geometry?.location?.lat?.();
     const lng = result.geometry?.location?.lng?.();
+    const roadAddress = pickLocationLabelFromGeocodeResult(result);
     return {
       place_id: result.place_id ?? `${lat}-${lng}`,
-      name: pickLocationLabelFromGeocodeResult(result) ?? trimmed,
-      address: result.formatted_address ?? "",
+      name: roadAddress ?? trimmed,
+      address: roadAddress ?? result.formatted_address ?? "",
       latitude: typeof lat === "number" ? lat : 0,
       longitude: typeof lng === "number" ? lng : 0,
     };

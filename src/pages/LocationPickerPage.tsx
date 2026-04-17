@@ -1,4 +1,4 @@
-import { ArrowLeft, Crosshair, Search } from "lucide-react";
+import { ArrowLeft, Crosshair, Minus, Plus, Search } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -16,6 +16,8 @@ type LatLng = { lat: number; lng: number };
 
 type GoogleMapInstance = {
   panTo: (pos: LatLng) => void;
+  getZoom: () => number | undefined;
+  setZoom: (zoom: number) => void;
   addListener: (event: string, handler: (e: MapClickEvent) => void) => { remove: () => void };
 };
 
@@ -29,6 +31,42 @@ type MapClickEvent = {
 type AdvancedMarkerInstance = {
   position: LatLng | null;
 };
+
+const ZOOM_BY_RADIUS: Record<50 | 100 | 250, number> = {
+  50: 17,
+  100: 16,
+  250: 15,
+};
+const MIN_MAP_ZOOM = 14;
+const MAX_MAP_ZOOM = 19;
+
+function getInitialZoomByRadius(radius: number): number {
+  if (radius === 50 || radius === 100 || radius === 250) {
+    return ZOOM_BY_RADIUS[radius];
+  }
+  return ZOOM_BY_RADIUS[100];
+}
+
+function createCustomMarkerContent(): HTMLDivElement {
+  const wrapper = document.createElement("div");
+  wrapper.style.width = "36px";
+  wrapper.style.height = "46px";
+  wrapper.style.display = "flex";
+  wrapper.style.alignItems = "center";
+  wrapper.style.justifyContent = "center";
+  wrapper.style.transform = "translateY(-6px)";
+
+  wrapper.innerHTML = `
+    <svg width="33" height="42" viewBox="0 0 44 56" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M22 55C21 55 20.2 54.6 19.6 53.9L7 41.4C2.8 37.2 0 31.2 0 24.5C0 10.9 10.4 0 22 0C33.6 0 44 10.9 44 24.5C44 31.2 41.2 37.2 37 41.4L24.4 53.9C23.8 54.6 23 55 22 55Z" fill="#FF1018"/>
+      <ellipse cx="22" cy="23" rx="8.6" ry="8.6" fill="#D9000A"/>
+      <path d="M9.2 13.2C7.9 15 7 17 6.5 19.3" stroke="rgba(255,255,255,0.65)" stroke-width="2" stroke-linecap="round"/>
+      <path d="M11 40.4L16.2 45.6" stroke="rgba(255,255,255,0.38)" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+  `;
+
+  return wrapper;
+}
 
 export function LocationPickerPage() {
   const navigate = useNavigate();
@@ -100,6 +138,7 @@ export function LocationPickerPage() {
         }
 
         const center = { lat: nearbyQuery.latitude, lng: nearbyQuery.longitude };
+        const initialZoom = getInitialZoomByRadius(nearbyQuery.radius);
         const mapsApi = window.google.maps;
         const mapsLib = mapsApi.importLibrary ? await mapsApi.importLibrary("maps") : null;
         const markerLib = mapsApi.importLibrary ? await mapsApi.importLibrary("marker") : null;
@@ -108,6 +147,8 @@ export function LocationPickerPage() {
           AdvancedMarkerElement?: new (opts: {
             position: LatLng;
             map: GoogleMapInstance;
+            content?: Node;
+            title?: string;
           }) => AdvancedMarkerInstance;
         };
         const MapCtor = (mapsLib as MapLib | null)?.Map ?? mapsApi.Map;
@@ -119,9 +160,10 @@ export function LocationPickerPage() {
 
         const map = new MapCtor(mapContainerRef.current, {
           center,
-          zoom: 16,
+          zoom: initialZoom,
           disableDefaultUI: true,
           zoomControl: true,
+          gestureHandling: "greedy",
           mapId: import.meta.env.VITE_GOOGLE_MAPS_MAP_ID || "DEMO_MAP_ID",
         });
         if (typeof AdvancedMarkerCtor !== "function") {
@@ -130,6 +172,7 @@ export function LocationPickerPage() {
         const marker = new AdvancedMarkerCtor({
           position: center,
           map,
+          content: createCustomMarkerContent(),
         });
 
         clickListener = map.addListener("click", (event: MapClickEvent) => {
@@ -165,7 +208,13 @@ export function LocationPickerPage() {
       mounted = false;
       clickListener?.remove();
     };
-  }, [moveMarker, nearbyQuery.latitude, nearbyQuery.longitude, resolveAddressFromLatLng]);
+  }, [
+    moveMarker,
+    nearbyQuery.latitude,
+    nearbyQuery.longitude,
+    nearbyQuery.radius,
+    resolveAddressFromLatLng,
+  ]);
 
   const handleSearchLocation = async () => {
     const query = searchQuery.trim();
@@ -230,6 +279,14 @@ export function LocationPickerPage() {
     );
   };
 
+  const handleZoom = (delta: number) => {
+    const map = mapRef.current;
+    if (!map) return;
+    const currentZoom = map.getZoom() ?? getInitialZoomByRadius(nearbyQuery.radius);
+    const nextZoom = Math.min(MAX_MAP_ZOOM, Math.max(MIN_MAP_ZOOM, currentZoom + delta));
+    map.setZoom(nextZoom);
+  };
+
   const handleConfirmLocation = () => {
     if (isConfirming) return;
     setIsConfirming(true);
@@ -256,75 +313,79 @@ export function LocationPickerPage() {
 
   return (
     <main className={styles.pageContainer}>
-      <header className={styles.header}>
-        <button type="button" className={styles.iconButton} onClick={() => navigate(-1)}>
-          <ArrowLeft className={styles.icon} />
-        </button>
-        <h1 className={styles.title}>내 위치 찾기</h1>
-      </header>
-
-      <section className={styles.searchBarSection}>
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              void handleSearchLocation();
-            }
-          }}
-          placeholder="주소/건물명 검색"
-          className={styles.searchInput}
-        />
-        <button
-          type="button"
-          className={styles.searchButton}
-          onClick={() => void handleSearchLocation()}
-          disabled={isSearching}
-        >
-          <Search className={styles.icon} />
-        </button>
-      </section>
-
-      {searchResults.length > 0 && (
-        <section className={styles.searchResults}>
-          {searchResults.map((location) => (
-            <button
-              key={location.place_id}
-              type="button"
-              className={styles.searchResultItem}
-              onClick={() => handleSelectSearchResult(location)}
-            >
-              <p className={styles.searchResultName}>{location.name}</p>
-              <p className={styles.searchResultAddress}>{location.address}</p>
-            </button>
-          ))}
-        </section>
-      )}
-
       <section className={styles.mapSection}>
         <div ref={mapContainerRef} className={styles.mapContainer} />
         {isLoadingMap && <div className={styles.mapLoadingOverlay}>지도를 불러오는 중...</div>}
-        <button type="button" className={styles.gpsButton} onClick={handleMoveToGps}>
-          <Crosshair className={styles.icon} />
-        </button>
-      </section>
-
-      <section className={styles.bottomSheet}>
-        <p className={styles.selectedAddress}>{selectedAddress || "선택한 위치"}</p>
-        <p className={styles.metaText}>
-          {isResolvingAddress
-            ? "위치 이름을 확인하는 중..."
-            : "지도를 탭하거나 검색/GPS로 위치를 선택해 주세요."}
-        </p>
-        <button
-          type="button"
-          className={styles.confirmButton}
-          onClick={handleConfirmLocation}
-          disabled={isConfirming}
-        >
-          {isConfirming ? "적용 중..." : "이 위치로 설정"}
-        </button>
+        <header className={styles.header}>
+          <button type="button" className={styles.iconButton} onClick={() => navigate(-1)}>
+            <ArrowLeft className={styles.icon} />
+          </button>
+          <h1 className={styles.title}>내 위치 찾기</h1>
+        </header>
+        <section className={styles.searchBarSection}>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                void handleSearchLocation();
+              }
+            }}
+            placeholder="도로명/건물명 검색"
+            className={styles.searchInput}
+          />
+          <button
+            type="button"
+            className={styles.searchButton}
+            onClick={() => void handleSearchLocation()}
+            disabled={isSearching}
+          >
+            <Search className={styles.icon} />
+          </button>
+        </section>
+        {searchResults.length > 0 && (
+          <section className={styles.searchResults}>
+            {searchResults.map((location) => (
+              <button
+                key={location.place_id}
+                type="button"
+                className={styles.searchResultItem}
+                onClick={() => handleSelectSearchResult(location)}
+              >
+                <p className={styles.searchResultName}>{location.name}</p>
+                <p className={styles.searchResultAddress}>{location.address}</p>
+              </button>
+            ))}
+          </section>
+        )}
+        <div className={styles.mapActionButtons}>
+          <button type="button" className={styles.mapActionButton} onClick={handleMoveToGps}>
+            <Crosshair className={styles.icon} />
+          </button>
+          <button type="button" className={styles.mapActionButton} onClick={() => handleZoom(1)}>
+            <Plus className={styles.icon} />
+          </button>
+          <button type="button" className={styles.mapActionButton} onClick={() => handleZoom(-1)}>
+            <Minus className={styles.icon} />
+          </button>
+        </div>
+        <section className={styles.bottomSheet}>
+          <p className={styles.selectedAddress}>{selectedAddress || "선택한 위치"}</p>
+          <p className={styles.metaText}>
+            {isResolvingAddress
+              ? "도로명 주소를 확인하는 중..."
+              : "지도 탭/검색/GPS로 위치를 고르고 아래 버튼으로 적용해 주세요."}
+          </p>
+          <button
+            type="button"
+            className={styles.confirmButton}
+            onClick={handleConfirmLocation}
+            disabled={isConfirming}
+          >
+            {isConfirming ? "적용 중..." : "이 위치로 설정"}
+          </button>
+        </section>
       </section>
     </main>
   );
