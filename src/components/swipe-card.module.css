@@ -20,37 +20,29 @@
   @apply absolute inset-0 bg-linear-to-t from-foreground/90 via-foreground/30 to-transparent;
 }
 
-/* Centered Action Icons */
-.actionIconLike {
-  @apply pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-like;
+/* Centered Action Icons - Advanced Overlay Style */
+.overlayContainer {
+  @apply pointer-events-none absolute z-10 flex w-fit flex-col items-center justify-center rounded-2xl border-4 bg-white/80 p-4 shadow-xl backdrop-blur-md;
 }
 
-.actionIconNope {
-  @apply pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-unlike;
+.overlayText {
+  @apply mt-1 text-lg font-black uppercase tracking-widest;
 }
 
-.actionIconReview {
-  @apply pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2;
+.overlayRight {
+  @apply top-10 left-10 border-like text-like;
 }
 
-.actionIconStop {
-  @apply pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-destructive;
+.overlayLeft {
+  @apply top-10 right-10 border-unlike text-unlike;
 }
 
-.thumbsUpIcon {
-  @apply size-32 opacity-60;
+.overlayDown {
+  @apply top-20 inset-x-0 mx-auto border-destructive text-destructive;
 }
 
-.thumbsDownIcon {
-  @apply size-32 opacity-60;
-}
-
-.messageSquareIcon {
-  @apply size-28;
-}
-
-.xIcon {
-  @apply size-32;
+.overlayIcon {
+  @apply size-10;
 }
 
 /* Content Section */
@@ -93,18 +85,6 @@
   @apply font-semibold;
 }
 
-.reviewCountItem {
-  @apply flex items-center gap-1 text-card/80;
-}
-
-.reviewCountIcon {
-  @apply size-4;
-}
-
-.reviewCountText {
-  @apply text-sm;
-}
-
 /* Distance */
 .distanceContainer {
   @apply mb-4 flex items-center gap-3;
@@ -133,9 +113,4 @@
 
 .amenityIcon {
   @apply size-3;
-}
-
-/* Review Button */
-.reviewButton {
-  @apply w-full rounded-xl bg-card/20 py-3 text-center font-medium backdrop-blur-sm transition-colors hover:bg-card/30 cursor-pointer;
 }

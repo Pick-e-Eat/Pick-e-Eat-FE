@@ -1,9 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { ThumbsDown, ThumbsUp } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { HamburgerMenu } from "@/components/hamburger-menu";
-import { ReviewSheet } from "@/components/review-sheet";
 import { SavedAddressLimitDialog } from "@/components/saved-address-limit-dialog";
 import { SwipeCard } from "@/components/swipe-card";
 import { HomeHeader } from "@/features/home/components/HomeHeader";
@@ -30,7 +28,6 @@ export function HomePage() {
 
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [showReviews, setShowReviews] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const currentLocation = nearbyQuery.address;
   const [filterSettings, setFilterSettings] = useState<FilterSettings>({
@@ -243,7 +240,6 @@ export function HomePage() {
                       key={restaurant.id}
                       restaurant={restaurant}
                       onSwipe={isTop ? handleSwipe : () => {}}
-                      onShowReviews={isTop ? () => setShowReviews(true) : () => {}}
                       onStop={isTop ? () => navigate(routes.results) : () => {}}
                       isTop={isTop}
                       exitDirection={isTop ? exitDirection : null}
@@ -275,11 +271,6 @@ export function HomePage() {
         )}
       </div>
 
-      <ReviewSheet
-        restaurant={currentRestaurant ?? null}
-        isOpen={showReviews}
-        onClose={() => setShowReviews(false)}
-      />
       <HamburgerMenu
         isOpen={menuOpen}
         onClose={() => setMenuOpen(false)}

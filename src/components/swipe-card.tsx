@@ -1,11 +1,16 @@
 import { useState, useEffect } from "react";
 import styles from "./swipe-card.module.css";
 import type { Restaurant } from "@/lib/types";
-import { motion, useMotionValue, useTransform, type PanInfo, animate } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useTransform,
+  type PanInfo,
+  animate,
+  type MotionValue,
+} from "framer-motion";
 import {
   Star,
-  MessageSquare,
-  FileText,
   Navigation,
   Car,
   Users,
@@ -16,10 +21,9 @@ import {
 } from "lucide-react";
 import { FastAverageColor } from "fast-average-color";
 import { useHeaderColorStore } from "@/features/home/stores/header-color-store";
-import { cn } from "@/shared/utils/cn"; // Added cn import
+import { cn } from "@/shared/utils/cn";
 
 const SWIPE_THRESHOLD = 100;
-const Y_SWIPE_THRESHOLD = -100; // Swipe up threshold (negative y)
 const Y_SWIPE_DOWN_THRESHOLD = 100; // Swipe down threshold (positive y)
 const EXIT_OFFSET = 500;
 const DRAG_LOCK_THRESHOLD = 5; // Pixels to determine initial drag direction
@@ -27,16 +31,52 @@ const DRAG_LOCK_THRESHOLD = 5; // Pixels to determine initial drag direction
 interface SwipeCardProps {
   restaurant: Restaurant;
   onSwipe: (direction: "left" | "right") => void;
-  onShowReviews: () => void;
   onStop: () => void;
   isTop?: boolean;
   exitDirection?: "left" | "right" | null;
 }
 
+interface AdvancedOverlayProps {
+  motionValue: MotionValue<number>;
+  direction: "right" | "left" | "down";
+  range: number;
+  icon: React.ElementType;
+  text: string;
+  className: string;
+}
+
+const AdvancedOverlay = ({
+  motionValue,
+  direction,
+  range,
+  icon: Icon,
+  text,
+  className,
+}: AdvancedOverlayProps) => {
+  // 1. 투명도: 0 -> 1 (더 빠르게 나타나도록 설정)
+  const opacity = useTransform(motionValue, [0, range * 0.6], [0, 1]);
+
+  // 2. 크기: 0.5배 -> 1.2배 -> 1배 (튕기는 느낌)
+  const scale = useTransform(motionValue, [0, range * 0.7, range], [0.5, 1.2, 1]);
+
+  // 3. 회전: 살짝 회전하면서 등장 (좌우 스와이프 시에만 적용)
+  const rotateRange = direction === "right" ? [-15, 0] : direction === "left" ? [15, 0] : [0, 0];
+  const rotate = useTransform(motionValue, [0, range], rotateRange);
+
+  return (
+    <motion.div
+      className={cn(styles.overlayContainer, className)}
+      style={{ opacity, scale, rotate }}
+    >
+      <Icon className={styles.overlayIcon} />
+      <span className={styles.overlayText}>{text}</span>
+    </motion.div>
+  );
+};
+
 export function SwipeCard({
   restaurant,
   onSwipe,
-  onShowReviews,
   onStop,
   isTop = true,
   exitDirection = null,
@@ -54,15 +94,8 @@ export function SwipeCard({
   // Card rotation based on horizontal drag
   const rotate = useTransform(x, [-200, 200], [-15, 15]);
 
-  // Opacity transforms for feedback icons based on dragX/dragY
-  const likeOpacity = useTransform(dragX, [0, 50], [0, 1]);
-  const nopeOpacity = useTransform(dragX, [-50, 0], [1, 0]);
-  const reviewOpacity = useTransform(dragY, [0, -50], [0, 1]);
-  const stopOpacity = useTransform(dragY, [0, 50], [0, 1]);
-
   const isExiting = exitDirection !== null;
-  const { setColors, resetColors } = useHeaderColorStore();
-  const backgroundColor = useHeaderColorStore((s) => s.backgroundColor);
+  const { resetColors } = useHeaderColorStore();
 
   // Animate card out when horizontal swipe is triggered by onSwipe (targets x)
   useEffect(() => {
@@ -75,25 +108,14 @@ export function SwipeCard({
   // Extract color from image when card is on top
   useEffect(() => {
     if (isTop) {
-      const fac = new FastAverageColor();
-      if(!restaurant.photo_url) return () => resetColors();
-      // fac
-      //   .getColorAsync(restaurant.photo_url, {
-      //     crossOrigin: "anonymous",
-      //   })
-      //   .then((color) => {
-      //     setColors(color.hex, color.isDark ? "#fff" : "#000");
-      //   })
-      //   .catch((e) => {
-      //     console.error("Failed to extract color:", e);
-      //     resetColors();
-      //   });
+      // const fac = new FastAverageColor();
+      if (!restaurant.photo_url) return () => resetColors();
 
       return () => {
         resetColors();
       };
     }
-  }, [isTop, restaurant.photo_url, setColors, resetColors]);
+  }, [isTop, restaurant.photo_url, resetColors]);
 
   // Explicitly reset drag gesture motion values when card state changes due to non-drag events
   useEffect(() => {
@@ -151,9 +173,7 @@ export function SwipeCard({
     const { offset } = info;
 
     if (lockedDirection === "y") {
-      if (offset.y < Y_SWIPE_THRESHOLD) {
-        onShowReviews();
-      } else if (offset.y > Y_SWIPE_DOWN_THRESHOLD) {
+      if (offset.y > Y_SWIPE_DOWN_THRESHOLD) {
         onStop();
       }
       // Animate card back to center after any vertical swipe
@@ -194,6 +214,7 @@ export function SwipeCard({
       onDragEnd={handleDragEnd}
       initial={{ scale: isTop ? 1 : 0.95, y: isTop ? 0 : 20 }}
       animate={{ scale: isTop ? 1 : 0.95, y: isTop ? 0 : 20 }}
+      whileTap={dragEnabled ? { scale: 0.98 } : {}}
     >
       {/* Card Container */}
       <div className={styles.cardContainer}>
@@ -206,25 +227,31 @@ export function SwipeCard({
         {/* Gradient Overlay */}
         <div className={styles.gradientOverlay} />
 
-        {/* Centered Action Icons */}
-        <motion.div className={styles.actionIconLike} style={{ opacity: likeOpacity }}>
-          <ThumbsUp className={styles.thumbsUpIcon} />
-        </motion.div>
-        <motion.div className={styles.actionIconNope} style={{ opacity: nopeOpacity }}>
-          <ThumbsDown className={styles.thumbsDownIcon} />
-        </motion.div>
-        <motion.div
-          className={styles.actionIconReview}
-          style={{
-            opacity: reviewOpacity,
-            color: backgroundColor || "var(--primary)",
-          }}
-        >
-          <MessageSquare className={cn(styles.messageSquareIcon, "fill-current stroke-none")} />
-        </motion.div>
-        <motion.div className={styles.actionIconStop} style={{ opacity: stopOpacity }}>
-          <X className={styles.xIcon} />
-        </motion.div>
+        {/* Centered Action Icons - Advanced Overlays */}
+        <AdvancedOverlay
+          motionValue={dragX}
+          direction="right"
+          range={SWIPE_THRESHOLD}
+          icon={ThumbsUp}
+          text="LIKE"
+          className={styles.overlayRight}
+        />
+        <AdvancedOverlay
+          motionValue={dragX}
+          direction="left"
+          range={-SWIPE_THRESHOLD}
+          icon={ThumbsDown}
+          text="NOPE"
+          className={styles.overlayLeft}
+        />
+        <AdvancedOverlay
+          motionValue={dragY}
+          direction="down"
+          range={Y_SWIPE_DOWN_THRESHOLD}
+          icon={X}
+          text="PASS"
+          className={styles.overlayDown}
+        />
 
         {/* Content */}
         <div className={styles.contentSection}>
@@ -248,16 +275,6 @@ export function SwipeCard({
             <div className={styles.ratingItem}>
               <Star className={styles.starIcon} />
               <span className={styles.ratingValue}>{restaurant.rating}</span>
-            </div>
-            <div className={styles.reviewCountItem}>
-              <MessageSquare className={styles.reviewCountIcon} />
-              <span className={styles.reviewCountText}>
-                리뷰 {restaurant.blog_review_count}
-              </span>
-            </div>
-            <div className={styles.reviewCountItem}>
-              <FileText className={styles.reviewCountIcon} />
-              <span className={styles.reviewCountText}>블로그 {restaurant.blog_review_count}</span>
             </div>
           </div>
 
@@ -291,18 +308,6 @@ export function SwipeCard({
               )}
             </div>
           )}
-
-          {/* Review Button */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onShowReviews();
-            }}
-            className="w-full rounded-xl bg-card/20 py-3 text-center font-medium backdrop-blur-sm transition-colors hover:bg-card/30 cursor-pointer"
-          >
-            리뷰 더보기
-          </button>
         </div>
       </div>
     </motion.div>
