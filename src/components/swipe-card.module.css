@@ -1,13 +1,13 @@
 @reference "../styles/globals.css";
 
-/* Main Card Container */
+/* Main Card Container — transform 되는 레이어에 라운드: 슬라이드/낙하 시에도 카드 한 장처럼 보이게 */
 .cardWrapper {
-  @apply absolute inset-0 cursor-grab active:cursor-grabbing touch-none;
+  @apply absolute inset-0 cursor-grab touch-none overflow-hidden rounded-[2rem] shadow-2xl ring-1 ring-border/25 active:cursor-grabbing;
 }
 
 /* Card Content Container */
 .cardContainer {
-  @apply relative h-full w-full overflow-hidden bg-card shadow-2xl;
+  @apply relative h-full w-full overflow-hidden bg-card;
 }
 
 /* Background Image */

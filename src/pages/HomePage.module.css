@@ -5,11 +5,12 @@
 }
 
 .cardStackContainer {
-  @apply relative flex-1;
+  @apply relative flex min-h-0 flex-1 flex-col px-4 pt-3 pb-3;
 }
 
+/* 스택 영역만 잘라 주고, 카드 실루엣·그림자는 SwipeCard 루트에서 처리 */
 .cardWrapper {
-  @apply relative h-full;
+  @apply relative min-h-0 flex-1 overflow-visible rounded-[2rem] border border-border/40 bg-background/40;
 }
 
 .noRestaurantsContainer {

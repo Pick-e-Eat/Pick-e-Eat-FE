@@ -15,8 +15,15 @@ import styles from "./swipe-card.module.css";
 
 const SWIPE_THRESHOLD = 100;
 const Y_SWIPE_DOWN_THRESHOLD = 100; // Swipe down threshold (positive y)
-const EXIT_OFFSET = 500;
+const EXIT_OFFSET = 520;
+const EXIT_FALL_Y = 200;
+const EXIT_TILT_DEG = 34;
+const MAX_DRAG_TILT = 22;
 const DRAG_LOCK_THRESHOLD = 5; // Pixels to determine initial drag direction
+
+function clampTilt(offsetX: number) {
+  return Math.max(-MAX_DRAG_TILT, Math.min(MAX_DRAG_TILT, (offsetX / 170) * 20));
+}
 
 interface SwipeCardProps {
   restaurant: Restaurant;
@@ -70,29 +77,40 @@ export function SwipeCard({
   isTop = true,
   exitDirection = null,
 }: SwipeCardProps) {
-  const [opacity, setOpacity] = useState(1);
   const [lockedDirection, setLockedDirection] = useState<"x" | "y" | null>(null);
   // Motion values for card's physical position on screen
   const x = useMotionValue(0);
   const y = useMotionValue(0);
+  const cardRotate = useMotionValue(0);
+  const cardScale = useMotionValue(1);
+  const cardOpacity = useMotionValue(1);
+  /** 드래그 중 살짝 키워 덱 위로 떠 있는 느낌 */
+  const liftScale = useMotionValue(1);
+  const displayScale = useTransform(
+    [cardScale, liftScale],
+    ([s, l]) => (s as number) * (l as number),
+  );
 
   // Motion values for tracking user's raw gesture offset (for feedback icons)
   const dragX = useMotionValue(0);
   const dragY = useMotionValue(0);
 
-  // Card rotation based on horizontal drag
-  const rotate = useTransform(x, [-200, 200], [-15, 15]);
-
   const isExiting = exitDirection !== null;
   const { resetColors } = useHeaderColorStore();
 
-  // Animate card out when horizontal swipe is triggered by onSwipe (targets x)
+  // 스와이프 확정 후: 옆으로 밀리며 아래로 떨어지는 느낌 + 살짝 축소·페이드
   useEffect(() => {
     if (!isExiting) return;
-    const to = exitDirection === "right" ? EXIT_OFFSET : -EXIT_OFFSET;
-    animate(x, to, { type: "spring", stiffness: 300, damping: 30 });
-    setOpacity(0);
-  }, [isExiting, exitDirection, x]);
+    liftScale.set(1);
+    const toX = exitDirection === "right" ? EXIT_OFFSET : -EXIT_OFFSET;
+    const toRotate = exitDirection === "right" ? EXIT_TILT_DEG : -EXIT_TILT_DEG;
+    const springOut = { type: "spring" as const, stiffness: 220, damping: 26, mass: 0.9 };
+    animate(x, toX, springOut);
+    animate(y, EXIT_FALL_Y, { ...springOut, stiffness: 260, damping: 30 });
+    animate(cardRotate, toRotate, { ...springOut, stiffness: 200, damping: 24 });
+    animate(cardScale, 0.88, { type: "spring", stiffness: 280, damping: 32 });
+    void animate(cardOpacity, 0, { duration: 0.42, ease: [0.4, 0, 1, 1] });
+  }, [isExiting, exitDirection, x, y, cardRotate, cardScale, cardOpacity, liftScale]);
 
   // Extract color from image when card is on top
   useEffect(() => {
@@ -117,6 +135,11 @@ export function SwipeCard({
     // Also reset physical card position if it somehow drifted
     x.set(0);
     y.set(0);
+    cardRotate.set(0);
+    cardScale.set(1);
+    cardOpacity.set(1);
+    liftScale.set(1);
+    void animate(liftScale, 1.07, { type: "spring", stiffness: 420, damping: 28 });
     // Reset gesture tracking motion values at the start of a drag
     dragX.set(0);
     dragY.set(0);
@@ -145,16 +168,19 @@ export function SwipeCard({
     if (lockedDirection === "y") {
       y.set(info.offset.y); // Card moves Y
       x.set(0); // Card X is 0
+      cardRotate.set(0);
       dragX.set(0); // Gesture tracking X is 0 if locked to Y
     } else if (lockedDirection === "x") {
       x.set(info.offset.x); // Card moves X
       y.set(0); // Card Y is 0
+      cardRotate.set(clampTilt(info.offset.x));
       dragY.set(0); // Gesture tracking Y is 0 if locked to X
     } else {
       // If direction not yet locked, card moves freely (within DRAG_LOCK_THRESHOLD, it's not actually moving)
       // dragX and dragY are already set above
       x.set(info.offset.x);
       y.set(info.offset.y);
+      cardRotate.set(clampTilt(info.offset.x));
     }
   };
 
@@ -168,6 +194,8 @@ export function SwipeCard({
       // Animate card back to center after any vertical swipe
       animate(x, 0, { type: "spring", stiffness: 500, damping: 30 });
       animate(y, 0, { type: "spring", stiffness: 500, damping: 30 });
+      animate(cardRotate, 0, { type: "spring", stiffness: 500, damping: 30 });
+      animate(liftScale, 1, { type: "spring", stiffness: 400, damping: 32 });
     } else if (lockedDirection === "x") {
       if (offset.x > SWIPE_THRESHOLD) {
         onSwipe("right");
@@ -177,11 +205,15 @@ export function SwipeCard({
         // Animate card back if not swiped far enough horizontally
         animate(x, 0, { type: "spring", stiffness: 500, damping: 30 });
         animate(y, 0, { type: "spring", stiffness: 500, damping: 30 });
+        animate(cardRotate, 0, { type: "spring", stiffness: 500, damping: 30 });
+        animate(liftScale, 1, { type: "spring", stiffness: 400, damping: 32 });
       }
     } else {
       // No significant drag occurred to lock a direction, animate back
       animate(x, 0, { type: "spring", stiffness: 500, damping: 30 });
       animate(y, 0, { type: "spring", stiffness: 500, damping: 30 });
+      animate(cardRotate, 0, { type: "spring", stiffness: 500, damping: 30 });
+      animate(liftScale, 1, { type: "spring", stiffness: 400, damping: 32 });
     }
 
     setLockedDirection(null); // Reset locked direction for the next drag
@@ -194,16 +226,20 @@ export function SwipeCard({
   return (
     <motion.div
       className={styles.cardWrapper}
-      style={{ x, y, rotate, opacity }} // Card's actual position
+      style={{
+        x,
+        y,
+        rotate: cardRotate,
+        scale: displayScale,
+        opacity: cardOpacity,
+        zIndex: isTop ? 30 : 1,
+      }}
       drag={!!dragEnabled} // Allow dragging in both directions initially
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
       dragElastic={{ top: 0.2, bottom: 0.2, left: 1, right: 1 }}
       onDragStart={handleDragStart}
       onDrag={handleDrag}
       onDragEnd={handleDragEnd}
-      initial={{ scale: isTop ? 1 : 0.95, y: isTop ? 0 : 20 }}
-      animate={{ scale: isTop ? 1 : 0.95, y: isTop ? 0 : 20 }}
-      whileTap={dragEnabled ? { scale: 0.98 } : {}}
     >
       {/* Card Container */}
       <div className={styles.cardContainer}>

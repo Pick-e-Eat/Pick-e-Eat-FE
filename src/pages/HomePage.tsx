@@ -141,7 +141,7 @@ export function HomePage() {
         if (results.length + 1 >= MAX_SELECTIONS) {
           navigate(routes.results);
         }
-      }, 300);
+      }, 480);
     },
     [currentRestaurant, results, addResult, navigate],
   );
