@@ -1,27 +1,17 @@
-import { useState, useEffect } from "react";
-import styles from "./swipe-card.module.css";
-import type { Restaurant } from "@/lib/types";
 import {
-  motion,
-  useMotionValue,
-  useTransform,
-  type PanInfo,
   animate,
   type MotionValue,
+  motion,
+  type PanInfo,
+  useMotionValue,
+  useTransform,
 } from "framer-motion";
-import {
-  Star,
-  Navigation,
-  Car,
-  Users,
-  Dog,
-  ThumbsUp,
-  ThumbsDown,
-  X,
-} from "lucide-react";
-import { FastAverageColor } from "fast-average-color";
+import { Car, Dog, Heart, HeartCrack, Navigation, Star, Users, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useHeaderColorStore } from "@/features/home/stores/header-color-store";
+import type { Restaurant } from "@/lib/types";
 import { cn } from "@/shared/utils/cn";
+import styles from "./swipe-card.module.css";
 
 const SWIPE_THRESHOLD = 100;
 const Y_SWIPE_DOWN_THRESHOLD = 100; // Swipe down threshold (positive y)
@@ -41,8 +31,8 @@ interface AdvancedOverlayProps {
   direction: "right" | "left" | "down";
   range: number;
   icon: React.ElementType;
-  text: string;
   className: string;
+  iconClassName?: string;
 }
 
 const AdvancedOverlay = ({
@@ -50,8 +40,8 @@ const AdvancedOverlay = ({
   direction,
   range,
   icon: Icon,
-  text,
   className,
+  iconClassName,
 }: AdvancedOverlayProps) => {
   // 1. 투명도: 0 -> 1 (더 빠르게 나타나도록 설정)
   const opacity = useTransform(motionValue, [0, range * 0.6], [0, 1]);
@@ -68,8 +58,7 @@ const AdvancedOverlay = ({
       className={cn(styles.overlayContainer, className)}
       style={{ opacity, scale, rotate }}
     >
-      <Icon className={styles.overlayIcon} />
-      <span className={styles.overlayText}>{text}</span>
+      <Icon className={cn(styles.overlayIcon, iconClassName)} />
     </motion.div>
   );
 };
@@ -232,16 +221,15 @@ export function SwipeCard({
           motionValue={dragX}
           direction="right"
           range={SWIPE_THRESHOLD}
-          icon={ThumbsUp}
-          text="LIKE"
+          icon={Heart}
           className={styles.overlayRight}
+          iconClassName={styles.overlayIconFilled}
         />
         <AdvancedOverlay
           motionValue={dragX}
           direction="left"
           range={-SWIPE_THRESHOLD}
-          icon={ThumbsDown}
-          text="NOPE"
+          icon={HeartCrack}
           className={styles.overlayLeft}
         />
         <AdvancedOverlay
@@ -249,7 +237,6 @@ export function SwipeCard({
           direction="down"
           range={Y_SWIPE_DOWN_THRESHOLD}
           icon={X}
-          text="PASS"
           className={styles.overlayDown}
         />
 

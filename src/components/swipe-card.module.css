@@ -22,27 +22,27 @@
 
 /* Centered Action Icons - Advanced Overlay Style */
 .overlayContainer {
-  @apply pointer-events-none absolute z-10 flex w-fit flex-col items-center justify-center rounded-2xl border-4 bg-white/80 p-4 shadow-xl backdrop-blur-md;
-}
-
-.overlayText {
-  @apply mt-1 text-lg font-black uppercase tracking-widest;
+  @apply pointer-events-none absolute z-10 flex items-center justify-center rounded-2xl border p-3.5 shadow-xl backdrop-blur-md;
 }
 
 .overlayRight {
-  @apply top-10 left-10 border-like text-like;
+  @apply inset-0 m-auto h-fit w-fit border-transparent bg-gradient-to-br from-pink-500 via-rose-500 to-fuchsia-500 text-white;
 }
 
 .overlayLeft {
-  @apply top-10 right-10 border-unlike text-unlike;
+  @apply inset-0 m-auto h-fit w-fit border-transparent bg-gradient-to-br from-blue-500 via-sky-500 to-cyan-500 text-white;
 }
 
 .overlayDown {
-  @apply top-20 inset-x-0 mx-auto border-destructive text-destructive;
+  @apply inset-0 m-auto h-fit w-fit border-transparent bg-gradient-to-br from-zinc-700 via-neutral-800 to-black text-white;
 }
 
 .overlayIcon {
-  @apply size-10;
+  @apply size-12;
+}
+
+.overlayIconFilled {
+  @apply fill-current;
 }
 
 /* Content Section */
