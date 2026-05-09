@@ -1,12 +1,12 @@
 @reference "../styles/globals.css";
 
 .mainContainer {
-  @apply flex min-h-dvh flex-col bg-background;
+  @apply flex h-dvh flex-col overflow-hidden bg-background;
 }
 
 /* Header */
 .header {
-  @apply border-b border-border bg-card px-6 py-6;
+  @apply shrink-0 border-b border-border bg-card px-6 py-6;
 }
 
 .headerTitle {
