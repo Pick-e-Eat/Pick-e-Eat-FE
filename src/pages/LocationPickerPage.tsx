@@ -2,6 +2,7 @@ import { ArrowLeft, Crosshair, Minus, Plus, Search } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { routes } from "@/shared/constants/routes";
 import { useNearbyQueryStore } from "@/shared/stores/nearby-query-store";
 import type { LocationResult } from "@/shared/types/api.types";
 import {
@@ -88,6 +89,14 @@ export function LocationPickerPage() {
   const markerRef = useRef<AdvancedMarkerInstance | null>(null);
   const geocoderRef = useRef<GoogleGeocoderLike | null>(null);
   const geocodeRequestIdRef = useRef(0);
+
+  const navigateBackOrHome = useCallback(() => {
+    if (window.history.length > 1) {
+      navigate(-1);
+      return;
+    }
+    navigate(routes.home, { replace: true });
+  }, [navigate]);
 
   const moveMarker = useCallback((nextPos: LatLng, panMap: boolean) => {
     setSelectedPosition(nextPos);
@@ -256,27 +265,55 @@ export function LocationPickerPage() {
       toast.error("이 브라우저는 GPS 기능을 지원하지 않습니다.");
       return;
     }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const nextPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        moveMarker(nextPos, true);
-        setSelectedAddress("위치 확인 중...");
-        void resolveAddressFromLatLng(nextPos).then((resolvedAddress) => {
-          if (resolvedAddress) {
-            setSelectedAddress(resolvedAddress);
-          } else {
-            setSelectedAddress("현재 위치");
+    const onSuccess = (pos: GeolocationPosition) => {
+      const nextPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      moveMarker(nextPos, true);
+      setSelectedAddress("위치 확인 중...");
+      void resolveAddressFromLatLng(nextPos).then((resolvedAddress) => {
+        if (resolvedAddress) {
+          setSelectedAddress(resolvedAddress);
+        } else {
+          setSelectedAddress("현재 위치");
+        }
+      });
+    };
+
+    const requestCurrentPosition = (useHighAccuracy: boolean) => {
+      navigator.geolocation.getCurrentPosition(
+        onSuccess,
+        (err) => {
+          console.error("Geolocation error:", err.code, err.message);
+          if (
+            useHighAccuracy &&
+            (err.code === err.TIMEOUT || err.code === err.POSITION_UNAVAILABLE)
+          ) {
+            requestCurrentPosition(false);
+            return;
           }
-        });
-      },
-      () => {
-        toast.error("위치 권한이 없거나 현재 위치를 가져올 수 없습니다.");
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10_000,
-      },
-    );
+
+          switch (err.code) {
+            case err.PERMISSION_DENIED:
+              toast.error("위치 권한이 거부되었습니다. 웹사이트 설정에서 위치 권한을 허용해 주세요.");
+              break;
+            case err.TIMEOUT:
+              toast.error("현재 위치 확인 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.");
+              break;
+            case err.POSITION_UNAVAILABLE:
+              toast.error("현재 위치 정보를 가져올 수 없습니다. 실외에서 다시 시도해 주세요.");
+              break;
+            default:
+              toast.error("현재 위치를 가져올 수 없습니다.");
+          }
+        },
+        {
+          enableHighAccuracy: useHighAccuracy,
+          timeout: useHighAccuracy ? 10_000 : 15_000,
+          maximumAge: 0,
+        },
+      );
+    };
+
+    requestCurrentPosition(true);
   };
 
   const handleZoom = (delta: number) => {
@@ -287,7 +324,7 @@ export function LocationPickerPage() {
     map.setZoom(nextZoom);
   };
 
-  const handleConfirmLocation = () => {
+  const handleConfirmLocation = useCallback(() => {
     if (isConfirming) return;
     setIsConfirming(true);
     const resolved = selectedAddress || "선택한 위치";
@@ -307,9 +344,17 @@ export function LocationPickerPage() {
       </>,
     );
     window.setTimeout(() => {
-      navigate(-1);
+      navigate(routes.home, { replace: true });
     }, 120);
-  };
+  }, [
+    isConfirming,
+    navigate,
+    selectedAddress,
+    selectedPosition.lat,
+    selectedPosition.lng,
+    setAddress,
+    setCoordinates,
+  ]);
 
   return (
     <main className={styles.pageContainer}>
@@ -317,7 +362,7 @@ export function LocationPickerPage() {
         <div ref={mapContainerRef} className={styles.mapContainer} />
         {isLoadingMap && <div className={styles.mapLoadingOverlay}>지도를 불러오는 중...</div>}
         <header className={styles.header}>
-          <button type="button" className={styles.iconButton} onClick={() => navigate(-1)}>
+          <button type="button" className={styles.iconButton} onClick={navigateBackOrHome}>
             <ArrowLeft className={styles.icon} />
           </button>
           <h1 className={styles.title}>내 위치 찾기</h1>
