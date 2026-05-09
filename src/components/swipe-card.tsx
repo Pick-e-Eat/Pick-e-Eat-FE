@@ -146,7 +146,8 @@ export function SwipeCard({
       ) {
         if (Math.abs(info.offset.x) > Math.abs(info.offset.y)) {
           setLockedDirection("x");
-        } else {
+        } else if (info.offset.y > 0) {
+          // Only lock to Y if dragging DOWN (PASS gesture)
           setLockedDirection("y");
         }
       }
@@ -154,18 +155,19 @@ export function SwipeCard({
 
     // Now, constrain *both* actual card motion AND gesture tracking motion to locked direction
     if (lockedDirection === "y") {
-      y.set(info.offset.y); // Card moves Y
+      y.set(Math.max(0, info.offset.y)); // Card moves Y (only down)
       x.set(0); // Card X is 0
       dragX.set(0); // Gesture tracking X is 0 if locked to Y
+      dragY.set(Math.max(0, info.offset.y)); // Ensure overlay also stays at 0 or positive
     } else if (lockedDirection === "x") {
       x.set(info.offset.x); // Card moves X
       y.set(0); // Card Y is 0
       dragY.set(0); // Gesture tracking Y is 0 if locked to X
     } else {
-      // If direction not yet locked, card moves freely (within DRAG_LOCK_THRESHOLD, it's not actually moving)
-      // dragX and dragY are already set above
+      // If direction not yet locked, card moves freely within DRAG_LOCK_THRESHOLD
       x.set(info.offset.x);
-      y.set(info.offset.y);
+      // Even before lock, we can prevent moving up if we're sure we want to remove it
+      y.set(Math.max(0, info.offset.y));
     }
   };
 
@@ -208,7 +210,7 @@ export function SwipeCard({
       style={{ x, y, rotate, opacity }} // Card's actual position
       drag={!!dragEnabled} // Allow dragging in both directions initially
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-      dragElastic={{ top: 0.2, bottom: 0.2, left: 1, right: 1 }}
+      dragElastic={{ top: 0, bottom: 0.2, left: 1, right: 1 }}
       onDragStart={handleDragStart}
       onDrag={handleDrag}
       onDragEnd={handleDragEnd}
