@@ -5,44 +5,38 @@ import {
   CircleUserRound,
   Dog,
   History,
-  Loader2,
   MapPin,
   Plus,
   RefreshCw,
-  Save,
   Trash2,
   Users,
   X,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { createPortal } from "react-dom";
-import { toast } from "sonner";
 import { APP_OVERLAY_ROOT_ID } from "@/app/AppLayout";
 import { LoginDialog } from "@/features/auth/components";
 import type { FilterSettings, SavedAddress } from "@/lib/types";
-import { restaurantAPI } from "@/shared/api/restaurant";
 import { MAX_SAVED_ADDRESSES } from "@/shared/stores/saved-addresses-store";
-import type { LocationResult } from "@/shared/types/api.types";
 import { cn } from "@/shared/utils/cn";
-import { searchAddressWithGoogleGeocoder } from "@/shared/utils/google-geocode-address-search";
 import styles from "./hamburger-menu.module.css";
 
-const ADDRESS_SEARCH_DEBOUNCE_MS = 380;
-const ADDRESS_SEARCH_MIN_LENGTH = 2;
+function coordsKey(lat: number, lng: number) {
+  return `${Math.round(lat * 1e5) / 1e5},${Math.round(lng * 1e5) / 1e5}`;
+}
 
 interface HamburgerMenuProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenLocationPicker: () => void;
+  onOpenSaveLocationPicker: () => void;
+  disableOpenAnimation?: boolean;
   currentLocation: string;
-  /** 주소 자동완성 검색 시 Geocoder bounds 바이어스 (보통 현재 검색 위치 좌표) */
-  addressSearchBiasLat: number;
-  addressSearchBiasLng: number;
+  currentLatitude: number;
+  currentLongitude: number;
   filterSettings: FilterSettings;
   onFilterChange: (settings: FilterSettings) => void;
   savedAddresses: SavedAddress[];
-  /** 저장 성공 시 true, 저장 안 됨(한도 등)이면 false */
-  onAddAddress: (address: SavedAddress) => boolean;
   /** 저장 주소가 이미 최대 개수일 때 (+ 클릭 또는 저장 시 상위에서 모달 등 처리) */
   onSavedAddressLimit: () => void;
   onRemoveAddress: (id: string) => void;
@@ -53,139 +47,30 @@ export function HamburgerMenu({
   isOpen,
   onClose,
   onOpenLocationPicker,
+  onOpenSaveLocationPicker,
+  disableOpenAnimation = false,
   currentLocation,
-  addressSearchBiasLat,
-  addressSearchBiasLng,
+  currentLatitude,
+  currentLongitude,
   filterSettings,
   onFilterChange,
   savedAddresses,
-  onAddAddress,
   onSavedAddressLimit,
   onRemoveAddress,
   onSelectAddress,
 }: HamburgerMenuProps) {
-  const [showAddressForm, setShowAddressForm] = useState(false);
-  const [newAddressLabel, setNewAddressLabel] = useState("");
-  const [addressSearchQuery, setAddressSearchQuery] = useState("");
-  const [addressSearchResults, setAddressSearchResults] = useState<LocationResult[]>([]);
-  const [addressSearchLoading, setAddressSearchLoading] = useState(false);
-  const [pickedLocation, setPickedLocation] = useState<LocationResult | null>(null);
-  const addressSearchSeq = useRef(0);
   const [activeFilterSection, setActiveFilterSection] = useState<"range" | "amenities" | null>(
     null,
   );
   const [showLogin, setShowLogin] = useState(false);
-
-  useEffect(() => {
-    if (!isOpen) {
-      addressSearchSeq.current += 1;
-      setShowAddressForm(false);
-      setNewAddressLabel("");
-      setAddressSearchQuery("");
-      setAddressSearchResults([]);
-      setPickedLocation(null);
-      setAddressSearchLoading(false);
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!showAddressForm) return;
-    const q = addressSearchQuery.trim();
-    if (q.length < ADDRESS_SEARCH_MIN_LENGTH) {
-      setAddressSearchResults([]);
-      setAddressSearchLoading(false);
-      return;
-    }
-
-    const handle = window.setTimeout(() => {
-      const id = ++addressSearchSeq.current;
-      setAddressSearchLoading(true);
-      void (async () => {
-        try {
-          const locations = await searchAddressWithGoogleGeocoder({
-            query: q,
-            contextAddress: currentLocation,
-            biasLat: addressSearchBiasLat,
-            biasLng: addressSearchBiasLng,
-          });
-          if (id !== addressSearchSeq.current) return;
-          setAddressSearchResults(locations);
-        } catch {
-          try {
-            const res = await restaurantAPI.searchText({ query: q });
-            if (id !== addressSearchSeq.current) return;
-            setAddressSearchResults(res.locations);
-          } catch {
-            if (id !== addressSearchSeq.current) return;
-            setAddressSearchResults([]);
-            toast.error("주소 검색에 실패했어요.");
-          }
-        } finally {
-          if (id === addressSearchSeq.current) {
-            setAddressSearchLoading(false);
-          }
-        }
-      })();
-    }, ADDRESS_SEARCH_DEBOUNCE_MS);
-
-    return () => window.clearTimeout(handle);
-  }, [
-    addressSearchBiasLat,
-    addressSearchBiasLng,
-    addressSearchQuery,
-    currentLocation,
-    showAddressForm,
-  ]);
-
-  const toggleAddressForm = () => {
-    setShowAddressForm((prev) => {
-      if (prev) {
-        return false;
-      }
-      if (savedAddresses.length >= MAX_SAVED_ADDRESSES) {
-        onSavedAddressLimit();
-        return false;
-      }
-      setNewAddressLabel("");
-      setAddressSearchQuery("");
-      setAddressSearchResults([]);
-      setPickedLocation(null);
-      return true;
-    });
-  };
-
-  const handlePickSuggestion = (loc: LocationResult) => {
-    setPickedLocation(loc);
-    setAddressSearchQuery(loc.name);
-    setAddressSearchResults([]);
-  };
-
-  const handleAddAddress = () => {
-    if (!newAddressLabel.trim() || !pickedLocation) {
-      toast.message("라벨을 입력하고 목록에서 주소를 선택해 주세요.");
-      return;
-    }
-    const addressLine = (pickedLocation.address?.trim() || pickedLocation.name).trim();
-    if (savedAddresses.length >= MAX_SAVED_ADDRESSES) {
-      onSavedAddressLimit();
-      return;
-    }
-    const added = onAddAddress({
-      id: Date.now().toString(),
-      label: newAddressLabel.trim(),
-      address: addressLine,
-      isDefault: savedAddresses.length === 0,
-      latitude: pickedLocation.latitude,
-      longitude: pickedLocation.longitude,
-    });
-    if (added) {
-      setNewAddressLabel("");
-      setAddressSearchQuery("");
-      setAddressSearchResults([]);
-      setPickedLocation(null);
-      setShowAddressForm(false);
-    }
-  };
+  const locationLabelOverride =
+    savedAddresses.find(
+      (address) =>
+        typeof address.latitude === "number" &&
+        typeof address.longitude === "number" &&
+        coordsKey(address.latitude, address.longitude) === coordsKey(currentLatitude, currentLongitude),
+    )?.label ?? null;
+  const currentLocationTitle = locationLabelOverride ?? currentLocation;
 
   const searchRangeOptions: Array<{ value: 50 | 100 | 250; label: string; sub?: string }> = [
     { value: 50, label: "50m" },
@@ -201,7 +86,7 @@ export function HamburgerMenu({
       {isOpen && (
         <>
           <motion.div
-            initial={{ opacity: 0 }}
+            initial={disableOpenAnimation ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.22, ease: "easeOut" }}
@@ -209,7 +94,7 @@ export function HamburgerMenu({
             onClick={onClose}
           />
           <motion.div
-            initial={{ x: "-100%" }}
+            initial={disableOpenAnimation ? false : { x: "-100%" }}
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "tween", duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
@@ -247,8 +132,10 @@ export function HamburgerMenu({
                 >
                   <MapPin className={styles.locationIcon} />
                   <div className={styles.locationTextContainer}>
-                    <p className={styles.locationAddress}>{currentLocation}</p>
-                    <p className={styles.locationHint}>탭하여 위치 변경</p>
+                    <p className={styles.locationAddress}>{currentLocationTitle}</p>
+                    {locationLabelOverride ? (
+                      <p className={styles.addressValue}>{currentLocation}</p>
+                    ) : null}
                   </div>
                   <ChevronRight className={styles.chevronIcon} />
                 </button>
@@ -387,7 +274,13 @@ export function HamburgerMenu({
                   <h3 className={styles.sectionTitle}>저장된 주소</h3>
                   <button
                     type="button"
-                    onClick={toggleAddressForm}
+                    onClick={() => {
+                      if (savedAddresses.length >= MAX_SAVED_ADDRESSES) {
+                        onSavedAddressLimit();
+                        return;
+                      }
+                      onOpenSaveLocationPicker();
+                    }}
                     className={cn(
                       styles.addAddressButton,
                       savedAddresses.length >= MAX_SAVED_ADDRESSES
@@ -408,88 +301,6 @@ export function HamburgerMenu({
                     <Plus className={styles.addAddressIcon} />
                   </button>
                 </div>
-
-                <AnimatePresence>
-                  {showAddressForm && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className={styles.addressFormContainer}
-                    >
-                      <div className={styles.addressForm}>
-                        <input
-                          type="text"
-                          placeholder="라벨 (예: 집, 회사)"
-                          value={newAddressLabel}
-                          onChange={(e) => setNewAddressLabel(e.target.value)}
-                          className={styles.addressInput}
-                          autoComplete="off"
-                        />
-                        <div className={styles.addressSearchWrap}>
-                          <input
-                            type="text"
-                            placeholder="주소 검색 (글자를 입력하면 후보가 나와요)"
-                            value={addressSearchQuery}
-                            onChange={(e) => {
-                              setAddressSearchQuery(e.target.value);
-                              setPickedLocation(null);
-                            }}
-                            className={styles.addressSearchInput}
-                            autoComplete="off"
-                          />
-                          {addressSearchLoading ? (
-                            <Loader2
-                              className={styles.addressSearchSpinner}
-                              aria-hidden
-                              strokeWidth={2.25}
-                            />
-                          ) : null}
-                        </div>
-                        {addressSearchResults.length > 0 && (
-                          <div className={styles.addressSuggestions}>
-                            {addressSearchResults.map((loc) => (
-                              <button
-                                key={loc.place_id}
-                                type="button"
-                                className={styles.addressSuggestionItem}
-                                onClick={() => handlePickSuggestion(loc)}
-                              >
-                                <span className={styles.addressSuggestionName}>{loc.name}</span>
-                                {loc.address ? (
-                                  <span className={styles.addressSuggestionAddress}>
-                                    {loc.address}
-                                  </span>
-                                ) : null}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                        {pickedLocation ? (
-                          <p className={styles.addressPickedHint}>
-                            선택됨:{" "}
-                            <span className={styles.addressPickedText}>
-                              {pickedLocation.address?.trim() || pickedLocation.name}
-                            </span>
-                          </p>
-                        ) : (
-                          <p className={styles.addressPickedHintMuted}>
-                            후보를 탭해 선택한 뒤 저장을 눌러 주세요.
-                          </p>
-                        )}
-                        <button
-                          type="button"
-                          onClick={handleAddAddress}
-                          className={styles.saveAddressButton}
-                          disabled={!newAddressLabel.trim() || !pickedLocation}
-                        >
-                          <Save className={styles.saveAddressIcon} />
-                          저장
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
 
                 <div className={styles.addressList}>
                   {savedAddresses.map((address) => (
