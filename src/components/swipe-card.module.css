@@ -2,7 +2,7 @@
 
 /* Main Card Container — transform 되는 레이어에 라운드: 슬라이드/낙하 시에도 카드 한 장처럼 보이게 */
 .cardWrapper {
-  @apply absolute inset-0 cursor-grab touch-none overflow-hidden rounded-[2rem] shadow-2xl ring-1 ring-border/25 active:cursor-grabbing;
+  @apply absolute inset-0 cursor-grab touch-none overflow-hidden rounded-[2rem] ring-1 ring-border/30 active:cursor-grabbing;
 }
 
 /* Card Content Container */
@@ -12,12 +12,40 @@
 
 /* Background Image */
 .backgroundImage {
-  @apply absolute inset-0 bg-cover bg-center;
+  @apply absolute inset-0;
 }
 
 /* Gradient Overlay */
 .gradientOverlay {
   @apply absolute inset-0 bg-linear-to-t from-foreground/90 via-foreground/30 to-transparent;
+}
+
+.contentSectionOnPlaceholder .restaurantName {
+  @apply text-card-foreground;
+}
+
+.contentSectionOnPlaceholder .restaurantType {
+  @apply text-muted-foreground;
+}
+
+.contentSectionOnPlaceholder .ratingValue {
+  @apply text-card-foreground;
+}
+
+.contentSectionOnPlaceholder .distanceText {
+  @apply text-card-foreground;
+}
+
+.contentSectionOnPlaceholder .tag {
+  @apply bg-foreground/8 text-card-foreground;
+}
+
+.contentSectionOnPlaceholder .distanceBadge {
+  @apply bg-foreground/8 text-card-foreground;
+}
+
+.contentSectionOnPlaceholder .navigationIcon {
+  @apply text-card-foreground;
 }
 
 /* Centered Action Icons - Advanced Overlay Style */

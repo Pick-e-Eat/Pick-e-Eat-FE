@@ -1,9 +1,10 @@
+import { motion } from "framer-motion";
+import { MapPin, MapPinned, RotateCcw, Star, ThumbsDown, ThumbsUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import styles from "./ResultsPage.module.css";
+import { RestaurantPhoto } from "@/components/restaurant-photo";
 import { routes } from "@/shared/constants/routes";
 import { useResultsStore } from "@/shared/stores/results-store";
-import { Star, MapPin, MapPinned, ThumbsUp, ThumbsDown, RotateCcw } from "lucide-react";
-import { motion } from "framer-motion";
+import styles from "./ResultsPage.module.css";
 
 export function ResultsPage() {
   const navigate = useNavigate();
@@ -59,9 +60,11 @@ export function ResultsPage() {
                   className={styles.likedItem}
                 >
                   <div className={styles.likedItemContent}>
-                    <div
+                    <RestaurantPhoto
+                      photoUrl={result.restaurant.photo_url}
+                      alt={result.restaurant.name}
+                      variant="thumbnail"
                       className={styles.likedItemImage}
-                      style={{ backgroundImage: `url(${result.restaurant.photo_url})` }}
                     />
                     <div className={styles.likedItemDetails}>
                       <h3 className={styles.likedItemName}>{result.restaurant.name}</h3>
@@ -81,10 +84,7 @@ export function ResultsPage() {
                       className={styles.mapButton}
                       aria-label="지도에서 위치 열기"
                       onClick={() =>
-                        openInMaps(
-                          result.restaurant.latitude,
-                          result.restaurant.longitude,
-                        )
+                        openInMaps(result.restaurant.latitude, result.restaurant.longitude)
                       }
                     >
                       <MapPinned className={styles.mapIcon} />
@@ -112,9 +112,11 @@ export function ResultsPage() {
                   transition={{ delay: (likedRestaurants.length + index) * 0.1 }}
                   className={styles.dislikedItem}
                 >
-                  <div
+                  <RestaurantPhoto
+                    photoUrl={result.restaurant.photo_url}
+                    alt={result.restaurant.name}
+                    variant="thumbnailSm"
                     className={styles.dislikedItemImage}
-                    style={{ backgroundImage: `url(${result.restaurant.photo_url})` }}
                   />
                   <div className={styles.dislikedItemDetails}>
                     <h3 className={styles.dislikedItemName}>{result.restaurant.name}</h3>

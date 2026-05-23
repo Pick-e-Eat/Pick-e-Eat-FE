@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { BrandWordmark } from "@/components/brand-wordmark";
 import { cn } from "@/shared/utils/cn";
 import styles from "./splash-screen.module.css";
 
@@ -7,7 +8,9 @@ const MOBILE_MEDIA = "(max-width: 639px)";
 
 const DISPLAY_MS = 3000;
 const FADE_MS = 350;
-/** 워드마크와 함께 화면이 뜬 뒤, 위쪽 문구가 나타나기까지 */
+/** 워드마크 페이드인 길이 */
+const WORDMARK_FADE_MS = 450;
+/** 워드마크 등장 후, 위쪽 문구가 나타나기까지 */
 const TAGLINE_DELAY_MS = 800;
 
 function isMobileViewport(): boolean {
@@ -27,12 +30,23 @@ export function SplashScreen() {
     return isMobileViewport() ? 1 : 0;
   });
   const [taglineVisible, setTaglineVisible] = useState(false);
+  const [wordmarkVisible, setWordmarkVisible] = useState(false);
 
   useEffect(() => {
     if (!isMobileViewport()) {
       setMounted(false);
       return;
     }
+
+    let wordmarkFrame1 = 0;
+    let wordmarkFrame2 = 0;
+
+    // opacity 0 상태를 먼저 그린 뒤 1로 전환해야 CSS transition이 동작함
+    wordmarkFrame1 = window.requestAnimationFrame(() => {
+      wordmarkFrame2 = window.requestAnimationFrame(() => {
+        setWordmarkVisible(true);
+      });
+    });
 
     const taglineTimer = window.setTimeout(() => {
       setTaglineVisible(true);
@@ -47,6 +61,8 @@ export function SplashScreen() {
     }, DISPLAY_MS + FADE_MS);
 
     return () => {
+      window.cancelAnimationFrame(wordmarkFrame1);
+      window.cancelAnimationFrame(wordmarkFrame2);
       window.clearTimeout(taglineTimer);
       window.clearTimeout(hideTimer);
       window.clearTimeout(unmountTimer);
@@ -78,19 +94,17 @@ export function SplashScreen() {
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
       }}
       role="status"
-      aria-label="Pick-e-Eat, 랜덤 맛집 추천서비스"
+      aria-label="Pick N Eat, 랜덤 맛집 추천서비스"
     >
       <div className={styles.stack}>
         <p className={cn(styles.tagline, taglineVisible && styles.taglineVisible)}>
           랜덤 맛집 추천서비스
         </p>
-        <h1 className={styles.wordmark} aria-label="Pick-e-Eat">
-          <span className={styles.wordPick}>Pick</span>
-          <span className={styles.wordGlue} aria-hidden="true">
-            -e-
-          </span>
-          <span className={styles.wordEat}>Eat</span>
-        </h1>
+        <BrandWordmark
+          variant="splash"
+          className={cn(styles.wordmark, wordmarkVisible && styles.wordmarkVisible)}
+          style={{ transitionDuration: `${WORDMARK_FADE_MS}ms` }}
+        />
       </div>
     </div>
   );

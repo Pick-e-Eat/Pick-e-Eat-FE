@@ -8,6 +8,7 @@ import {
 } from "framer-motion";
 import { Car, Dog, Heart, HeartCrack, Navigation, Star, Users, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { RestaurantPhoto } from "@/components/restaurant-photo";
 import { useHeaderColorStore } from "@/features/home/stores/header-color-store";
 import type { Restaurant } from "@/lib/types";
 import { cn } from "@/shared/utils/cn";
@@ -78,6 +79,7 @@ export function SwipeCard({
   exitDirection = null,
 }: SwipeCardProps) {
   const [lockedDirection, setLockedDirection] = useState<"x" | "y" | null>(null);
+  const [usingPlaceholder, setUsingPlaceholder] = useState(!restaurant.photo_url);
   // Motion values for card's physical position on screen
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -247,13 +249,15 @@ export function SwipeCard({
       {/* Card Container */}
       <div className={styles.cardContainer}>
         {/* Background Image */}
-        <div
+        <RestaurantPhoto
+          photoUrl={restaurant.photo_url}
+          alt={`${restaurant.name} 대표 사진`}
+          variant="cover"
           className={styles.backgroundImage}
-          style={{ backgroundImage: `url(${restaurant.photo_url})` }}
+          onUsingPlaceholderChange={setUsingPlaceholder}
         />
 
-        {/* Gradient Overlay */}
-        <div className={styles.gradientOverlay} />
+        {!usingPlaceholder ? <div className={styles.gradientOverlay} /> : null}
 
         {/* Centered Action Icons - Advanced Overlays */}
         <AdvancedOverlay
@@ -280,7 +284,12 @@ export function SwipeCard({
         />
 
         {/* Content */}
-        <div className={styles.contentSection}>
+        <div
+          className={cn(
+            styles.contentSection,
+            usingPlaceholder && styles.contentSectionOnPlaceholder,
+          )}
+        >
           {/* Tags */}
           {restaurant.tags && restaurant.tags.length > 0 && (
             <div className={styles.tagsContainer}>

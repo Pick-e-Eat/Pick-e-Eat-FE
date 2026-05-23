@@ -20,17 +20,10 @@
 }
 
 .wordmark {
-  @apply order-last flex flex-wrap items-baseline justify-center px-5;
+  @apply order-last opacity-0;
+  transition: opacity ease;
 }
 
-.wordPick {
-  @apply text-[2.25rem] font-black tracking-[-0.045em] text-white;
-}
-
-.wordGlue {
-  @apply mx-1 translate-y-px text-[1.45rem] font-extralight tracking-[-0.03em] text-white/90;
-}
-
-.wordEat {
-  @apply text-[2.25rem] font-black tracking-[-0.045em] text-white;
+.wordmarkVisible {
+  opacity: 1;
 }

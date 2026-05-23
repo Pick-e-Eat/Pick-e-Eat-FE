@@ -2,12 +2,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   Car,
   ChevronRight,
-  CircleUserRound,
+  // CircleUserRound,
   Dog,
-  History,
+  // History,
   MapPin,
   Plus,
-  RefreshCw,
+  // RefreshCw,
   Trash2,
   Users,
   X,
@@ -15,7 +15,8 @@ import {
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { APP_OVERLAY_ROOT_ID } from "@/app/AppLayout";
-import { LoginDialog } from "@/features/auth/components";
+import { BrandWordmark } from "@/components/brand-wordmark";
+// import { LoginDialog } from "@/features/auth/components";
 import type { FilterSettings, SavedAddress } from "@/lib/types";
 import { MAX_SAVED_ADDRESSES } from "@/shared/stores/saved-addresses-store";
 import { cn } from "@/shared/utils/cn";
@@ -62,13 +63,14 @@ export function HamburgerMenu({
   const [activeFilterSection, setActiveFilterSection] = useState<"range" | "amenities" | null>(
     null,
   );
-  const [showLogin, setShowLogin] = useState(false);
+  // const [showLogin, setShowLogin] = useState(false);
   const locationLabelOverride =
     savedAddresses.find(
       (address) =>
         typeof address.latitude === "number" &&
         typeof address.longitude === "number" &&
-        coordsKey(address.latitude, address.longitude) === coordsKey(currentLatitude, currentLongitude),
+        coordsKey(address.latitude, address.longitude) ===
+          coordsKey(currentLatitude, currentLongitude),
     )?.label ?? null;
   const currentLocationTitle = locationLabelOverride ?? currentLocation;
 
@@ -103,13 +105,7 @@ export function HamburgerMenu({
             {/* Header — 모달형: 중앙 타이틀 + 우측 닫기 */}
             <div className={styles.header}>
               <div className={styles.headerLead} aria-hidden />
-              <h2 className={styles.headerWordmark} aria-label="Pick-e-Eat">
-                <span className={styles.headerWordPick}>Pick</span>
-                <span className={styles.headerWordGlue} aria-hidden="true">
-                  -e-
-                </span>
-                <span className={styles.headerWordEat}>Eat</span>
-              </h2>
+              <BrandWordmark variant="menu" as="h2" className={styles.headerWordmark} />
               <button
                 type="button"
                 onClick={onClose}
@@ -329,7 +325,7 @@ export function HamburgerMenu({
                 </div>
               </div>
 
-              {/* Actions */}
+              {/* Actions — 로그인 / 동기화 / 히스토리 (미사용)
               <div className={styles.actionsCard}>
                 <button
                   type="button"
@@ -351,6 +347,7 @@ export function HamburgerMenu({
                   <ChevronRight className={styles.actionChevron} />
                 </button>
               </div>
+              */}
             </div>
           </motion.div>
         </>
@@ -361,11 +358,11 @@ export function HamburgerMenu({
   return (
     <>
       {overlayRoot ? createPortal(menuContent, overlayRoot) : null}
-      <LoginDialog
+      {/* <LoginDialog
         open={showLogin}
         onOpenChange={setShowLogin}
         onSubmit={async (v) => console.log("Login", v)}
-      />
+      /> */}
     </>
   );
 }

@@ -22,21 +22,8 @@
   @apply size-10;
 }
 
-/* 스플래시와 동일 워드마크 구조 — 색은 메뉴 본문(text-card-foreground)과 동일 톤 */
 .headerWordmark {
-  @apply m-0 flex flex-wrap items-baseline justify-center text-center text-card-foreground;
-}
-
-.headerWordPick {
-  @apply text-[1.35rem] font-black tracking-[-0.045em];
-}
-
-.headerWordGlue {
-  @apply mx-1 translate-y-px text-[0.95rem] font-extralight tracking-[-0.03em] text-card-foreground/68;
-}
-
-.headerWordEat {
-  @apply text-[1.35rem] font-black tracking-[-0.045em];
+  @apply justify-self-center;
 }
 
 .closeButton {
