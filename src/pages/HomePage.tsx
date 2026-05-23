@@ -104,7 +104,7 @@ export function HomePage() {
     };
 
     fetchRestaurants();
-  }, [nearbyQuery.latitude, nearbyQuery.longitude, filterSettings, results]);
+  }, [nearbyQuery.latitude, nearbyQuery.longitude, filterSettings.searchRange]);
 
   const filteredRestaurants = restaurants.filter((r) => {
     if (filterSettings.hasParking !== null && r.has_parking !== filterSettings.hasParking)
