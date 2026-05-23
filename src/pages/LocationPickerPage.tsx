@@ -1,9 +1,13 @@
-import { ArrowLeft, Crosshair, Minus, Plus, Search } from "lucide-react";
+import { ArrowLeft, Crosshair, Minus, Plus, Save, Search, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { routes } from "@/shared/constants/routes";
 import { useNearbyQueryStore } from "@/shared/stores/nearby-query-store";
+import {
+  MAX_SAVED_ADDRESSES,
+  useSavedAddressesStore,
+} from "@/shared/stores/saved-addresses-store";
 import type { LocationResult } from "@/shared/types/api.types";
 import {
   type GoogleGeocoderLike,
@@ -31,6 +35,12 @@ type MapClickEvent = {
 
 type AdvancedMarkerInstance = {
   position: LatLng | null;
+};
+
+type LocationPickerNavState = {
+  mode?: "setLocation" | "saveOnly";
+  returnToMenuOpen?: boolean;
+  skipMenuOpenAnimation?: boolean;
 };
 
 const ZOOM_BY_RADIUS: Record<50 | 100 | 250, number> = {
@@ -71,18 +81,28 @@ function createCustomMarkerContent(): HTMLDivElement {
 
 export function LocationPickerPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const navState = location.state as LocationPickerNavState | null;
+  const isSaveOnlyMode = navState?.mode === "saveOnly";
+  const shouldReturnToMenuOpen = Boolean(navState?.returnToMenuOpen);
+  const shouldSkipMenuOpenAnimation = Boolean(navState?.skipMenuOpenAnimation);
   const { nearbyQuery, setCoordinates, setAddress } = useNearbyQueryStore();
+  const savedAddresses = useSavedAddressesStore((s) => s.addresses);
+  const addSavedAddress = useSavedAddressesStore((s) => s.addAddress);
   const [selectedPosition, setSelectedPosition] = useState<LatLng>({
     lat: nearbyQuery.latitude,
     lng: nearbyQuery.longitude,
   });
   const [selectedAddress, setSelectedAddress] = useState(nearbyQuery.address);
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [saveLabel, setSaveLabel] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<LocationResult[]>([]);
   const [isLoadingMap, setIsLoadingMap] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
   const [isResolvingAddress, setIsResolvingAddress] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
+  const [isSavingAddress, setIsSavingAddress] = useState(false);
 
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<GoogleMapInstance | null>(null);
@@ -331,20 +351,14 @@ export function LocationPickerPage() {
     setCoordinates(selectedPosition.lat, selectedPosition.lng);
     setAddress(resolved);
 
-    const appliedLocationLabel = resolved.replace(/^대한민국\s*/, "").trim();
-    const shortLabel =
-      appliedLocationLabel.length > 18
-        ? `${appliedLocationLabel.slice(0, 18)}...`
-        : appliedLocationLabel;
-    toast.success(
-      <>
-        위치를 적용했어요.
-        <br />
-        위치: {shortLabel}
-      </>,
-    );
     window.setTimeout(() => {
-      navigate(routes.home, { replace: true });
+      navigate(routes.home, {
+        replace: true,
+        state: {
+          returnToMenuOpen: shouldReturnToMenuOpen,
+          skipMenuOpenAnimation: shouldSkipMenuOpenAnimation,
+        },
+      });
     }, 120);
   }, [
     isConfirming,
@@ -354,6 +368,73 @@ export function LocationPickerPage() {
     selectedPosition.lng,
     setAddress,
     setCoordinates,
+    shouldReturnToMenuOpen,
+    shouldSkipMenuOpenAnimation,
+  ]);
+
+  const handleOpenSaveModal = useCallback(() => {
+    if (savedAddresses.length >= MAX_SAVED_ADDRESSES) {
+      toast.message(`주소는 최대 ${MAX_SAVED_ADDRESSES}개까지 저장할 수 있어요.`);
+      return;
+    }
+    setSaveLabel("");
+    setIsSaveModalOpen(true);
+  }, [savedAddresses.length]);
+
+  const handleSaveAddress = useCallback(() => {
+    if (isSavingAddress) return;
+    const trimmedLabel = saveLabel.trim();
+    if (!trimmedLabel) {
+      toast.message("저장할 라벨을 입력해 주세요.");
+      return;
+    }
+    if (savedAddresses.length >= MAX_SAVED_ADDRESSES) {
+      toast.message(`주소는 최대 ${MAX_SAVED_ADDRESSES}개까지 저장할 수 있어요.`);
+      return;
+    }
+    setIsSavingAddress(true);
+    const resolved = selectedAddress || "선택한 위치";
+    const result = addSavedAddress({
+      id: Date.now().toString(),
+      label: trimmedLabel,
+      address: resolved,
+      isDefault: savedAddresses.length === 0,
+      latitude: selectedPosition.lat,
+      longitude: selectedPosition.lng,
+    });
+    if (result === "duplicate") {
+      setIsSavingAddress(false);
+      toast.message("이미 저장된 위치예요.");
+      return;
+    }
+    if (result === "limit") {
+      setIsSavingAddress(false);
+      toast.message(`주소는 최대 ${MAX_SAVED_ADDRESSES}개까지 저장할 수 있어요.`);
+      return;
+    }
+
+    window.setTimeout(() => {
+      setIsSaveModalOpen(false);
+      setIsSavingAddress(false);
+      navigate(routes.home, {
+        replace: true,
+        state: {
+          returnToMenuOpen: shouldReturnToMenuOpen,
+          skipMenuOpenAnimation: shouldSkipMenuOpenAnimation,
+        },
+      });
+    }, 120);
+  }, [
+    addSavedAddress,
+    isSavingAddress,
+    navigate,
+    saveLabel,
+    savedAddresses.length,
+    selectedAddress,
+    selectedPosition.lat,
+    selectedPosition.lng,
+    shouldReturnToMenuOpen,
+    shouldSkipMenuOpenAnimation,
   ]);
 
   return (
@@ -365,7 +446,7 @@ export function LocationPickerPage() {
           <button type="button" className={styles.iconButton} onClick={navigateBackOrHome}>
             <ArrowLeft className={styles.icon} />
           </button>
-          <h1 className={styles.title}>내 위치 찾기</h1>
+          <h1 className={styles.title}>{isSaveOnlyMode ? "위치 저장" : "위치 설정"}</h1>
         </header>
         <section className={styles.searchBarSection}>
           <input
@@ -405,6 +486,17 @@ export function LocationPickerPage() {
           </section>
         )}
         <div className={styles.mapActionButtons}>
+          {!isSaveOnlyMode && (
+            <button
+              type="button"
+              className={styles.mapActionButton}
+              onClick={handleOpenSaveModal}
+              aria-label="현재 위치 저장"
+              title="현재 위치 저장"
+            >
+              <Save className={styles.icon} />
+            </button>
+          )}
           <button type="button" className={styles.mapActionButton} onClick={handleMoveToGps}>
             <Crosshair className={styles.icon} />
           </button>
@@ -415,22 +507,79 @@ export function LocationPickerPage() {
             <Minus className={styles.icon} />
           </button>
         </div>
-        <section className={styles.bottomSheet}>
-          <p className={styles.selectedAddress}>{selectedAddress || "선택한 위치"}</p>
-          <p className={styles.metaText}>
-            {isResolvingAddress
-              ? "도로명 주소를 확인하는 중..."
-              : "지도 탭/검색/GPS로 위치를 고르고 아래 버튼으로 적용해 주세요."}
-          </p>
-          <button
-            type="button"
-            className={styles.confirmButton}
-            onClick={handleConfirmLocation}
-            disabled={isConfirming}
-          >
-            {isConfirming ? "적용 중..." : "이 위치로 설정"}
-          </button>
-        </section>
+        {isSaveOnlyMode ? (
+          <section className={styles.bottomSheet}>
+            <p className={styles.selectedAddress}>{selectedAddress || "선택한 위치"}</p>
+            <input
+              type="text"
+              value={saveLabel}
+              onChange={(e) => setSaveLabel(e.target.value)}
+              placeholder="라벨 (예: 집, 회사)"
+              className={styles.saveLabelInput}
+              autoComplete="off"
+            />
+            <button
+              type="button"
+              className={`${styles.confirmButton} ${styles.compactConfirmButton}`}
+              onClick={handleSaveAddress}
+              disabled={isSavingAddress || !saveLabel.trim()}
+            >
+              {isSavingAddress ? "저장 중..." : "이 위치 저장"}
+            </button>
+          </section>
+        ) : (
+          <section className={styles.bottomSheet}>
+            <p className={styles.selectedAddress}>{selectedAddress || "선택한 위치"}</p>
+            <button
+              type="button"
+              className={styles.confirmButton}
+              onClick={handleConfirmLocation}
+              disabled={isConfirming}
+            >
+              {isConfirming ? "처리 중..." : "이 위치로 설정"}
+            </button>
+          </section>
+        )}
+        {!isSaveOnlyMode && isSaveModalOpen && (
+          <div className={styles.saveModalOverlay} role="presentation" onClick={() => setIsSaveModalOpen(false)}>
+            <section
+              className={styles.saveModal}
+              role="dialog"
+              aria-modal="true"
+              aria-label="주소 저장"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className={styles.saveModalHeader}>
+                <h2 className={styles.saveModalTitle}>현재 위치 저장</h2>
+                <button
+                  type="button"
+                  className={styles.saveModalCloseButton}
+                  onClick={() => setIsSaveModalOpen(false)}
+                  aria-label="닫기"
+                >
+                  <X className={styles.icon} />
+                </button>
+              </div>
+              <p className={styles.saveModalAddress}>{selectedAddress || "선택한 위치"}</p>
+              <input
+                type="text"
+                value={saveLabel}
+                onChange={(e) => setSaveLabel(e.target.value)}
+                placeholder="라벨 (예: 집, 회사)"
+                className={styles.saveLabelInput}
+                autoComplete="off"
+              />
+              <button
+                type="button"
+                className={`${styles.confirmButton} ${styles.compactConfirmButton}`}
+                onClick={handleSaveAddress}
+                disabled={isSavingAddress}
+              >
+                {isSavingAddress ? "저장 중..." : "저장"}
+              </button>
+            </section>
+          </div>
+        )}
       </section>
     </main>
   );

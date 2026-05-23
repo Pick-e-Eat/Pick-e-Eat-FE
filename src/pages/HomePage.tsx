@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { HamburgerMenu } from "@/components/hamburger-menu";
 import { SavedAddressLimitDialog } from "@/components/saved-address-limit-dialog";
 import { SwipeCard } from "@/components/swipe-card";
@@ -10,25 +10,29 @@ import { restaurantAPI } from "@/shared/api/restaurant";
 import { routes } from "@/shared/constants/routes";
 import { useNearbyQueryStore } from "@/shared/stores/nearby-query-store";
 import { useResultsStore } from "@/shared/stores/results-store";
-import {
-  type SavedAddressWithCoordinates,
-  useSavedAddressesStore,
-} from "@/shared/stores/saved-addresses-store";
+import type { SavedAddressWithCoordinates } from "@/shared/stores/saved-addresses-store";
+import { useSavedAddressesStore } from "@/shared/stores/saved-addresses-store";
 import styles from "./HomePage.module.css";
 
 const MAX_SELECTIONS = 10;
 
 export function HomePage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const navState = location.state as
+    | { returnToMenuOpen?: boolean; skipMenuOpenAnimation?: boolean }
+    | null;
+  const initialMenuOpen = Boolean(navState?.returnToMenuOpen);
+  const initialSkipMenuOpenAnimation = Boolean(navState?.skipMenuOpenAnimation);
   const { results, addResult, resetResults } = useResultsStore();
   const { nearbyQuery, setCoordinates, setAddress, setRadius } = useNearbyQueryStore();
   const savedAddresses = useSavedAddressesStore((s) => s.addresses);
-  const addSavedAddress = useSavedAddressesStore((s) => s.addAddress);
   const removeSavedAddress = useSavedAddressesStore((s) => s.removeAddress);
 
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(initialMenuOpen);
+  const [skipMenuOpenAnimation, setSkipMenuOpenAnimation] = useState(initialSkipMenuOpenAnimation);
   const currentLocation = nearbyQuery.address;
   const [filterSettings, setFilterSettings] = useState<FilterSettings>({
     searchRange: nearbyQuery.radius,
@@ -46,6 +50,14 @@ export function HomePage() {
       prev.searchRange === nearbyQuery.radius ? prev : { ...prev, searchRange: nearbyQuery.radius },
     );
   }, [nearbyQuery.radius]);
+
+  useEffect(() => {
+    const shouldOpenMenuAfterLocationSet = Boolean(navState?.returnToMenuOpen);
+    if (!shouldOpenMenuAfterLocationSet) return;
+    setMenuOpen(true);
+    setSkipMenuOpenAnimation(Boolean(navState?.skipMenuOpenAnimation));
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location.pathname, navState?.returnToMenuOpen, navState?.skipMenuOpenAnimation, navigate]);
 
   useEffect(() => {
     const fetchRestaurants = async () => {
@@ -130,7 +142,7 @@ export function HomePage() {
         if (results.length + 1 >= MAX_SELECTIONS) {
           navigate(routes.results);
         }
-      }, 300);
+      }, 480);
     },
     [currentRestaurant, results, addResult, navigate],
   );
@@ -176,14 +188,6 @@ export function HomePage() {
       });
   };
 
-  const handleAddAddress = (address: SavedAddress) => {
-    const result = addSavedAddress(address as SavedAddressWithCoordinates);
-    if (result === "limit") {
-      setSavedAddressLimitOpen(true);
-      return false;
-    }
-    return result === "ok";
-  };
   const handleRemoveAddress = (id: string) => removeSavedAddress(id);
   const handleSelectAddress = async (address: SavedAddress) => {
     const selectedAddress = address as SavedAddressWithCoordinates;
@@ -193,7 +197,6 @@ export function HomePage() {
       typeof selectedAddress.longitude === "number"
     ) {
       setCoordinates(selectedAddress.latitude, selectedAddress.longitude);
-      setMenuOpen(false);
       return;
     }
 
@@ -207,7 +210,6 @@ export function HomePage() {
       setError("주소 좌표 검색에 실패했습니다.");
       console.error(err);
     }
-    setMenuOpen(false);
   };
 
   const handleFilterChange = (settings: FilterSettings) => {
@@ -216,13 +218,26 @@ export function HomePage() {
   };
 
   const handleOpenLocationPicker = () => {
-    setMenuOpen(false);
-    navigate(routes.locationPicker);
+    navigate(routes.locationPicker, {
+      state: { mode: "setLocation", returnToMenuOpen: true, skipMenuOpenAnimation: true },
+    });
+  };
+
+  const handleOpenSaveLocationPicker = () => {
+    navigate(routes.locationPicker, {
+      state: { mode: "saveOnly", returnToMenuOpen: true, skipMenuOpenAnimation: true },
+    });
   };
 
   return (
     <main className={styles.mainContainer}>
-      <HomeHeader onMenuOpen={() => setMenuOpen(true)} maxSelections={MAX_SELECTIONS} />
+      <HomeHeader
+        onMenuOpen={() => {
+          setSkipMenuOpenAnimation(false);
+          setMenuOpen(true);
+        }}
+        maxSelections={MAX_SELECTIONS}
+      />
 
       <div className={styles.cardStackContainer}>
         {isLoading && <div className={styles.loadingMessage}>Loading restaurants...</div>}
@@ -290,15 +305,19 @@ export function HomePage() {
 
       <HamburgerMenu
         isOpen={menuOpen}
-        onClose={() => setMenuOpen(false)}
+        onClose={() => {
+          setMenuOpen(false);
+          setSkipMenuOpenAnimation(false);
+        }}
         onOpenLocationPicker={handleOpenLocationPicker}
+        onOpenSaveLocationPicker={handleOpenSaveLocationPicker}
         currentLocation={currentLocation}
-        addressSearchBiasLat={nearbyQuery.latitude}
-        addressSearchBiasLng={nearbyQuery.longitude}
+        currentLatitude={nearbyQuery.latitude}
+        currentLongitude={nearbyQuery.longitude}
+        disableOpenAnimation={skipMenuOpenAnimation}
         filterSettings={filterSettings}
         onFilterChange={handleFilterChange}
         savedAddresses={savedAddresses}
-        onAddAddress={handleAddAddress}
         onSavedAddressLimit={() => setSavedAddressLimitOpen(true)}
         onRemoveAddress={handleRemoveAddress}
         onSelectAddress={handleSelectAddress}

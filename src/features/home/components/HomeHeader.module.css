@@ -1,11 +1,8 @@
 @reference "../../../styles/globals.css";
 
 .header {
-  @apply absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-3 backdrop-blur-lg;
-  background-color: var(
-    --header-bg,
-    color-mix(in srgb, var(--card) 80%, transparent)
-  );
+  @apply sticky top-0 z-20 mb-1 flex items-center justify-between border-b border-border/70 bg-background px-4 py-3 shadow-[0_1px_0_rgba(15,23,42,0.06)];
+  background-color: var(--header-bg, var(--background));
   color: var(--header-text, var(--card-foreground));
   transition:
     background-color 0.5s ease,

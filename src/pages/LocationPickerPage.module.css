@@ -77,13 +77,45 @@
 }
 
 .selectedAddress {
-  @apply line-clamp-2 text-sm font-semibold text-card-foreground;
+  @apply mb-2.5 line-clamp-2 text-sm font-semibold leading-relaxed text-card-foreground;
 }
 
 .metaText {
   @apply mb-3 mt-1 text-xs text-muted-foreground;
 }
 
+.saveLabelInput {
+  @apply mb-2.5 w-full rounded-xl border border-border/70 bg-card/95 px-3 py-2.5 text-[0.9375rem] text-card-foreground placeholder:text-muted-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-primary;
+}
+
 .confirmButton {
   @apply w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-70 cursor-pointer;
+}
+
+.compactConfirmButton {
+  @apply py-2.5 text-[0.9375rem];
+}
+
+.saveModalOverlay {
+  @apply absolute inset-0 z-40 flex items-end bg-black/40 p-4 sm:items-center sm:justify-center;
+}
+
+.saveModal {
+  @apply w-full rounded-2xl border border-border bg-card p-4 shadow-xl sm:max-w-sm;
+}
+
+.saveModalHeader {
+  @apply mb-2 flex items-center justify-between;
+}
+
+.saveModalTitle {
+  @apply text-base font-semibold text-card-foreground;
+}
+
+.saveModalCloseButton {
+  @apply rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted cursor-pointer;
+}
+
+.saveModalAddress {
+  @apply mb-3 line-clamp-2 text-xs text-muted-foreground;
 }
