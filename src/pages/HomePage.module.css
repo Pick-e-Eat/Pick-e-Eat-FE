@@ -13,17 +13,25 @@
 }
 
 .noRestaurantsContainer {
-  @apply flex h-full flex-col items-center justify-center text-center;
+  @apply flex h-full flex-col items-center justify-center p-6 text-center;
 }
 
 .noRestaurantsCard {
-  @apply rounded-3xl bg-card p-8 shadow-lg;
+  @apply w-full max-w-sm rounded-3xl bg-card p-8 shadow-lg;
 }
 
 .noRestaurantsMessage {
-  @apply mb-4 text-lg font-medium text-card-foreground;
+  @apply mb-6 text-lg font-medium text-card-foreground;
+}
+
+.noRestaurantsActions {
+  @apply flex flex-col gap-3;
+}
+
+.viewResultsButton {
+  @apply flex w-full items-center justify-center rounded-xl bg-primary px-6 py-4 font-bold text-primary-foreground transition-all active:scale-[0.98] cursor-pointer;
 }
 
 .startOverButton {
-  @apply rounded-xl bg-primary px-6 py-3 font-medium text-primary-foreground hover:bg-primary/90 cursor-pointer;
+  @apply flex w-full items-center justify-center rounded-xl border border-border bg-background px-6 py-4 font-bold text-card-foreground transition-all active:scale-[0.98] cursor-pointer;
 }

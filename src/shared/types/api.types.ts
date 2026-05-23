@@ -12,6 +12,7 @@ export interface NearbySearchRequest {
   latitude: number; // 위도 (예: 37.5665)
   longitude: number; // 경도 (예: 126.978)
   radius?: 50 | 100 | 250; // 검색 반경 (미터). 50, 100, 250 중 선택
+  excluded_place_ids?: string[]; // 이미 스와이프한 장소 제외
 }
 
 export interface RestaurantResponse {

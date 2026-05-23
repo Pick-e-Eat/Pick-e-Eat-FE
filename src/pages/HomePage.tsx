@@ -56,6 +56,7 @@ export function HomePage() {
           latitude: nearbyQuery.latitude,
           longitude: nearbyQuery.longitude,
           radius: filterSettings.searchRange as 50 | 100 | 250,
+          excluded_place_ids: results.map((r) => r.restaurant.id),
         });
         // Map RestaurantResponse to local Restaurant type
         const fetchedRestaurants: Restaurant[] = response.restaurants.map((r) => ({
@@ -91,7 +92,7 @@ export function HomePage() {
     };
 
     fetchRestaurants();
-  }, [nearbyQuery.latitude, nearbyQuery.longitude, filterSettings]);
+  }, [nearbyQuery.latitude, nearbyQuery.longitude, filterSettings, results]);
 
   const filteredRestaurants = restaurants.filter((r) => {
     if (filterSettings.hasParking !== null && r.has_parking !== filterSettings.hasParking)
@@ -143,6 +144,7 @@ export function HomePage() {
         latitude: nearbyQuery.latitude,
         longitude: nearbyQuery.longitude,
         radius: filterSettings.searchRange as 50 | 100 | 250,
+        excluded_place_ids: [], // Reset results means no exclusions initially
       })
       .then((response) => {
         const fetchedRestaurants: Restaurant[] = response.restaurants.map((r) => ({
@@ -258,13 +260,28 @@ export function HomePage() {
                 className={styles.noRestaurantsCard}
               >
                 <p className={styles.noRestaurantsMessage}>
-                  {filteredRestaurants.length === 0
-                    ? "조건에 맞는 음식점이 없습니다"
-                    : "모든 음식점을 확인했어요!"}
+                  {results.length > 0
+                    ? "더 이상 검색할 음식점이 없습니다"
+                    : "조건에 맞는 음식점이 없습니다"}
                 </p>
-                <button type="button" onClick={handleStartOver} className={styles.startOverButton}>
-                  다시 시작하기
-                </button>
+                <div className={styles.noRestaurantsActions}>
+                  {results.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => navigate(routes.results)}
+                      className={styles.viewResultsButton}
+                    >
+                      결과 보기
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleStartOver}
+                    className={styles.startOverButton}
+                  >
+                    {results.length > 0 ? "처음부터 다시하기" : "다시 시도하기"}
+                  </button>
+                </div>
               </motion.div>
             </div>
           )
