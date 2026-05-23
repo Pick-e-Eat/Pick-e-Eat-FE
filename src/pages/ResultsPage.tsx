@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { RestaurantPhoto } from "@/components/restaurant-photo";
 import { routes } from "@/shared/constants/routes";
 import { useResultsStore } from "@/shared/stores/results-store";
+import type { Restaurant } from "@/lib/types";
 import styles from "./ResultsPage.module.css";
 
 export function ResultsPage() {
@@ -29,6 +30,18 @@ export function ResultsPage() {
       "_blank",
       "noopener,noreferrer",
     );
+  };
+
+  const openRestaurantInMaps = (restaurant: Restaurant) => {
+    const mapsUrl =
+      restaurant.google_maps_links?.place_uri ?? restaurant.google_maps_uri ?? restaurant.kakao_map_uri;
+
+    if (mapsUrl) {
+      window.open(mapsUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    openInMaps(restaurant.latitude, restaurant.longitude);
   };
 
   return (
@@ -83,9 +96,7 @@ export function ResultsPage() {
                       type="button"
                       className={styles.mapButton}
                       aria-label="지도에서 위치 열기"
-                      onClick={() =>
-                        openInMaps(result.restaurant.latitude, result.restaurant.longitude)
-                      }
+                      onClick={() => openRestaurantInMaps(result.restaurant)}
                     >
                       <MapPinned className={styles.mapIcon} />
                     </button>

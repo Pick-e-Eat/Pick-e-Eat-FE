@@ -87,6 +87,9 @@ export function HomePage() {
           has_parking: r.has_parking,
           blog_review_count: r.blog_review_count,
           tags: r.tags,
+          google_maps_uri: r.google_maps_uri,
+          google_maps_links: r.google_maps_links,
+          kakao_map_uri: r.kakao_map_uri,
           // Default values for fields not in API response
           type: "Unknown", // Placeholder
           hasGroupSeating: null, // Placeholder
@@ -175,6 +178,9 @@ export function HomePage() {
           has_parking: r.has_parking,
           blog_review_count: r.blog_review_count,
           tags: r.tags,
+          google_maps_uri: r.google_maps_uri,
+          google_maps_links: r.google_maps_links,
+          kakao_map_uri: r.kakao_map_uri,
           type: "Unknown",
           hasGroupSeating: null,
           petFriendly: null,
