@@ -1,0 +1,45 @@
+@reference "../styles/globals.css";
+
+.placeholder {
+  @apply flex flex-col items-center justify-center gap-1.5 bg-white text-secondary;
+}
+
+.cover {
+  @apply absolute inset-0 h-full w-full gap-2;
+}
+
+.thumbnail {
+  @apply h-full w-full rounded-xl ring-1 ring-border/50;
+}
+
+.thumbnailSm {
+  @apply h-full w-full rounded-lg ring-1 ring-border/45;
+}
+
+.icon {
+  @apply shrink-0 text-secondary/85;
+}
+
+.cover .icon {
+  @apply size-11;
+}
+
+.thumbnail .icon {
+  @apply size-7;
+}
+
+.thumbnailSm .icon {
+  @apply size-5;
+}
+
+.label {
+  @apply font-medium text-muted-foreground;
+}
+
+.cover .label {
+  @apply text-sm;
+}
+
+.thumbnail .label {
+  @apply text-[0.6875rem];
+}

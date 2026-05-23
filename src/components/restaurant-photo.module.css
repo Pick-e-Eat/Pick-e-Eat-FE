@@ -1,0 +1,17 @@
+@reference "../styles/globals.css";
+
+.photo {
+  @apply object-cover object-center;
+}
+
+.cover {
+  @apply absolute inset-0 h-full w-full;
+}
+
+.thumbnail {
+  @apply h-full w-full rounded-xl;
+}
+
+.thumbnailSm {
+  @apply h-full w-full rounded-lg;
+}

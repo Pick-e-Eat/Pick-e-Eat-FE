@@ -1,0 +1,37 @@
+@reference "../styles/globals.css";
+
+.root {
+  @apply m-0 inline-flex items-center justify-center gap-x-[0.35em] text-center font-semibold tracking-[0.04em];
+}
+
+.splash {
+  @apply px-5 text-[2rem] text-white;
+}
+
+.menu {
+  @apply text-[1.125rem] text-card-foreground;
+}
+
+.word {
+  @apply font-semibold;
+}
+
+.nGroup {
+  @apply inline-flex items-center gap-x-1;
+}
+
+.nLine {
+  @apply h-px w-2 shrink-0 bg-[#111111];
+}
+
+.nHighlight {
+  @apply font-bold leading-none tracking-[0.1em];
+}
+
+.splash .nHighlight {
+  @apply text-[#111111];
+}
+
+.menu .nHighlight {
+  @apply text-primary;
+}
