@@ -22,7 +22,7 @@ export function HomePage() {
     | null;
   const initialMenuOpen = Boolean(navState?.returnToMenuOpen);
   const initialSkipMenuOpenAnimation = Boolean(navState?.skipMenuOpenAnimation);
-  const { results, addResult, resetResults, maxSelections, setMaxSelections } = useResultsStore();
+  const { results, addResult, resetResults } = useResultsStore();
   const { nearbyQuery, setCoordinates, setAddress, setRadius } = useNearbyQueryStore();
   const savedAddresses = useSavedAddressesStore((s) => s.addresses);
   const removeSavedAddress = useSavedAddressesStore((s) => s.removeAddress);
@@ -96,11 +96,6 @@ export function HomePage() {
         }));
         setRestaurants(fetchedRestaurants);
         setCurrentIndex(0); // Reset index when new restaurants are fetched
-
-        // Update max selections if more are available
-        if (results.length + fetchedRestaurants.length > maxSelections) {
-          setMaxSelections(results.length + fetchedRestaurants.length);
-        }
       } catch (err) {
         setError("Failed to fetch restaurants.");
         console.error(err);
@@ -124,12 +119,18 @@ export function HomePage() {
       return false;
     if (filterSettings.petFriendly !== null && r.petFriendly !== filterSettings.petFriendly)
       return false;
-    if (r.distance_meters && r.distance_meters > filterSettings.searchRange) return false;
+    if (r.distance_meters && r.distance_meters > filterSettings.searchRange) {
+      console.log(
+        `[Filter] Excluded "${r.name}": distance ${r.distance_meters}m > range ${filterSettings.searchRange}m`,
+      );
+      return false;
+    }
     return true;
   });
 
   const currentRestaurant = filteredRestaurants[currentIndex];
-  const remainingCount = maxSelections - results.length;
+  // Calculate maxSelections dynamically: already swiped + remaining available cards
+  const maxSelections = Math.max(10, results.length + Math.max(0, filteredRestaurants.length - currentIndex));
 
   const handleSwipe = useCallback(
     (direction: "left" | "right") => {
