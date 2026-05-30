@@ -119,12 +119,6 @@ export function HomePage() {
       return false;
     if (filterSettings.petFriendly !== null && r.petFriendly !== filterSettings.petFriendly)
       return false;
-    if (r.distance_meters && r.distance_meters > filterSettings.searchRange) {
-      console.log(
-        `[Filter] Excluded "${r.name}": distance ${r.distance_meters}m > range ${filterSettings.searchRange}m`,
-      );
-      return false;
-    }
     return true;
   });
 
