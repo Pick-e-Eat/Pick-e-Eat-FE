@@ -14,8 +14,6 @@ import type { SavedAddressWithCoordinates } from "@/shared/stores/saved-addresse
 import { useSavedAddressesStore } from "@/shared/stores/saved-addresses-store";
 import styles from "./HomePage.module.css";
 
-const MAX_SELECTIONS = 10;
-
 export function HomePage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -24,7 +22,7 @@ export function HomePage() {
     | null;
   const initialMenuOpen = Boolean(navState?.returnToMenuOpen);
   const initialSkipMenuOpenAnimation = Boolean(navState?.skipMenuOpenAnimation);
-  const { results, addResult, resetResults } = useResultsStore();
+  const { results, addResult, resetResults, maxSelections, setMaxSelections } = useResultsStore();
   const { nearbyQuery, setCoordinates, setAddress, setRadius } = useNearbyQueryStore();
   const savedAddresses = useSavedAddressesStore((s) => s.addresses);
   const removeSavedAddress = useSavedAddressesStore((s) => s.removeAddress);
@@ -95,6 +93,11 @@ export function HomePage() {
         }));
         setRestaurants(fetchedRestaurants);
         setCurrentIndex(0); // Reset index when new restaurants are fetched
+
+        // Update max selections if more are available
+        if (results.length + fetchedRestaurants.length > maxSelections) {
+          setMaxSelections(results.length + fetchedRestaurants.length);
+        }
       } catch (err) {
         setError("Failed to fetch restaurants.");
         console.error(err);
@@ -123,7 +126,7 @@ export function HomePage() {
   });
 
   const currentRestaurant = filteredRestaurants[currentIndex];
-  const remainingCount = MAX_SELECTIONS - results.length;
+  const remainingCount = maxSelections - results.length;
 
   const handleSwipe = useCallback(
     (direction: "left" | "right") => {
@@ -139,12 +142,12 @@ export function HomePage() {
         setCurrentIndex((prev) => prev + 1);
         setExitDirection(null);
         // results 상태는 비동기적으로 업데이트되므로, 갱신될 길이를 예측하기 위해 +1을 사용합니다.
-        if (results.length + 1 >= MAX_SELECTIONS) {
+        if (results.length + 1 >= maxSelections) {
           navigate(routes.results);
         }
       }, 480);
     },
-    [currentRestaurant, results, addResult, navigate],
+    [currentRestaurant, results, addResult, navigate, maxSelections],
   );
 
   const handleStartOver = () => {
@@ -236,7 +239,7 @@ export function HomePage() {
           setSkipMenuOpenAnimation(false);
           setMenuOpen(true);
         }}
-        maxSelections={MAX_SELECTIONS}
+        maxSelections={maxSelections}
       />
 
       <div className={styles.cardStackContainer}>
