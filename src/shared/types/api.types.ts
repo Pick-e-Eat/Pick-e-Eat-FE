@@ -15,6 +15,14 @@ export interface NearbySearchRequest {
   excluded_place_ids?: string[]; // 이미 스와이프한 장소 제외
 }
 
+export interface GoogleMapsDeepLinksResponse {
+  place_uri?: string | null;
+  directions_uri?: string | null;
+  reviews_uri?: string | null;
+  photos_uri?: string | null;
+  write_a_review_uri?: string | null;
+}
+
 export interface RestaurantResponse {
   /** 식당 카드 한 장에 필요한 정보. 스와이프 UI에서 카드 단위로 사용됩니다. */
   place_id: string; // Google Place 고유 ID
@@ -33,6 +41,9 @@ export interface RestaurantResponse {
   has_parking?: boolean | null; // 주차 가능 여부
   blog_review_count?: number | null; // 블로그 리뷰 수
   tags?: string[]; // 태그 목록 (예: 혼밥, 가성비)
+  google_maps_uri?: string | null; // Google Maps 상세 페이지
+  google_maps_links?: GoogleMapsDeepLinksResponse | null; // Google Maps 딥링크 묶음
+  kakao_map_uri?: string | null; // 카카오맵 딥링크
 }
 
 export interface NearbySearchResponse {
