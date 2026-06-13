@@ -6,7 +6,7 @@ import { SavedAddressLimitDialog } from "@/components/saved-address-limit-dialog
 import { SwipeCard } from "@/components/swipe-card";
 import { HomeHeader } from "@/features/home/components/HomeHeader";
 import type { FilterSettings, Restaurant, SavedAddress, SwipeResult } from "@/lib/types";
-import { restaurantAPI } from "@/shared/api/restaurant";
+import { restaurantAPI, buildNearbySearchRequest, mapRestaurantResponse } from "@/shared/api/restaurant";
 import { routes } from "@/shared/constants/routes";
 import { useNearbyQueryStore } from "@/shared/stores/nearby-query-store";
 import { useResultsStore } from "@/shared/stores/results-store";
@@ -62,41 +62,17 @@ export function HomePage() {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await restaurantAPI.searchNearby({
-          latitude: nearbyQuery.latitude,
-          longitude: nearbyQuery.longitude,
-          radius: filterSettings.searchRange as 50 | 100 | 250,
-          excluded_place_ids: results.map((r) => r.restaurant.id),
-        });
-        // Map RestaurantResponse to local Restaurant type
-        const fetchedRestaurants: Restaurant[] = response.restaurants.map((r) => ({
-          id: r.place_id,
-          name: r.name,
-          address: r.address,
-          latitude: r.latitude,
-          longitude: r.longitude,
-          rating: r.rating,
-          user_ratings_total: r.user_ratings_total,
-          photo_url: r.photo_url,
-          photo_urls: r.photo_urls,
-          opening_now: r.opening_now,
-          cuisine_type: r.cuisine_type,
-          distance_meters: r.distance_meters,
-          walking_minutes: r.walking_minutes,
-          has_parking: r.has_parking,
-          blog_review_count: r.blog_review_count,
-          tags: r.tags,
-          google_maps_uri: r.google_maps_uri,
-          google_maps_links: r.google_maps_links,
-          kakao_map_uri: r.kakao_map_uri,
-          // Default values for fields not in API response
-          type: "Unknown", // Placeholder
-          hasGroupSeating: null, // Placeholder
-          petFriendly: null, // Placeholder
-          reviews: [], // Placeholder
-        }));
+        const response = await restaurantAPI.searchNearby(
+          buildNearbySearchRequest(
+            nearbyQuery.latitude,
+            nearbyQuery.longitude,
+            filterSettings,
+            results.map((r) => r.restaurant.id),
+          ),
+        );
+        const fetchedRestaurants: Restaurant[] = response.restaurants.map(mapRestaurantResponse);
         setRestaurants(fetchedRestaurants);
-        setCurrentIndex(0); // Reset index when new restaurants are fetched
+        setCurrentIndex(0);
       } catch (err) {
         setError("Failed to fetch restaurants.");
         console.error(err);
@@ -106,26 +82,17 @@ export function HomePage() {
     };
 
     fetchRestaurants();
-  }, [nearbyQuery.latitude, nearbyQuery.longitude, filterSettings.searchRange]);
+  }, [
+    nearbyQuery.latitude,
+    nearbyQuery.longitude,
+    filterSettings.searchRange,
+    filterSettings.hasParking,
+    filterSettings.hasGroupSeating,
+    filterSettings.petFriendly,
+  ]);
 
-  const filteredRestaurants = restaurants.filter((r) => {
-    if (filterSettings.hasParking !== null && r.has_parking !== filterSettings.hasParking)
-      return false;
-    // Assuming hasGroupSeating and petFriendly are not coming from API yet,
-    // so keeping the local filter for now.
-    if (
-      filterSettings.hasGroupSeating !== null &&
-      r.hasGroupSeating !== filterSettings.hasGroupSeating
-    )
-      return false;
-    if (filterSettings.petFriendly !== null && r.petFriendly !== filterSettings.petFriendly)
-      return false;
-    return true;
-  });
-
-  const currentRestaurant = filteredRestaurants[currentIndex];
-  // Calculate maxSelections dynamically: already swiped + remaining available cards
-  const maxSelections = Math.max(10, results.length + Math.max(0, filteredRestaurants.length - currentIndex));
+  const currentRestaurant = restaurants[currentIndex];
+  const maxSelections = Math.max(10, results.length + Math.max(0, restaurants.length - currentIndex));
 
   const handleSwipe = useCallback(
     (direction: "left" | "right") => {
@@ -154,39 +121,16 @@ export function HomePage() {
     setCurrentIndex(0);
     // Re-fetch restaurants when starting over
     restaurantAPI
-      .searchNearby({
-        latitude: nearbyQuery.latitude,
-        longitude: nearbyQuery.longitude,
-        radius: filterSettings.searchRange as 50 | 100 | 250,
-        excluded_place_ids: [], // Reset results means no exclusions initially
-      })
+      .searchNearby(
+        buildNearbySearchRequest(
+          nearbyQuery.latitude,
+          nearbyQuery.longitude,
+          filterSettings,
+          [],
+        ),
+      )
       .then((response) => {
-        const fetchedRestaurants: Restaurant[] = response.restaurants.map((r) => ({
-          id: r.place_id,
-          name: r.name,
-          address: r.address,
-          latitude: r.latitude,
-          longitude: r.longitude,
-          rating: r.rating,
-          user_ratings_total: r.user_ratings_total,
-          photo_url: r.photo_url,
-          photo_urls: r.photo_urls,
-          opening_now: r.opening_now,
-          cuisine_type: r.cuisine_type,
-          distance_meters: r.distance_meters,
-          walking_minutes: r.walking_minutes,
-          has_parking: r.has_parking,
-          blog_review_count: r.blog_review_count,
-          tags: r.tags,
-          google_maps_uri: r.google_maps_uri,
-          google_maps_links: r.google_maps_links,
-          kakao_map_uri: r.kakao_map_uri,
-          type: "Unknown",
-          hasGroupSeating: null,
-          petFriendly: null,
-          reviews: [],
-        }));
-        setRestaurants(fetchedRestaurants);
+        setRestaurants(response.restaurants.map(mapRestaurantResponse));
       })
       .catch((err) => {
         setError("Failed to fetch restaurants on start over.");
@@ -250,11 +194,11 @@ export function HomePage() {
         {error && <div className={styles.errorMessage}>Error: {error}</div>}
         {!isLoading &&
         !error &&
-        filteredRestaurants.length > 0 &&
-        currentIndex < filteredRestaurants.length ? (
+        restaurants.length > 0 &&
+        currentIndex < restaurants.length ? (
           <div className={styles.cardWrapper}>
             <AnimatePresence>
-              {[filteredRestaurants[currentIndex + 1], filteredRestaurants[currentIndex]]
+              {[restaurants[currentIndex + 1], restaurants[currentIndex]]
                 .filter(Boolean)
                 .map((restaurant, index, arr) => {
                   const isTop = index === arr.length - 1;
