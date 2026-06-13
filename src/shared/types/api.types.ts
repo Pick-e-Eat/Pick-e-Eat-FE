@@ -33,6 +33,7 @@ export interface RestaurantResponse {
   rating?: number | null; // Google 평점 (1.0~5.0)
   user_ratings_total?: number | null; // 리뷰 수
   photo_url?: string | null; // 대표 사진 URL (1장)
+  photo_urls?: string[] | null; // 여러 장의 사진 URL
   opening_now?: boolean | null; // 현재 영업 중 여부
   // --- UI 카드에 필요한 확장 필드 ---
   cuisine_type?: string | null; // 음식 카테고리 (예: 일식 / 돈까스)

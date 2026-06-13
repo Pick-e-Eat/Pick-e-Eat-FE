@@ -22,7 +22,7 @@ export function HomePage() {
     | null;
   const initialMenuOpen = Boolean(navState?.returnToMenuOpen);
   const initialSkipMenuOpenAnimation = Boolean(navState?.skipMenuOpenAnimation);
-  const { results, addResult, resetResults, maxSelections, setMaxSelections } = useResultsStore();
+  const { results, addResult, resetResults } = useResultsStore();
   const { nearbyQuery, setCoordinates, setAddress, setRadius } = useNearbyQueryStore();
   const savedAddresses = useSavedAddressesStore((s) => s.addresses);
   const removeSavedAddress = useSavedAddressesStore((s) => s.removeAddress);
@@ -78,6 +78,7 @@ export function HomePage() {
           rating: r.rating,
           user_ratings_total: r.user_ratings_total,
           photo_url: r.photo_url,
+          photo_urls: r.photo_urls,
           opening_now: r.opening_now,
           cuisine_type: r.cuisine_type,
           distance_meters: r.distance_meters,
@@ -96,11 +97,6 @@ export function HomePage() {
         }));
         setRestaurants(fetchedRestaurants);
         setCurrentIndex(0); // Reset index when new restaurants are fetched
-
-        // Update max selections if more are available
-        if (results.length + fetchedRestaurants.length > maxSelections) {
-          setMaxSelections(results.length + fetchedRestaurants.length);
-        }
       } catch (err) {
         setError("Failed to fetch restaurants.");
         console.error(err);
@@ -124,12 +120,12 @@ export function HomePage() {
       return false;
     if (filterSettings.petFriendly !== null && r.petFriendly !== filterSettings.petFriendly)
       return false;
-    if (r.distance_meters && r.distance_meters > filterSettings.searchRange) return false;
     return true;
   });
 
   const currentRestaurant = filteredRestaurants[currentIndex];
-  const remainingCount = maxSelections - results.length;
+  // Calculate maxSelections dynamically: already swiped + remaining available cards
+  const maxSelections = Math.max(10, results.length + Math.max(0, filteredRestaurants.length - currentIndex));
 
   const handleSwipe = useCallback(
     (direction: "left" | "right") => {
@@ -174,6 +170,7 @@ export function HomePage() {
           rating: r.rating,
           user_ratings_total: r.user_ratings_total,
           photo_url: r.photo_url,
+          photo_urls: r.photo_urls,
           opening_now: r.opening_now,
           cuisine_type: r.cuisine_type,
           distance_meters: r.distance_meters,

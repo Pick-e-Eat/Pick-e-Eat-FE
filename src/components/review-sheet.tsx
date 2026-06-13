@@ -67,7 +67,7 @@ export function ReviewSheet({ restaurant, isOpen, onClose }: ReviewSheetProps) {
             {/* Reviews */}
             <div className={styles.reviewsContainer}>
               <div className={styles.reviewsList}>
-                {restaurant.reviews.map((review) => (
+                {restaurant.reviews?.map((review) => (
                   <div key={review.id} className={styles.reviewItem}>
                     <div className={styles.reviewHeader}>
                       <div className={styles.reviewAuthorInfo}>
@@ -86,7 +86,7 @@ export function ReviewSheet({ restaurant, isOpen, onClose }: ReviewSheetProps) {
                 ))}
               </div>
 
-              {restaurant.reviews.length === 0 && (
+              {(!restaurant.reviews || restaurant.reviews.length === 0) && (
                 <div className={styles.noReviewsContainer}>
                   <p className={styles.noReviewsText}>아직 리뷰가 없습니다.</p>
                 </div>

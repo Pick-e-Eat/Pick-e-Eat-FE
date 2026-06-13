@@ -6,9 +6,9 @@ import {
   useMotionValue,
   useTransform,
 } from "framer-motion";
-import { Car, Dog, Heart, HeartCrack, Navigation, Star, Users, X } from "lucide-react";
+import { Car, Dog, Heart, HeartCrack, MapPinned, Navigation, Star, Users, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { RestaurantPhoto } from "@/components/restaurant-photo";
+import { RestaurantPhotoGrid } from "@/components/restaurant-photo-grid";
 import { useHeaderColorStore } from "@/features/home/stores/header-color-store";
 import type { Restaurant } from "@/lib/types";
 import { cn } from "@/shared/utils/cn";
@@ -226,6 +226,30 @@ export function SwipeCard({
     dragY.set(0);
   };
 
+  const openInMaps = (latitude: number, longitude: number) => {
+    const q = encodeURIComponent(`${latitude},${longitude}`);
+    window.open(
+      `https://www.google.com/maps/search/?api=1&query=${q}`,
+      "_blank",
+      "noopener,noreferrer",
+    );
+  };
+
+  const openRestaurantInMaps = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const mapsUrl =
+      restaurant.google_maps_links?.place_uri ??
+      restaurant.google_maps_uri ??
+      restaurant.kakao_map_uri;
+
+    if (mapsUrl) {
+      window.open(mapsUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    openInMaps(restaurant.latitude, restaurant.longitude);
+  };
+
   const dragEnabled = isTop && !isExiting;
 
   return (
@@ -249,15 +273,28 @@ export function SwipeCard({
       {/* Card Container */}
       <div className={styles.cardContainer}>
         {/* Background Image */}
-        <RestaurantPhoto
+        <RestaurantPhotoGrid
+          photoUrls={restaurant.photo_urls}
           photoUrl={restaurant.photo_url}
           alt={`${restaurant.name} 대표 사진`}
-          variant="cover"
           className={styles.backgroundImage}
           onUsingPlaceholderChange={setUsingPlaceholder}
         />
 
         {!usingPlaceholder ? <div className={styles.gradientOverlay} /> : null}
+
+        {/* Map Button - Direct Action */}
+        {isTop && !isExiting && (
+          <button
+            type="button"
+            className={styles.mapButton}
+            onClick={openRestaurantInMaps}
+            onPointerDown={(e) => e.stopPropagation()}
+            aria-label="지도에서 보기"
+          >
+            <MapPinned className={styles.mapIcon} />
+          </button>
+        )}
 
         {/* Centered Action Icons - Advanced Overlays */}
         <AdvancedOverlay
