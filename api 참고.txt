@@ -1,0 +1,11 @@
+"editorial_summary": "string",
+"reviews": [
+{
+  "rating": 0,
+  "text": "string",
+  "relative_time": "string",
+  "author_name": "string",
+  "author_photo_uri": "string",
+  "author_uri": "string",
+  "publish_time": "string"
+}
