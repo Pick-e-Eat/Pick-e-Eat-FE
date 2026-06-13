@@ -24,6 +24,7 @@ export interface Restaurant {
   rating?: number | null; // Mapped from rating
   user_ratings_total?: number | null; // Mapped from reviewCount
   photo_url?: string | null; // Mapped from image
+  photo_urls?: string[] | null; // 여러 장의 사진 URL
   opening_now?: boolean | null; // Added from RestaurantResponse
   cuisine_type?: string | null; // Added from RestaurantResponse
   distance_meters?: number | null; // Mapped from distance
@@ -35,7 +36,16 @@ export interface Restaurant {
   google_maps_links?: GoogleMapsDeepLinks | null; // Google Maps 딥링크 묶음
   kakao_map_uri?: string | null; // 카카오맵 딥링크
 
+  // Legacy/Mock data compatibility fields
+  image?: string;
+  reviewCount?: number;
+  blogReviewCount?: number;
+  walkingTime?: number;
+  distance?: number;
+  hasParking?: boolean;
+
   // Existing fields without direct API mapping, kept as optional
+  type?: string;
   hasGroupSeating?: boolean | null;
   petFriendly?: boolean | null;
   reviews?: Review[];

@@ -1,0 +1,55 @@
+.gridContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  gap: 2px;
+  overflow: hidden;
+  background-color: #000;
+}
+
+/* 1 Image */
+.layout1 {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+
+/* 2 Images */
+.layout2 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+}
+
+/* 3 Images */
+.layout3 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+.layout3 > *:first-child {
+  grid-row: span 2;
+}
+
+/* 4+ Images */
+.layout4 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+.photoItem {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.moreOverlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+  pointer-events: none;
+}
