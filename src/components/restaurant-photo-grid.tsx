@@ -8,6 +8,7 @@ interface RestaurantPhotoGridProps {
   alt: string;
   className?: string;
   onUsingPlaceholderChange?: (usingPlaceholder: boolean) => void;
+  onPhotoClick?: (index: number) => void;
 }
 
 export function RestaurantPhotoGrid({
@@ -16,6 +17,7 @@ export function RestaurantPhotoGrid({
   alt,
   className,
   onUsingPlaceholderChange,
+  onPhotoClick,
 }: RestaurantPhotoGridProps) {
   // Normalize images into an array
   const images = photoUrls && photoUrls.length > 0 ? photoUrls : photoUrl ? [photoUrl] : [];
@@ -37,7 +39,12 @@ export function RestaurantPhotoGrid({
   return (
     <div className={cn(styles.gridContainer, layoutClass, className)}>
       {displayImages.map((url, index) => (
-        <div key={`${url}-${index}`} className={styles.photoItem}>
+        <div
+          key={`${url}-${index}`}
+          className={styles.photoItem}
+          onClick={() => onPhotoClick?.(index)}
+          onPointerDown={(e) => e.stopPropagation()}
+        >
           <RestaurantPhoto
             photoUrl={url}
             alt={`${alt} ${index + 1}`}

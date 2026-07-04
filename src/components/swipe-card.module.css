@@ -101,12 +101,16 @@
   @apply mb-4 flex flex-wrap items-center gap-4;
 }
 
-/* Map Button */
-.mapButton {
-  @apply absolute top-6 right-6 z-20 flex size-12 cursor-pointer items-center justify-center rounded-full bg-card/20 text-card transition-all hover:bg-card/40 active:scale-95 backdrop-blur-sm;
+/* Action Buttons */
+.actionButtonsContainer {
+  @apply absolute top-6 right-6 z-20 flex flex-col gap-3;
 }
 
-.mapIcon {
+.actionButton {
+  @apply flex size-12 cursor-pointer items-center justify-center rounded-full bg-card/20 text-card transition-all hover:bg-card/40 active:scale-95 backdrop-blur-sm;
+}
+
+.actionIcon {
   @apply size-6;
 }
 

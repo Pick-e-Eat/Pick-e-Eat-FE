@@ -6,9 +6,10 @@ import {
   useMotionValue,
   useTransform,
 } from "framer-motion";
-import { Car, Dog, Heart, HeartCrack, MapPinned, Navigation, Star, Users, X } from "lucide-react";
+import { Car, Dog, Heart, HeartCrack, MapPinned, Navigation, Star, Users, X, Images } from "lucide-react";
 import { useEffect, useState } from "react";
 import { RestaurantPhotoGrid } from "@/components/restaurant-photo-grid";
+import { ImageGalleryModal } from "@/components/image-gallery-modal";
 import { useHeaderColorStore } from "@/features/home/stores/header-color-store";
 import type { Restaurant } from "@/lib/types";
 import { cn } from "@/shared/utils/cn";
@@ -80,6 +81,9 @@ export function SwipeCard({
 }: SwipeCardProps) {
   const [lockedDirection, setLockedDirection] = useState<"x" | "y" | null>(null);
   const [usingPlaceholder, setUsingPlaceholder] = useState(!restaurant.photo_url);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
   // Motion values for card's physical position on screen
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -250,138 +254,174 @@ export function SwipeCard({
     openInMaps(restaurant.latitude, restaurant.longitude);
   };
 
+  const openGallery = (e: React.MouseEvent, index = 0) => {
+    e.stopPropagation();
+    setSelectedImageIndex(index);
+    setIsGalleryOpen(true);
+  };
+
   const dragEnabled = isTop && !isExiting;
+  const images = restaurant.photo_urls && restaurant.photo_urls.length > 0 
+    ? restaurant.photo_urls 
+    : restaurant.photo_url ? [restaurant.photo_url] : [];
 
   return (
-    <motion.div
-      className={styles.cardWrapper}
-      style={{
-        x,
-        y,
-        rotate: cardRotate,
-        scale: displayScale,
-        opacity: cardOpacity,
-        zIndex: isTop ? 30 : 1,
-      }}
-      drag={!!dragEnabled} // Allow dragging in both directions initially
-      dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-      dragElastic={{ top: 0, bottom: 0.2, left: 1, right: 1 }}
-      onDragStart={handleDragStart}
-      onDrag={handleDrag}
-      onDragEnd={handleDragEnd}
-    >
-      {/* Card Container */}
-      <div className={styles.cardContainer}>
-        {/* Background Image */}
-        <RestaurantPhotoGrid
-          photoUrls={restaurant.photo_urls}
-          photoUrl={restaurant.photo_url}
-          alt={`${restaurant.name} 대표 사진`}
-          className={styles.backgroundImage}
-          onUsingPlaceholderChange={setUsingPlaceholder}
-        />
+    <>
+      <motion.div
+        className={styles.cardWrapper}
+        style={{
+          x,
+          y,
+          rotate: cardRotate,
+          scale: displayScale,
+          opacity: cardOpacity,
+          zIndex: isTop ? 30 : 1,
+        }}
+        drag={!!dragEnabled} // Allow dragging in both directions initially
+        dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+        dragElastic={{ top: 0, bottom: 0.2, left: 1, right: 1 }}
+        onDragStart={handleDragStart}
+        onDrag={handleDrag}
+        onDragEnd={handleDragEnd}
+      >
+        {/* Card Container */}
+        <div className={styles.cardContainer}>
+          {/* Background Image */}
+          <RestaurantPhotoGrid
+            photoUrls={restaurant.photo_urls}
+            photoUrl={restaurant.photo_url}
+            alt={`${restaurant.name} 대표 사진`}
+            className={styles.backgroundImage}
+            onUsingPlaceholderChange={setUsingPlaceholder}
+            onPhotoClick={(index) => {
+              setSelectedImageIndex(index);
+              setIsGalleryOpen(true);
+            }}
+          />
 
-        {!usingPlaceholder ? <div className={styles.gradientOverlay} /> : null}
+          {!usingPlaceholder ? <div className={styles.gradientOverlay} /> : null}
 
-        {/* Map Button - Direct Action */}
-        {isTop && !isExiting && (
-          <button
-            type="button"
-            className={styles.mapButton}
-            onClick={openRestaurantInMaps}
-            onPointerDown={(e) => e.stopPropagation()}
-            aria-label="지도에서 보기"
+          {/* Action Buttons Container */}
+          {isTop && !isExiting && (
+            <div className={styles.actionButtonsContainer}>
+              <button
+                type="button"
+                className={styles.actionButton}
+                onClick={openRestaurantInMaps}
+                onPointerDown={(e) => e.stopPropagation()}
+                aria-label="지도에서 보기"
+              >
+                <MapPinned className={styles.actionIcon} />
+              </button>
+              
+              {!usingPlaceholder && images.length > 0 && (
+                <button
+                  type="button"
+                  className={styles.actionButton}
+                  onClick={(e) => openGallery(e)}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  aria-label="사진 전체보기"
+                >
+                  <Images className={styles.actionIcon} />
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Centered Action Icons - Advanced Overlays */}
+          <AdvancedOverlay
+            motionValue={dragX}
+            direction="right"
+            range={SWIPE_THRESHOLD}
+            icon={Heart}
+            className={styles.overlayRight}
+            iconClassName={styles.overlayIconFilled}
+          />
+          <AdvancedOverlay
+            motionValue={dragX}
+            direction="left"
+            range={-SWIPE_THRESHOLD}
+            icon={HeartCrack}
+            className={styles.overlayLeft}
+          />
+          <AdvancedOverlay
+            motionValue={dragY}
+            direction="down"
+            range={Y_SWIPE_DOWN_THRESHOLD}
+            icon={X}
+            className={styles.overlayDown}
+          />
+
+          {/* Content */}
+          <div
+            className={cn(
+              styles.contentSection,
+              usingPlaceholder && styles.contentSectionOnPlaceholder,
+            )}
           >
-            <MapPinned className={styles.mapIcon} />
-          </button>
-        )}
+            {/* Tags */}
+            {restaurant.tags && restaurant.tags.length > 0 && (
+              <div className={styles.tagsContainer}>
+                {restaurant.tags.map((tag) => (
+                  <span key={tag} className={styles.tag}>
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
 
-        {/* Centered Action Icons - Advanced Overlays */}
-        <AdvancedOverlay
-          motionValue={dragX}
-          direction="right"
-          range={SWIPE_THRESHOLD}
-          icon={Heart}
-          className={styles.overlayRight}
-          iconClassName={styles.overlayIconFilled}
-        />
-        <AdvancedOverlay
-          motionValue={dragX}
-          direction="left"
-          range={-SWIPE_THRESHOLD}
-          icon={HeartCrack}
-          className={styles.overlayLeft}
-        />
-        <AdvancedOverlay
-          motionValue={dragY}
-          direction="down"
-          range={Y_SWIPE_DOWN_THRESHOLD}
-          icon={X}
-          className={styles.overlayDown}
-        />
+            {/* Restaurant Name & Type */}
+            <h2 className={styles.restaurantName}>{restaurant.name}</h2>
+            <p className={styles.restaurantType}>{restaurant.cuisine_type}</p>
 
-        {/* Content */}
-        <div
-          className={cn(
-            styles.contentSection,
-            usingPlaceholder && styles.contentSectionOnPlaceholder,
-          )}
-        >
-          {/* Tags */}
-          {restaurant.tags && restaurant.tags.length > 0 && (
-            <div className={styles.tagsContainer}>
-              {restaurant.tags.map((tag) => (
-                <span key={tag} className={styles.tag}>
-                  {tag}
+            {/* Ratings & Reviews */}
+            <div className={styles.ratingsReviewsContainer}>
+              <div className={styles.ratingItem}>
+                <Star className={styles.starIcon} />
+                <span className={styles.ratingValue}>{restaurant.rating}</span>
+              </div>
+            </div>
+
+            {/* Distance */}
+            <div className={styles.distanceContainer}>
+              <div className={styles.distanceBadge}>
+                <Navigation className={styles.navigationIcon} />
+                <span className={styles.distanceText}>
+                  도보 {restaurant.walking_minutes}분 ({restaurant.distance_meters}m)
                 </span>
-              ))}
+              </div>
             </div>
-          )}
 
-          {/* Restaurant Name & Type */}
-          <h2 className={styles.restaurantName}>{restaurant.name}</h2>
-          <p className={styles.restaurantType}>{restaurant.cuisine_type}</p>
-
-          {/* Ratings & Reviews */}
-          <div className={styles.ratingsReviewsContainer}>
-            <div className={styles.ratingItem}>
-              <Star className={styles.starIcon} />
-              <span className={styles.ratingValue}>{restaurant.rating}</span>
-            </div>
+            {/* Amenities */}
+            {(restaurant.has_parking || restaurant.hasGroupSeating || restaurant.petFriendly) && (
+              <div className={styles.amenitiesContainer}>
+                {restaurant.has_parking && (
+                  <span className={styles.amenityBadge}>
+                    <Car className={styles.amenityIcon} /> 주차
+                  </span>
+                )}
+                {restaurant.hasGroupSeating && (
+                  <span className={styles.amenityBadge}>
+                    <Users className={styles.amenityIcon} /> 단체석
+                  </span>
+                )}
+                {restaurant.petFriendly && (
+                  <span className={styles.amenityBadge}>
+                    <Dog className={styles.amenityIcon} /> 반려동물
+                  </span>
+                )}
+              </div>
+            )}
           </div>
-
-          {/* Distance */}
-          <div className={styles.distanceContainer}>
-            <div className={styles.distanceBadge}>
-              <Navigation className={styles.navigationIcon} />
-              <span className={styles.distanceText}>
-                도보 {restaurant.walking_minutes}분 ({restaurant.distance_meters}m)
-              </span>
-            </div>
-          </div>
-
-          {/* Amenities */}
-          {(restaurant.has_parking || restaurant.hasGroupSeating || restaurant.petFriendly) && (
-            <div className={styles.amenitiesContainer}>
-              {restaurant.has_parking && (
-                <span className={styles.amenityBadge}>
-                  <Car className={styles.amenityIcon} /> 주차
-                </span>
-              )}
-              {restaurant.hasGroupSeating && (
-                <span className={styles.amenityBadge}>
-                  <Users className={styles.amenityIcon} /> 단체석
-                </span>
-              )}
-              {restaurant.petFriendly && (
-                <span className={styles.amenityBadge}>
-                  <Dog className={styles.amenityIcon} /> 반려동물
-                </span>
-              )}
-            </div>
-          )}
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+
+      <ImageGalleryModal
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
+        images={images}
+        initialIndex={selectedImageIndex}
+      />
+    </>
   );
 }
