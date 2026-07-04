@@ -3,17 +3,21 @@ import styles from "./HomeHeader.module.css";
 import { Menu } from "lucide-react";
 
 import { routes } from "@/shared/constants/routes";
-import { useResultsStore } from "@/shared/stores/results-store";
+import { getBatchProgress, useResultsStore } from "@/shared/stores/results-store";
 import { useHeaderColorStore } from "@/features/home/stores/header-color-store";
 
 interface HomeHeaderProps {
   onMenuOpen: () => void;
-  maxSelections: number;
 }
 
-export function HomeHeader({ onMenuOpen, maxSelections }: HomeHeaderProps) {
+export function HomeHeader({ onMenuOpen }: HomeHeaderProps) {
   const navigate = useNavigate();
-  const { results } = useResultsStore();
+  const { results, sessionBatchStart, sessionBatchEnd } = useResultsStore();
+  const { current: batchProgress, max: batchMax } = getBatchProgress({
+    results,
+    sessionBatchStart,
+    sessionBatchEnd,
+  });
   const { backgroundColor, textColor } = useHeaderColorStore();
 
   const headerStyle = {
@@ -35,14 +39,14 @@ export function HomeHeader({ onMenuOpen, maxSelections }: HomeHeaderProps) {
       <div className={styles.rightSection}>
         <div
           className={styles.pickProgress}
-          aria-label={`고른 맛집 ${results.length}곳, 최대 ${maxSelections}곳`}
+          aria-label={`고른 맛집 ${batchProgress}곳, 최대 ${batchMax}곳`}
         >
           <span className={styles.pickProgressInner}>
-            <span className={styles.pickProgressCurrent}>{results.length}</span>
+            <span className={styles.pickProgressCurrent}>{batchProgress}</span>
             <span className={styles.pickProgressSep} aria-hidden="true">
               /
             </span>
-            <span className={styles.pickProgressMax}>{maxSelections}</span>
+            <span className={styles.pickProgressMax}>{batchMax}</span>
           </span>
         </div>
         {results.length > 0 && (

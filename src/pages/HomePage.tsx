@@ -5,7 +5,7 @@ import { HamburgerMenu } from "@/components/hamburger-menu";
 import { SavedAddressLimitDialog } from "@/components/saved-address-limit-dialog";
 import { SwipeCard } from "@/components/swipe-card";
 import { HomeHeader } from "@/features/home/components/HomeHeader";
-import type { FilterSettings, Restaurant, SavedAddress, SwipeResult } from "@/lib/types";
+import type { FilterSettings, SavedAddress, SwipeResult } from "@/lib/types";
 import { restaurantAPI, buildNearbySearchRequest, mapRestaurantResponse } from "@/shared/api/restaurant";
 import { routes } from "@/shared/constants/routes";
 import { useNearbyQueryStore } from "@/shared/stores/nearby-query-store";
@@ -18,17 +18,23 @@ export function HomePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const navState = location.state as
-    | { returnToMenuOpen?: boolean; skipMenuOpenAnimation?: boolean }
+    | { returnToMenuOpen?: boolean; skipMenuOpenAnimation?: boolean; continueSearch?: boolean }
     | null;
   const initialMenuOpen = Boolean(navState?.returnToMenuOpen);
   const initialSkipMenuOpenAnimation = Boolean(navState?.skipMenuOpenAnimation);
-  const { results, addResult, resetResults } = useResultsStore();
+  const {
+    results,
+    restaurants,
+    currentIndex,
+    sessionBatchEnd,
+    addResult,
+    setRestaurants,
+    resetResults,
+  } = useResultsStore();
   const { nearbyQuery, setCoordinates, setAddress, setRadius } = useNearbyQueryStore();
   const savedAddresses = useSavedAddressesStore((s) => s.addresses);
   const removeSavedAddress = useSavedAddressesStore((s) => s.removeAddress);
 
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [menuOpen, setMenuOpen] = useState(initialMenuOpen);
   const [skipMenuOpenAnimation, setSkipMenuOpenAnimation] = useState(initialSkipMenuOpenAnimation);
   const currentLocation = nearbyQuery.address;
@@ -42,6 +48,15 @@ export function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savedAddressLimitOpen, setSavedAddressLimitOpen] = useState(false);
+
+  const searchQueryKey = [
+    nearbyQuery.latitude,
+    nearbyQuery.longitude,
+    filterSettings.searchRange,
+    filterSettings.hasParking,
+    filterSettings.hasGroupSeating,
+    filterSettings.petFriendly,
+  ].join("|");
 
   useEffect(() => {
     setFilterSettings((prev) =>
@@ -58,21 +73,43 @@ export function HomePage() {
   }, [location.pathname, navState?.returnToMenuOpen, navState?.skipMenuOpenAnimation, navigate]);
 
   useEffect(() => {
-    const fetchRestaurants = async () => {
+    if (!navState?.continueSearch) return;
+    navigate(location.pathname, { replace: true, state: null });
+  }, [navState?.continueSearch, navigate, location.pathname]);
+
+  const fetchNearby = useCallback(async () => {
+    const response = await restaurantAPI.searchNearby(
+      buildNearbySearchRequest(
+        nearbyQuery.latitude,
+        nearbyQuery.longitude,
+        filterSettings,
+        [],
+      ),
+    );
+    const fetchedRestaurants = response.restaurants.map(mapRestaurantResponse);
+    setRestaurants(fetchedRestaurants, response.count);
+    return fetchedRestaurants;
+  }, [
+    nearbyQuery.latitude,
+    nearbyQuery.longitude,
+    filterSettings.searchRange,
+    filterSettings.hasParking,
+    filterSettings.hasGroupSeating,
+    filterSettings.petFriendly,
+    setRestaurants,
+  ]);
+
+  // 위치·필터 변경 시 1회 호출 (최대 20개 수신, 1차에는 10개만 노출)
+  useEffect(() => {
+    if (navState?.continueSearch) return;
+
+    const loadInitialRestaurants = async () => {
       setIsLoading(true);
       setError(null);
+      resetResults();
+
       try {
-        const response = await restaurantAPI.searchNearby(
-          buildNearbySearchRequest(
-            nearbyQuery.latitude,
-            nearbyQuery.longitude,
-            filterSettings,
-            results.map((r) => r.restaurant.id),
-          ),
-        );
-        const fetchedRestaurants: Restaurant[] = response.restaurants.map(mapRestaurantResponse);
-        setRestaurants(fetchedRestaurants);
-        setCurrentIndex(0);
+        await fetchNearby();
       } catch (err) {
         setError("Failed to fetch restaurants.");
         console.error(err);
@@ -81,18 +118,12 @@ export function HomePage() {
       }
     };
 
-    fetchRestaurants();
-  }, [
-    nearbyQuery.latitude,
-    nearbyQuery.longitude,
-    filterSettings.searchRange,
-    filterSettings.hasParking,
-    filterSettings.hasGroupSeating,
-    filterSettings.petFriendly,
-  ]);
+    loadInitialRestaurants();
+  }, [searchQueryKey, fetchNearby, resetResults]);
 
   const currentRestaurant = restaurants[currentIndex];
-  const maxSelections = Math.max(10, results.length + Math.max(0, restaurants.length - currentIndex));
+  const hasCardsInCurrentBatch =
+    restaurants.length > 0 && currentIndex < sessionBatchEnd && currentIndex < restaurants.length;
 
   const handleSwipe = useCallback(
     (direction: "left" | "right") => {
@@ -105,37 +136,26 @@ export function HomePage() {
 
       setTimeout(() => {
         addResult(newResult);
-        setCurrentIndex((prev) => prev + 1);
         setExitDirection(null);
-        // results 상태는 비동기적으로 업데이트되므로, 갱신될 길이를 예측하기 위해 +1을 사용합니다.
-        if (results.length + 1 >= maxSelections) {
+        const nextCount = results.length + 1;
+        if (nextCount === sessionBatchEnd) {
           navigate(routes.results);
         }
       }, 480);
     },
-    [currentRestaurant, results, addResult, navigate, maxSelections],
+    [currentRestaurant, results.length, sessionBatchEnd, addResult, navigate],
   );
 
   const handleStartOver = () => {
     resetResults();
-    setCurrentIndex(0);
-    // Re-fetch restaurants when starting over
-    restaurantAPI
-      .searchNearby(
-        buildNearbySearchRequest(
-          nearbyQuery.latitude,
-          nearbyQuery.longitude,
-          filterSettings,
-          [],
-        ),
-      )
-      .then((response) => {
-        setRestaurants(response.restaurants.map(mapRestaurantResponse));
-      })
+    setIsLoading(true);
+    setError(null);
+    fetchNearby()
       .catch((err) => {
         setError("Failed to fetch restaurants on start over.");
         console.error(err);
-      });
+      })
+      .finally(() => setIsLoading(false));
   };
 
   const handleRemoveAddress = (id: string) => removeSavedAddress(id);
@@ -186,16 +206,12 @@ export function HomePage() {
           setSkipMenuOpenAnimation(false);
           setMenuOpen(true);
         }}
-        maxSelections={maxSelections}
       />
 
       <div className={styles.cardStackContainer}>
         {isLoading && <div className={styles.loadingMessage}>Loading restaurants...</div>}
         {error && <div className={styles.errorMessage}>Error: {error}</div>}
-        {!isLoading &&
-        !error &&
-        restaurants.length > 0 &&
-        currentIndex < restaurants.length ? (
+        {!isLoading && !error && hasCardsInCurrentBatch ? (
           <div className={styles.cardWrapper}>
             <AnimatePresence>
               {[restaurants[currentIndex + 1], restaurants[currentIndex]]

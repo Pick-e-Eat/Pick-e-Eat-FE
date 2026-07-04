@@ -3,13 +3,14 @@ import { MapPin, MapPinned, RotateCcw, Star, ThumbsDown, ThumbsUp } from "lucide
 import { useNavigate } from "react-router-dom";
 import { RestaurantPhoto } from "@/components/restaurant-photo";
 import { routes } from "@/shared/constants/routes";
-import { useResultsStore } from "@/shared/stores/results-store";
+import { canShowContinueSearch, useResultsStore } from "@/shared/stores/results-store";
 import type { Restaurant } from "@/lib/types";
 import styles from "./ResultsPage.module.css";
 
 export function ResultsPage() {
   const navigate = useNavigate();
-  const { results, resetResults } = useResultsStore();
+  const { results, cachedTotalCount, sessionBatchEnd, sessionBatchStart, resetResults, continueSession } =
+    useResultsStore();
 
   const likedRestaurants = results.filter((r) => r.liked);
   const dislikedRestaurants = results.filter((r) => !r.liked);
@@ -20,8 +21,16 @@ export function ResultsPage() {
   };
 
   const handleContinue = () => {
-    navigate(routes.home);
+    continueSession();
+    navigate(routes.home, { state: { continueSearch: true } });
   };
+
+  const showContinueButton = canShowContinueSearch({
+    results,
+    cachedTotalCount,
+    sessionBatchEnd,
+    sessionBatchStart,
+  });
 
   const openInMaps = (latitude: number, longitude: number) => {
     const q = encodeURIComponent(`${latitude},${longitude}`);
@@ -156,9 +165,11 @@ export function ResultsPage() {
             <RotateCcw className={styles.resetIcon} />
             처음부터
           </button>
-          <button type="button" onClick={handleContinue} className={styles.continueButton}>
-            더 검색하기
-          </button>
+          {showContinueButton && (
+            <button type="button" onClick={handleContinue} className={styles.continueButton}>
+              더 검색하기
+            </button>
+          )}
         </div>
       </div>
     </div>
