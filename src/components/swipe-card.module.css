@@ -20,8 +20,21 @@
   @apply absolute inset-0 bg-linear-to-t from-foreground/90 via-foreground/30 to-transparent;
 }
 
+/* Gradient Overlay */
+.gradientOverlay {
+  @apply absolute inset-0 bg-linear-to-t from-foreground/90 via-foreground/30 to-transparent;
+}
+
+.placeholderOverlay {
+  @apply absolute inset-x-0 bottom-0 h-[58%] bg-linear-to-t from-card via-card/92 to-transparent;
+}
+
+.contentSectionOnPlaceholder {
+  @apply text-foreground;
+}
+
 .contentSectionOnPlaceholder .restaurantName {
-  @apply text-card-foreground;
+  @apply text-foreground;
 }
 
 .contentSectionOnPlaceholder .restaurantType {
@@ -29,23 +42,27 @@
 }
 
 .contentSectionOnPlaceholder .ratingValue {
-  @apply text-card-foreground;
+  @apply text-foreground;
 }
 
 .contentSectionOnPlaceholder .distanceText {
-  @apply text-card-foreground;
+  @apply text-foreground;
 }
 
 .contentSectionOnPlaceholder .tag {
-  @apply bg-foreground/8 text-card-foreground;
+  @apply border border-border/70 bg-background/85 text-foreground;
 }
 
 .contentSectionOnPlaceholder .distanceBadge {
-  @apply bg-foreground/8 text-card-foreground;
+  @apply border border-border/70 bg-background/85 text-foreground;
 }
 
 .contentSectionOnPlaceholder .navigationIcon {
-  @apply text-card-foreground;
+  @apply text-foreground;
+}
+
+.contentSectionOnPlaceholder .amenityBadge {
+  @apply bg-accent text-accent-foreground;
 }
 
 /* Centered Action Icons - Advanced Overlay Style */
@@ -108,6 +125,10 @@
 
 .actionButton {
   @apply flex size-12 cursor-pointer items-center justify-center rounded-full bg-card/20 text-card transition-all hover:bg-card/40 active:scale-95 backdrop-blur-sm;
+}
+
+.actionButtonsOnPlaceholder .actionButton {
+  @apply border border-border/60 bg-card/90 text-foreground shadow-sm hover:bg-card;
 }
 
 .actionIcon {
