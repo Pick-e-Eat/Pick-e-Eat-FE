@@ -305,10 +305,16 @@ export function SwipeCard({
           />
 
           {!usingPlaceholder ? <div className={styles.gradientOverlay} /> : null}
+          {usingPlaceholder ? <div className={styles.placeholderOverlay} /> : null}
 
           {/* Action Buttons Container */}
           {isTop && !isExiting && (
-            <div className={styles.actionButtonsContainer}>
+            <div
+              className={cn(
+                styles.actionButtonsContainer,
+                usingPlaceholder && styles.actionButtonsOnPlaceholder,
+              )}
+            >
               <button
                 type="button"
                 className={styles.actionButton}

@@ -26,7 +26,7 @@ export function RestaurantPhotoGrid({
     return (
       <RestaurantPhoto
         alt={alt}
-        className={cn(styles.gridContainer, className)}
+        className={cn(styles.gridContainer, styles.gridContainerEmpty, className)}
         onUsingPlaceholderChange={onUsingPlaceholderChange}
       />
     );
