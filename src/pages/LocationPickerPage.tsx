@@ -83,7 +83,7 @@ export function LocationPickerPage() {
   const isSaveOnlyMode = navState?.mode === "saveOnly";
   const shouldReturnToMenuOpen = Boolean(navState?.returnToMenuOpen);
   const shouldSkipMenuOpenAnimation = Boolean(navState?.skipMenuOpenAnimation);
-  const { nearbyQuery, setCoordinates, setAddress } = useNearbyQueryStore();
+  const { nearbyQuery, setManualLocation } = useNearbyQueryStore();
   const savedAddresses = useSavedAddressesStore((s) => s.addresses);
   const addSavedAddress = useSavedAddressesStore((s) => s.addAddress);
   const [selectedPosition, setSelectedPosition] = useState<LatLng>({
@@ -347,8 +347,7 @@ export function LocationPickerPage() {
     if (isConfirming) return;
     setIsConfirming(true);
     const resolved = selectedAddress || "선택한 위치";
-    setCoordinates(selectedPosition.lat, selectedPosition.lng);
-    setAddress(resolved);
+    setManualLocation(selectedPosition.lat, selectedPosition.lng, resolved);
 
     window.setTimeout(() => {
       navigate(routes.home, {
@@ -365,8 +364,7 @@ export function LocationPickerPage() {
     selectedAddress,
     selectedPosition.lat,
     selectedPosition.lng,
-    setAddress,
-    setCoordinates,
+    setManualLocation,
     shouldReturnToMenuOpen,
     shouldSkipMenuOpenAnimation,
   ]);
