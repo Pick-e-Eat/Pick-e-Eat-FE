@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import styles from "./SignupForm.module.css";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { routes } from "@/shared/constants/routes";
+import styles from "./SignupForm.module.css";
 
 export interface SignupFormValues {
   email: string;

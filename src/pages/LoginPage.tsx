@@ -1,10 +1,10 @@
+import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-import styles from "./LoginPage.module.css";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { LoginForm } from "@/features/auth/components";
 import { routes } from "@/shared/constants/routes";
-import { ArrowLeft } from "lucide-react";
+import styles from "./LoginPage.module.css";
 
 export function LoginPage() {
   const handleSubmit = async (values: { email: string; password: string }) => {

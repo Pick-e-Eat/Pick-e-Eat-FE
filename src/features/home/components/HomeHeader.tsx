@@ -1,10 +1,10 @@
-import { useNavigate } from "react-router-dom";
-import styles from "./HomeHeader.module.css";
 import { Menu } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useHeaderColorStore } from "@/features/home/stores/header-color-store";
 
 import { routes } from "@/shared/constants/routes";
 import { getBatchProgress, useResultsStore } from "@/shared/stores/results-store";
-import { useHeaderColorStore } from "@/features/home/stores/header-color-store";
+import styles from "./HomeHeader.module.css";
 
 interface HomeHeaderProps {
   onMenuOpen: () => void;
@@ -39,6 +39,7 @@ export function HomeHeader({ onMenuOpen }: HomeHeaderProps) {
       <div className={styles.rightSection}>
         <div
           className={styles.pickProgress}
+          role="status"
           aria-label={`고른 맛집 ${batchProgress}곳, 최대 ${batchMax}곳`}
         >
           <span className={styles.pickProgressInner}>

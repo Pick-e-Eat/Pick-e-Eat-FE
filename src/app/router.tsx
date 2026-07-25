@@ -1,12 +1,12 @@
 // 페이지 라우팅을 중앙에서 선언적으로 관리
 import { createBrowserRouter } from "react-router-dom";
-import { routes } from "@/shared/constants/routes";
 import { AppLayout } from "@/app/AppLayout";
 import { HomePage } from "@/pages/HomePage";
-import { LoginPage } from "@/pages/LoginPage";
-import { SignupPage } from "@/pages/SignupPage";
-import { ResultsPage } from "@/pages/ResultsPage";
 import { LocationPickerPage } from "@/pages/LocationPickerPage.tsx";
+import { LoginPage } from "@/pages/LoginPage";
+import { ResultsPage } from "@/pages/ResultsPage";
+import { SignupPage } from "@/pages/SignupPage";
+import { routes } from "@/shared/constants/routes";
 
 export const appRouter = createBrowserRouter([
   {

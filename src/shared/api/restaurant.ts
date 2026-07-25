@@ -1,5 +1,4 @@
 import type { FilterSettings, Restaurant } from "@/lib/types";
-import { apiClient } from "./client";
 import type {
   NearbySearchRequest,
   NearbySearchResponse,
@@ -7,6 +6,7 @@ import type {
   TextSearchRequest,
   TextSearchResponse,
 } from "../types/api.types";
+import { apiClient } from "./client";
 
 export function buildNearbySearchRequest(
   latitude: number,

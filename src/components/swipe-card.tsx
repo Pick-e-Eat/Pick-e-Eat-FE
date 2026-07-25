@@ -6,11 +6,21 @@ import {
   useMotionValue,
   useTransform,
 } from "framer-motion";
-import { Car, Dog, Heart, HeartCrack, MapPinned, Navigation, Star, Users, X, Images, MessageCircle } from "lucide-react";
+import {
+  Car,
+  Dog,
+  Heart,
+  HeartCrack,
+  Images,
+  MapPinned,
+  Navigation,
+  Star,
+  Users,
+  X,
+} from "lucide-react";
 import { useEffect, useState } from "react";
-import { RestaurantPhotoGrid } from "@/components/restaurant-photo-grid";
 import { ImageGalleryModal } from "@/components/image-gallery-modal";
-import { ReviewSheet } from "@/components/review-sheet";
+import { RestaurantPhotoGrid } from "@/components/restaurant-photo-grid";
 import { useHeaderColorStore } from "@/features/home/stores/header-color-store";
 import type { Restaurant } from "@/lib/types";
 import { cn } from "@/shared/utils/cn";
@@ -263,9 +273,12 @@ export function SwipeCard({
   };
 
   const dragEnabled = isTop && !isExiting;
-  const images = restaurant.photo_urls && restaurant.photo_urls.length > 0 
-    ? restaurant.photo_urls 
-    : restaurant.photo_url ? [restaurant.photo_url] : [];
+  const images =
+    restaurant.photo_urls && restaurant.photo_urls.length > 0
+      ? restaurant.photo_urls
+      : restaurant.photo_url
+        ? [restaurant.photo_url]
+        : [];
 
   return (
     <>
@@ -321,7 +334,7 @@ export function SwipeCard({
               >
                 <MapPinned className={styles.actionIcon} />
               </button>
-              
+
               {!usingPlaceholder && images.length > 0 && (
                 <button
                   type="button"
