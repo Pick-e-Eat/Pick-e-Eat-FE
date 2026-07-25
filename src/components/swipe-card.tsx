@@ -6,10 +6,11 @@ import {
   useMotionValue,
   useTransform,
 } from "framer-motion";
-import { Car, Dog, Heart, HeartCrack, MapPinned, Navigation, Star, Users, X, Images } from "lucide-react";
+import { Car, Dog, Heart, HeartCrack, MapPinned, Navigation, Star, Users, X, Images, MessageCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { RestaurantPhotoGrid } from "@/components/restaurant-photo-grid";
 import { ImageGalleryModal } from "@/components/image-gallery-modal";
+import { ReviewSheet } from "@/components/review-sheet";
 import { useHeaderColorStore } from "@/features/home/stores/header-color-store";
 import type { Restaurant } from "@/lib/types";
 import { cn } from "@/shared/utils/cn";
@@ -17,6 +18,7 @@ import styles from "./swipe-card.module.css";
 
 const SWIPE_THRESHOLD = 100;
 const Y_SWIPE_DOWN_THRESHOLD = 100; // Swipe down threshold (positive y)
+const Y_SWIPE_UP_THRESHOLD = -100; // Swipe up threshold (negative y)
 const EXIT_OFFSET = 520;
 const EXIT_FALL_Y = 200;
 const EXIT_TILT_DEG = 34;
@@ -37,7 +39,7 @@ interface SwipeCardProps {
 
 interface AdvancedOverlayProps {
   motionValue: MotionValue<number>;
-  direction: "right" | "left" | "down";
+  direction: "right" | "left" | "down" | "up";
   range: number;
   icon: React.ElementType;
   className: string;
@@ -83,6 +85,7 @@ export function SwipeCard({
   const [usingPlaceholder, setUsingPlaceholder] = useState(!restaurant.photo_url);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isReviewSheetOpen, setIsReviewSheetOpen] = useState(false);
 
   // Motion values for card's physical position on screen
   const x = useMotionValue(0);
@@ -164,8 +167,7 @@ export function SwipeCard({
       ) {
         if (Math.abs(info.offset.x) > Math.abs(info.offset.y)) {
           setLockedDirection("x");
-        } else if (info.offset.y > 0) {
-          // Only lock to Y if dragging DOWN (PASS gesture)
+        } else {
           setLockedDirection("y");
         }
       }
@@ -173,11 +175,11 @@ export function SwipeCard({
 
     // Now, constrain *both* actual card motion AND gesture tracking motion to locked direction
     if (lockedDirection === "y") {
-      y.set(Math.max(0, info.offset.y)); // Card moves Y (only down)
+      y.set(info.offset.y); // Card moves Y (both up and down)
       x.set(0); // Card X is 0
       cardRotate.set(0);
       dragX.set(0); // Gesture tracking X is 0 if locked to Y
-      dragY.set(Math.max(0, info.offset.y)); // Ensure overlay also stays at 0 or positive
+      dragY.set(info.offset.y);
     } else if (lockedDirection === "x") {
       x.set(info.offset.x); // Card moves X
       y.set(0); // Card Y is 0
@@ -186,9 +188,7 @@ export function SwipeCard({
     } else {
       // If direction not yet locked, card moves freely within DRAG_LOCK_THRESHOLD
       x.set(info.offset.x);
-      // Even before lock, we can prevent moving up if we're sure we want to remove it
-      y.set(Math.max(0, info.offset.y));
-      // y.set(info.offset.y); TODO 검토 필요 위에걸로 대체함
+      y.set(info.offset.y);
       cardRotate.set(clampTilt(info.offset.x));
     }
   };
@@ -199,6 +199,8 @@ export function SwipeCard({
     if (lockedDirection === "y") {
       if (offset.y > Y_SWIPE_DOWN_THRESHOLD) {
         onStop();
+      } else if (offset.y < Y_SWIPE_UP_THRESHOLD) {
+        setIsReviewSheetOpen(true);
       }
       // Animate card back to center after any vertical swipe
       animate(x, 0, { type: "spring", stiffness: 500, damping: 30 });
@@ -279,7 +281,7 @@ export function SwipeCard({
         }}
         drag={!!dragEnabled} // Allow dragging in both directions initially
         dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-        dragElastic={{ top: 0, bottom: 0.2, left: 1, right: 1 }}
+        dragElastic={{ top: 0.2, bottom: 0.2, left: 1, right: 1 }}
         onDragStart={handleDragStart}
         onDrag={handleDrag}
         onDragEnd={handleDragEnd}
@@ -357,6 +359,13 @@ export function SwipeCard({
             icon={X}
             className={styles.overlayDown}
           />
+          <AdvancedOverlay
+            motionValue={dragY}
+            direction="up"
+            range={Y_SWIPE_UP_THRESHOLD}
+            icon={MessageCircle}
+            className={styles.overlayUp}
+          />
 
           {/* Content */}
           <div
@@ -427,6 +436,12 @@ export function SwipeCard({
         onClose={() => setIsGalleryOpen(false)}
         images={images}
         initialIndex={selectedImageIndex}
+      />
+
+      <ReviewSheet
+        restaurant={restaurant}
+        isOpen={isReviewSheetOpen}
+        onClose={() => setIsReviewSheetOpen(false)}
       />
     </>
   );

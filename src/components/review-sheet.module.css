@@ -23,10 +23,6 @@
   @apply flex items-center justify-between border-b border-border px-6 py-4;
 }
 
-.headerTextContainer {
-  /* No specific classes, just a container */
-}
-
 .restaurantName {
   @apply text-xl font-bold text-card-foreground;
 }
@@ -43,9 +39,35 @@
   @apply size-5;
 }
 
+/* Content Area */
+.contentArea {
+  @apply min-h-0 flex-1 overflow-y-auto;
+}
+
+/* Summary Section */
+.summarySection {
+  @apply border-b border-border/50 bg-primary/5 px-6 py-8;
+}
+
+.summaryContent {
+  @apply relative flex flex-col items-center text-center;
+}
+
+.quoteIcon {
+  @apply mb-4 size-8 text-primary/30;
+}
+
+.summaryText {
+  @apply text-lg font-medium leading-relaxed text-card-foreground;
+}
+
 /* Reviews Section */
 .reviewsContainer {
-  @apply min-h-0 flex-1 overflow-y-auto p-6;
+  @apply p-6;
+}
+
+.sectionTitle {
+  @apply mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground;
 }
 
 .reviewsList {
