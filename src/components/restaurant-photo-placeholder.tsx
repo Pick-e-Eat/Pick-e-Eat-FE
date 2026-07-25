@@ -14,8 +14,7 @@ export function RestaurantPhotoPlaceholder({
   className,
 }: RestaurantPhotoPlaceholderProps) {
   const showLabel = variant !== "thumbnailSm";
-  const label =
-    variant === "thumbnail" ? "이미지 없음" : "가게에 올려진 이미지가 없어요.";
+  const label = variant === "thumbnail" ? "이미지 없음" : "가게에 올려진 이미지가 없어요.";
 
   return (
     <div

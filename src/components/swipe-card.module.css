@@ -33,38 +33,6 @@
   @apply text-foreground;
 }
 
-.contentSectionOnPlaceholder .restaurantName {
-  @apply text-foreground;
-}
-
-.contentSectionOnPlaceholder .restaurantType {
-  @apply text-muted-foreground;
-}
-
-.contentSectionOnPlaceholder .ratingValue {
-  @apply text-foreground;
-}
-
-.contentSectionOnPlaceholder .distanceText {
-  @apply text-foreground;
-}
-
-.contentSectionOnPlaceholder .tag {
-  @apply border border-border/70 bg-background/85 text-foreground;
-}
-
-.contentSectionOnPlaceholder .distanceBadge {
-  @apply border border-border/70 bg-background/85 text-foreground;
-}
-
-.contentSectionOnPlaceholder .navigationIcon {
-  @apply text-foreground;
-}
-
-.contentSectionOnPlaceholder .amenityBadge {
-  @apply bg-accent text-accent-foreground;
-}
-
 /* Centered Action Icons - Advanced Overlay Style */
 .overlayContainer {
   @apply pointer-events-none absolute z-10 flex items-center justify-center rounded-2xl border p-3.5 shadow-xl backdrop-blur-md;
@@ -179,4 +147,40 @@
 
 .amenityIcon {
   @apply size-3;
+}
+
+/*
+ * 플레이스홀더 배경 위에서의 색상 오버라이드.
+ * 기본 규칙보다 명시도가 높으므로 반드시 뒤에 와야 한다 (noDescendingSpecificity).
+ */
+.contentSectionOnPlaceholder .restaurantName {
+  @apply text-foreground;
+}
+
+.contentSectionOnPlaceholder .restaurantType {
+  @apply text-muted-foreground;
+}
+
+.contentSectionOnPlaceholder .ratingValue {
+  @apply text-foreground;
+}
+
+.contentSectionOnPlaceholder .distanceText {
+  @apply text-foreground;
+}
+
+.contentSectionOnPlaceholder .tag {
+  @apply border border-border/70 bg-background/85 text-foreground;
+}
+
+.contentSectionOnPlaceholder .distanceBadge {
+  @apply border border-border/70 bg-background/85 text-foreground;
+}
+
+.contentSectionOnPlaceholder .navigationIcon {
+  @apply text-foreground;
+}
+
+.contentSectionOnPlaceholder .amenityBadge {
+  @apply bg-accent text-accent-foreground;
 }
