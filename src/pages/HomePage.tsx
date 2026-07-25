@@ -95,6 +95,7 @@ export function HomePage() {
     navigate(location.pathname, { replace: true, state: null });
   }, [navState?.continueSearch, navigate, location.pathname]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: FilterSettings는 아래 4개 필드가 전부라 필드 단위 deps로도 누락이 없다. 객체째 넣으면 스토어가 새 객체를 낼 때마다 불필요하게 재생성된다
   const fetchNearby = useCallback(async () => {
     const response = await restaurantAPI.searchNearby(
       buildNearbySearchRequest(nearbyQuery.latitude, nearbyQuery.longitude, filterSettings, []),
@@ -113,6 +114,7 @@ export function HomePage() {
   ]);
 
   // 위치·필터 변경 시 1회 호출 (최대 20개 수신, 1차에는 10개만 노출)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: searchQueryKey는 본문에서 안 쓰지만 위치·필터 변경을 감지하는 트리거라 의도적으로 넣었다. 반대로 navState?.continueSearch를 넣으면 다른 effect가 navState를 비울 때 effect가 다시 돌아 "이어서 검색"인데도 재조회가 발생한다
   useEffect(() => {
     if (navState?.continueSearch) return;
     // 위치가 확정되기 전에 기본 좌표로 검색하면 엉뚱한 지역 결과가 먼저 노출됨

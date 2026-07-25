@@ -13,6 +13,7 @@ import {
   HeartCrack,
   Images,
   MapPinned,
+  MessageCircle,
   Navigation,
   Star,
   Users,
@@ -21,6 +22,7 @@ import {
 import { useEffect, useState } from "react";
 import { ImageGalleryModal } from "@/components/image-gallery-modal";
 import { RestaurantPhotoGrid } from "@/components/restaurant-photo-grid";
+import { ReviewSheet } from "@/components/review-sheet";
 import { useHeaderColorStore } from "@/features/home/stores/header-color-store";
 import type { Restaurant } from "@/lib/types";
 import { cn } from "@/shared/utils/cn";
