@@ -1,0 +1,15 @@
+{
+  "name": "Pick-e-Eat",
+  "short_name": "Pick-e-Eat",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf8f5",
+  "theme_color": "#faf8f5",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
