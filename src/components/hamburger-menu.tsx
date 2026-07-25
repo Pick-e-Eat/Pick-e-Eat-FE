@@ -60,6 +60,7 @@ export function HamburgerMenu({
   onRemoveAddress,
   onSelectAddress,
 }: HamburgerMenuProps) {
+  // "range"(검색 범위)는 API가 250m만 지원하는 동안 UI에서 숨김 처리 중
   const [activeFilterSection, setActiveFilterSection] = useState<"range" | "amenities" | null>(
     null,
   );
@@ -74,11 +75,13 @@ export function HamburgerMenu({
     )?.label ?? null;
   const currentLocationTitle = locationLabelOverride ?? currentLocation;
 
+  /* 검색 범위 옵션 — API가 250m만 지원하는 동안 미사용 (재지원 시 아래 섹션과 함께 복구)
   const searchRangeOptions: Array<{ value: 50 | 100 | 250; label: string; sub?: string }> = [
     { value: 50, label: "50m" },
     { value: 100, label: "100m", sub: "(기본)" },
     { value: 250, label: "250m" },
   ];
+  */
 
   const overlayRoot =
     typeof document !== "undefined" ? document.getElementById(APP_OVERLAY_ROOT_ID) : null;
@@ -137,7 +140,7 @@ export function HamburgerMenu({
                 </button>
               </div>
 
-              {/* Search Range */}
+              {/* Search Range — API가 250m만 지원하는 동안 숨김 (기본 250m 고정, 재지원 시 주석 해제)
               <div className={styles.section}>
                 <button
                   type="button"
@@ -190,6 +193,7 @@ export function HamburgerMenu({
                   </div>
                 )}
               </div>
+              */}
 
               {/* Filters */}
               <div className={styles.section}>
