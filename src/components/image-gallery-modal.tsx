@@ -1,7 +1,7 @@
-import { useState, useCallback, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import styles from "./image-gallery-modal.module.css";
 
 interface ImageGalleryModalProps {
@@ -63,8 +63,16 @@ export function ImageGalleryModal({
     <DialogPrimitive.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className={styles.overlay}>
-          <DialogPrimitive.Content className={styles.galleryContainer} onPointerDown={(e) => e.stopPropagation()}>
-            <button className={styles.closeButton} onClick={onClose} aria-label="Close">
+          <DialogPrimitive.Content
+            className={styles.galleryContainer}
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className={styles.closeButton}
+              onClick={onClose}
+              aria-label="Close"
+            >
               <X size={24} />
             </button>
 
@@ -97,7 +105,7 @@ export function ImageGalleryModal({
                 >
                   <img
                     src={images[imageIndex]}
-                    alt={`Gallery image ${imageIndex + 1}`}
+                    alt={`Gallery ${imageIndex + 1} of ${images.length}`}
                     className={styles.image}
                     draggable={false}
                   />
@@ -108,6 +116,7 @@ export function ImageGalleryModal({
             {images.length > 1 && (
               <>
                 <button
+                  type="button"
                   className={`${styles.navButton} ${styles.prevButton}`}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -118,6 +127,7 @@ export function ImageGalleryModal({
                   <ChevronLeft size={32} />
                 </button>
                 <button
+                  type="button"
                   className={`${styles.navButton} ${styles.nextButton}`}
                   onClick={(e) => {
                     e.stopPropagation();

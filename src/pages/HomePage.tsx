@@ -6,7 +6,11 @@ import { SavedAddressLimitDialog } from "@/components/saved-address-limit-dialog
 import { SwipeCard } from "@/components/swipe-card";
 import { HomeHeader } from "@/features/home/components/HomeHeader";
 import type { FilterSettings, SavedAddress, SwipeResult } from "@/lib/types";
-import { restaurantAPI, buildNearbySearchRequest, mapRestaurantResponse } from "@/shared/api/restaurant";
+import {
+  buildNearbySearchRequest,
+  mapRestaurantResponse,
+  restaurantAPI,
+} from "@/shared/api/restaurant";
 import { routes } from "@/shared/constants/routes";
 import { useNearbyQueryStore } from "@/shared/stores/nearby-query-store";
 import { useResultsStore } from "@/shared/stores/results-store";
@@ -17,9 +21,11 @@ import styles from "./HomePage.module.css";
 export function HomePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const navState = location.state as
-    | { returnToMenuOpen?: boolean; skipMenuOpenAnimation?: boolean; continueSearch?: boolean }
-    | null;
+  const navState = location.state as {
+    returnToMenuOpen?: boolean;
+    skipMenuOpenAnimation?: boolean;
+    continueSearch?: boolean;
+  } | null;
   const initialMenuOpen = Boolean(navState?.returnToMenuOpen);
   const initialSkipMenuOpenAnimation = Boolean(navState?.skipMenuOpenAnimation);
   const {
@@ -79,12 +85,7 @@ export function HomePage() {
 
   const fetchNearby = useCallback(async () => {
     const response = await restaurantAPI.searchNearby(
-      buildNearbySearchRequest(
-        nearbyQuery.latitude,
-        nearbyQuery.longitude,
-        filterSettings,
-        [],
-      ),
+      buildNearbySearchRequest(nearbyQuery.latitude, nearbyQuery.longitude, filterSettings, []),
     );
     const fetchedRestaurants = response.restaurants.map(mapRestaurantResponse);
     setRestaurants(fetchedRestaurants, response.count);

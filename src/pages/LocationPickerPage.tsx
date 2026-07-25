@@ -4,10 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { routes } from "@/shared/constants/routes";
 import { useNearbyQueryStore } from "@/shared/stores/nearby-query-store";
-import {
-  MAX_SAVED_ADDRESSES,
-  useSavedAddressesStore,
-} from "@/shared/stores/saved-addresses-store";
+import { MAX_SAVED_ADDRESSES, useSavedAddressesStore } from "@/shared/stores/saved-addresses-store";
 import type { LocationResult } from "@/shared/types/api.types";
 import {
   type GoogleGeocoderLike,
@@ -100,7 +97,7 @@ export function LocationPickerPage() {
   const [searchResults, setSearchResults] = useState<LocationResult[]>([]);
   const [isLoadingMap, setIsLoadingMap] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
-  const [isResolvingAddress, setIsResolvingAddress] = useState(false);
+  const [, setIsResolvingAddress] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
   const [isSavingAddress, setIsSavingAddress] = useState(false);
 
@@ -313,7 +310,9 @@ export function LocationPickerPage() {
 
           switch (err.code) {
             case err.PERMISSION_DENIED:
-              toast.error("위치 권한이 거부되었습니다. 웹사이트 설정에서 위치 권한을 허용해 주세요.");
+              toast.error(
+                "위치 권한이 거부되었습니다. 웹사이트 설정에서 위치 권한을 허용해 주세요.",
+              );
               break;
             case err.TIMEOUT:
               toast.error("현재 위치 확인 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.");
@@ -541,7 +540,11 @@ export function LocationPickerPage() {
           </section>
         )}
         {!isSaveOnlyMode && isSaveModalOpen && (
-          <div className={styles.saveModalOverlay} role="presentation" onClick={() => setIsSaveModalOpen(false)}>
+          <div
+            className={styles.saveModalOverlay}
+            role="presentation"
+            onClick={() => setIsSaveModalOpen(false)}
+          >
             <section
               className={styles.saveModal}
               role="dialog"

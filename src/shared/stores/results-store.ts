@@ -51,10 +51,7 @@ export const useResultsStore = create<ResultsState>((set) => ({
   setCurrentIndex: (index) => set({ currentIndex: index }),
   continueSession: () =>
     set((state) => {
-      const batchSize = Math.min(
-        SWIPE_BATCH_SIZE,
-        state.cachedTotalCount - state.results.length,
-      );
+      const batchSize = Math.min(SWIPE_BATCH_SIZE, state.cachedTotalCount - state.results.length);
 
       return {
         sessionBatchStart: state.results.length,
@@ -65,10 +62,9 @@ export const useResultsStore = create<ResultsState>((set) => ({
   resetResults: () => set({ ...initialSessionState }),
 }));
 
-export function getBatchProgress(state: Pick<
-  ResultsState,
-  "results" | "sessionBatchStart" | "sessionBatchEnd"
->) {
+export function getBatchProgress(
+  state: Pick<ResultsState, "results" | "sessionBatchStart" | "sessionBatchEnd">,
+) {
   const batchMax = Math.min(
     SWIPE_BATCH_SIZE,
     Math.max(0, state.sessionBatchEnd - state.sessionBatchStart),
@@ -78,10 +74,12 @@ export function getBatchProgress(state: Pick<
   return { current, max: batchMax };
 }
 
-export function canShowContinueSearch(state: Pick<
-  ResultsState,
-  "results" | "cachedTotalCount" | "sessionBatchEnd" | "sessionBatchStart"
->) {
+export function canShowContinueSearch(
+  state: Pick<
+    ResultsState,
+    "results" | "cachedTotalCount" | "sessionBatchEnd" | "sessionBatchStart"
+  >,
+) {
   const finishedFirstBatch =
     state.results.length >= SWIPE_BATCH_SIZE && state.sessionBatchStart === 0;
 

@@ -57,7 +57,12 @@ export function pickLocationLabelFromGeocodeResult(
   const neighborhood = findByType("administrative_area_level_3");
 
   if (route) {
-    return [cityOrProvince, district, neighborhood, [route, roadAddressNumber].filter(Boolean).join(" ")]
+    return [
+      cityOrProvince,
+      district,
+      neighborhood,
+      [route, roadAddressNumber].filter(Boolean).join(" "),
+    ]
       .filter(Boolean)
       .join(" ")
       .trim();

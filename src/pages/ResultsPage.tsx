@@ -2,15 +2,21 @@ import { motion } from "framer-motion";
 import { MapPin, MapPinned, RotateCcw, Star, ThumbsDown, ThumbsUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { RestaurantPhoto } from "@/components/restaurant-photo";
+import type { Restaurant } from "@/lib/types";
 import { routes } from "@/shared/constants/routes";
 import { canShowContinueSearch, useResultsStore } from "@/shared/stores/results-store";
-import type { Restaurant } from "@/lib/types";
 import styles from "./ResultsPage.module.css";
 
 export function ResultsPage() {
   const navigate = useNavigate();
-  const { results, cachedTotalCount, sessionBatchEnd, sessionBatchStart, resetResults, continueSession } =
-    useResultsStore();
+  const {
+    results,
+    cachedTotalCount,
+    sessionBatchEnd,
+    sessionBatchStart,
+    resetResults,
+    continueSession,
+  } = useResultsStore();
 
   const likedRestaurants = results.filter((r) => r.liked);
   const dislikedRestaurants = results.filter((r) => !r.liked);
@@ -43,7 +49,9 @@ export function ResultsPage() {
 
   const openRestaurantInMaps = (restaurant: Restaurant) => {
     const mapsUrl =
-      restaurant.google_maps_links?.place_uri ?? restaurant.google_maps_uri ?? restaurant.kakao_map_uri;
+      restaurant.google_maps_links?.place_uri ??
+      restaurant.google_maps_uri ??
+      restaurant.kakao_map_uri;
 
     if (mapsUrl) {
       window.open(mapsUrl, "_blank", "noopener,noreferrer");

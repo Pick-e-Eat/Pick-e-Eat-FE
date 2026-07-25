@@ -23,7 +23,9 @@ export function loadGoogleMapsSdk(): Promise<void> {
   }
 
   googleMapsLoaderPromise = new Promise<void>((resolve, reject) => {
-    const existingScript = document.getElementById(GOOGLE_MAPS_SCRIPT_ID) as HTMLScriptElement | null;
+    const existingScript = document.getElementById(
+      GOOGLE_MAPS_SCRIPT_ID,
+    ) as HTMLScriptElement | null;
     if (existingScript) {
       if (window.google?.maps) {
         resolve();
@@ -40,9 +42,7 @@ export function loadGoogleMapsSdk(): Promise<void> {
 
     const script = document.createElement("script");
     script.id = GOOGLE_MAPS_SCRIPT_ID;
-    script.src =
-      `https://maps.googleapis.com/maps/api/js?key=${apiKey}` +
-      "&language=ko&region=KR&v=weekly";
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&language=ko&region=KR&v=weekly`;
     script.async = true;
     script.defer = true;
     script.onload = () => resolve();
