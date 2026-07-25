@@ -1,9 +1,9 @@
+import { AnimatePresence, motion } from "framer-motion";
+import { Quote, Star, X } from "lucide-react";
 import { createPortal } from "react-dom";
 import { APP_OVERLAY_ROOT_ID } from "@/app/AppLayout";
 import type { Restaurant } from "@/lib/types";
 import styles from "./review-sheet.module.css";
-import { X, Star, Quote } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface ReviewSheetProps {
   restaurant: Restaurant | null;
