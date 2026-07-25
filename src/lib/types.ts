@@ -36,6 +36,8 @@ export interface Restaurant {
   google_maps_links?: GoogleMapsDeepLinks | null; // Google Maps 딥링크 묶음
   kakao_map_uri?: string | null; // 카카오맵 딥링크
 
+  editorial_summary?: string | null; // 식당 요약 설명
+
   // Legacy/Mock data compatibility fields
   image?: string;
   reviewCount?: number;

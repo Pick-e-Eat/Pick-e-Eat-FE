@@ -65,6 +65,10 @@
   @apply inset-0 m-auto h-fit w-fit border-transparent bg-gradient-to-br from-zinc-700 via-neutral-800 to-black text-white;
 }
 
+.overlayUp {
+  @apply inset-0 m-auto h-fit w-fit border-transparent bg-gradient-to-br from-violet-500 via-purple-500 to-indigo-500 text-white;
+}
+
 .overlayIcon {
   @apply size-12;
 }

@@ -107,6 +107,8 @@
   body {
     font-family: var(--font-sans);
     @apply bg-background text-foreground min-h-dvh antialiased;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
   }
   /* 데스크톱: 앱 컬럼 바깥 캔버스 (스크롤 바운스 시에도 동일 톤) */
   @media (min-width: 640px) {
