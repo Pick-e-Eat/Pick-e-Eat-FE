@@ -4,6 +4,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "1",
     name: "맛있는 돈까스",
+    latitude: 37.567,
+    longitude: 126.9785,
     type: "일식 / 돈까스",
     rating: 4.5,
     reviewCount: 1234,
@@ -37,6 +39,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "2",
     name: "청담 파스타",
+    latitude: 37.524,
+    longitude: 127.053,
     type: "양식 / 이탈리안",
     rating: 4.7,
     reviewCount: 856,
@@ -70,6 +74,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "3",
     name: "진짜 짬뽕",
+    latitude: 37.5658,
+    longitude: 126.977,
     type: "중식 / 짬뽕 전문",
     rating: 4.3,
     reviewCount: 2341,
@@ -103,6 +109,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "4",
     name: "할머니 순두부",
+    latitude: 37.5648,
+    longitude: 126.982,
     type: "한식 / 순두부찌개",
     rating: 4.8,
     reviewCount: 3456,
@@ -136,6 +144,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "5",
     name: "교대 스시",
+    latitude: 37.4934,
+    longitude: 127.0146,
     type: "일식 / 초밥",
     rating: 4.6,
     reviewCount: 987,
@@ -169,6 +179,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "6",
     name: "강남 치킨",
+    latitude: 37.4979,
+    longitude: 127.0276,
     type: "한식 / 치킨",
     rating: 4.4,
     reviewCount: 5678,
@@ -202,6 +214,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "7",
     name: "베트남 쌀국수",
+    latitude: 37.5675,
+    longitude: 126.9825,
     type: "아시안 / 베트남",
     rating: 4.2,
     reviewCount: 1567,
@@ -235,6 +249,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "8",
     name: "서울 불고기",
+    latitude: 37.564,
+    longitude: 126.9755,
     type: "한식 / 불고기",
     rating: 4.5,
     reviewCount: 2890,
@@ -268,6 +284,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "9",
     name: "명동 칼국수",
+    latitude: 37.5636,
+    longitude: 126.985,
     type: "한식 / 칼국수",
     rating: 4.6,
     reviewCount: 4567,
@@ -301,6 +319,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "10",
     name: "홍대 타코",
+    latitude: 37.5572,
+    longitude: 126.9245,
     type: "멕시칸 / 타코",
     rating: 4.3,
     reviewCount: 876,
@@ -334,6 +354,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "11",
     name: "이태원 버거",
+    latitude: 37.5345,
+    longitude: 126.9946,
     type: "양식 / 햄버거",
     rating: 4.7,
     reviewCount: 2345,
@@ -367,6 +389,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "12",
     name: "종로 삼계탕",
+    latitude: 37.5704,
+    longitude: 126.992,
     type: "한식 / 삼계탕",
     rating: 4.8,
     reviewCount: 3456,
@@ -400,6 +424,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "13",
     name: "역삼 곱창골목",
+    latitude: 37.5006,
+    longitude: 127.0365,
     type: "한식 / 곱창·막창",
     rating: 4.4,
     reviewCount: 1892,
@@ -433,6 +459,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "14",
     name: "선릉 카레",
+    latitude: 37.5045,
+    longitude: 127.0492,
     type: "일식 / 카레",
     rating: 4.5,
     reviewCount: 1123,
@@ -466,6 +494,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "15",
     name: "논현 떡볶이집",
+    latitude: 37.511,
+    longitude: 127.0215,
     type: "한식 / 분식",
     rating: 4.2,
     reviewCount: 4231,
@@ -499,6 +529,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "16",
     name: "서초 한정식",
+    latitude: 37.4837,
+    longitude: 127.0324,
     type: "한식 / 한정식",
     rating: 4.9,
     reviewCount: 567,
@@ -532,6 +564,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "17",
     name: "방배 동남아음식",
+    latitude: 37.4813,
+    longitude: 126.9975,
     type: "아시안 / 태국·베트남",
     rating: 4.3,
     reviewCount: 876,
@@ -565,6 +599,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "18",
     name: "반포 수제비",
+    latitude: 37.5085,
+    longitude: 126.9955,
     type: "한식 / 수제비·칼국수",
     rating: 4.6,
     reviewCount: 2345,
@@ -598,6 +634,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "19",
     name: "잠실 피자",
+    latitude: 37.5133,
+    longitude: 127.1,
     type: "양식 / 피자",
     rating: 4.5,
     reviewCount: 1678,
@@ -631,6 +669,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "20",
     name: "성수 브런치카페",
+    latitude: 37.5445,
+    longitude: 127.0559,
     type: "카페·브런치",
     rating: 4.7,
     reviewCount: 3456,
@@ -664,6 +704,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "21",
     name: "건대 닭갈비",
+    latitude: 37.5404,
+    longitude: 127.0695,
     type: "한식 / 닭갈비",
     rating: 4.4,
     reviewCount: 2890,
@@ -697,6 +739,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "22",
     name: "여의도 회식당",
+    latitude: 37.5215,
+    longitude: 126.9243,
     type: "일식 / 회·해산물",
     rating: 4.8,
     reviewCount: 1234,
@@ -730,6 +774,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "23",
     name: "마포 감자탕",
+    latitude: 37.5395,
+    longitude: 126.9455,
     type: "한식 / 감자탕",
     rating: 4.5,
     reviewCount: 3456,
@@ -763,6 +809,8 @@ export const mockRestaurants: Restaurant[] = [
   {
     id: "24",
     name: "공덕 샌드위치",
+    latitude: 37.5443,
+    longitude: 126.9515,
     type: "양식 / 샌드위치·브런치",
     rating: 4.6,
     reviewCount: 987,
