@@ -33,7 +33,7 @@
 }
 
 .label {
-  @apply font-medium text-muted-foreground;
+  @apply font-medium text-muted-foreground text-center break-keep px-2;
 }
 
 .cover .label {

@@ -19,10 +19,10 @@ export function RestaurantPhotoPlaceholder({
     <div
       className={cn(styles.placeholder, styles[variant], className)}
       role="img"
-      aria-label="가게에 올려진 이미지가 없어요."
+      aria-label="등록된 이미지가 없어요."
     >
       <Utensils className={styles.icon} aria-hidden="true" />
-      {showLabel ? <span className={styles.label}>가게에 올려진 이미지가 없어요.</span> : null}
+      {showLabel ? <span className={styles.label}>등록된 이미지가 없어요.</span> : null}
     </div>
   );
 }
