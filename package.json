@@ -10,7 +10,7 @@
   "_comment": "React + Vite 기반으로 빠른 DX를 위한 기본 패키지 구성",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "biome check .",
     "format": "biome format . --write"
