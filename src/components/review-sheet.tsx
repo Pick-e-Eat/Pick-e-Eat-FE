@@ -52,7 +52,11 @@ export function ReviewSheet({ restaurant, isOpen, onClose }: ReviewSheetProps) {
             <div className={styles.header}>
               <div className={styles.headerTextContainer}>
                 <h3 className={styles.restaurantName}>{restaurant.name}</h3>
-                {restaurant.type && <p className={styles.restaurantType}>{restaurant.cuisine_type || restaurant.type}</p>}
+                {restaurant.type && (
+                  <p className={styles.restaurantType}>
+                    {restaurant.cuisine_type || restaurant.type}
+                  </p>
+                )}
               </div>
               <button
                 type="button"
