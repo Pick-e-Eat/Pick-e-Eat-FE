@@ -71,7 +71,7 @@ export function ImageGalleryModal({
               type="button"
               className={styles.closeButton}
               onClick={onClose}
-              aria-label="Close"
+              aria-label="닫기"
             >
               <X size={24} />
             </button>
@@ -105,7 +105,7 @@ export function ImageGalleryModal({
                 >
                   <img
                     src={images[imageIndex]}
-                    alt={`Gallery ${imageIndex + 1} of ${images.length}`}
+                    alt={`음식점 사진 ${imageIndex + 1} / ${images.length}`}
                     className={styles.image}
                     draggable={false}
                   />
@@ -122,7 +122,7 @@ export function ImageGalleryModal({
                     e.stopPropagation();
                     paginate(-1);
                   }}
-                  aria-label="Previous image"
+                  aria-label="이전 사진"
                 >
                   <ChevronLeft size={32} />
                 </button>
@@ -133,7 +133,7 @@ export function ImageGalleryModal({
                     e.stopPropagation();
                     paginate(1);
                   }}
-                  aria-label="Next image"
+                  aria-label="다음 사진"
                 >
                   <ChevronRight size={32} />
                 </button>
