@@ -1,4 +1,7 @@
 {
+  "files": {
+    "includes": ["**", "!dist", "!dev-dist", "!coverage"]
+  },
   "formatter": {
     "indentStyle": "space",
     "indentWidth": 2,

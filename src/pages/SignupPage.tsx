@@ -1,10 +1,10 @@
+import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-import styles from "./SignupPage.module.css";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { SignupForm } from "@/features/auth/components";
 import { routes } from "@/shared/constants/routes";
-import { ArrowLeft } from "lucide-react";
+import styles from "./SignupPage.module.css";
 
 export function SignupPage() {
   const handleSubmit = async (values: {

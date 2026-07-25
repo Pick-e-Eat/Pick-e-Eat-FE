@@ -13,6 +13,9 @@ export interface NearbySearchRequest {
   longitude: number; // 경도 (예: 126.978)
   radius?: 50 | 100 | 250; // 검색 반경 (미터). 50, 100, 250 중 선택
   excluded_place_ids?: string[]; // 이미 스와이프한 장소 제외
+  has_parking?: boolean; // 주차 가능 여부 필터
+  allows_dogs?: boolean; // 반려동물 동반 가능 필터
+  good_for_groups?: boolean; // 단체 모임 좋음 필터
 }
 
 export interface GoogleMapsDeepLinksResponse {
@@ -40,6 +43,8 @@ export interface RestaurantResponse {
   distance_meters?: number | null; // 사용자로부터의 거리 (미터)
   walking_minutes?: number | null; // 도보 소요 시간 (분)
   has_parking?: boolean | null; // 주차 가능 여부
+  allows_dogs?: boolean | null; // 반려동물 동반 가능 여부
+  good_for_groups?: boolean | null; // 단체 모임 좋음 여부
   blog_review_count?: number | null; // 블로그 리뷰 수
   tags?: string[]; // 태그 목록 (예: 혼밥, 가성비)
   google_maps_uri?: string | null; // Google Maps 상세 페이지

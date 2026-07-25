@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import styles from "./LoginForm.module.css";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { routes } from "@/shared/constants/routes";
+import styles from "./LoginForm.module.css";
 
 export interface LoginFormValues {
   email: string;

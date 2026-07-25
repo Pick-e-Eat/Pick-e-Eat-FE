@@ -1,6 +1,6 @@
-import styles from "./SignupDialog.module.css";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SignupForm, type SignupFormValues } from "@/features/auth/components/SignupForm";
+import styles from "./SignupDialog.module.css";
 
 interface SignupDialogProps {
   open: boolean;

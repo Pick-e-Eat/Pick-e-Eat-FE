@@ -1,6 +1,6 @@
-import styles from "./LoginDialog.module.css";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { LoginForm, type LoginFormValues } from "@/features/auth/components/LoginForm";
+import styles from "./LoginDialog.module.css";
 
 interface LoginDialogProps {
   open: boolean;
