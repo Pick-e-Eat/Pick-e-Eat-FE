@@ -57,7 +57,8 @@ export function mapRestaurantResponse(r: RestaurantResponse): Restaurant {
     google_maps_uri: r.google_maps_uri,
     google_maps_links: r.google_maps_links,
     kakao_map_uri: r.kakao_map_uri,
-    type: "Unknown",
+    // 서버가 음식 카테고리를 내려주지 않음 — 빈 값이면 리뷰 시트에서 줄을 감춥니다
+    type: "",
     reviews: [],
   };
 }

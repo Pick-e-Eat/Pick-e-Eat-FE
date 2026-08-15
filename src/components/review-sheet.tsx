@@ -1,9 +1,9 @@
+import { AnimatePresence, motion } from "framer-motion";
+import { Quote, Star, X } from "lucide-react";
 import { createPortal } from "react-dom";
 import { APP_OVERLAY_ROOT_ID } from "@/app/AppLayout";
 import type { Restaurant } from "@/lib/types";
 import styles from "./review-sheet.module.css";
-import { X, Star, Quote } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface ReviewSheetProps {
   restaurant: Restaurant | null;
@@ -52,7 +52,11 @@ export function ReviewSheet({ restaurant, isOpen, onClose }: ReviewSheetProps) {
             <div className={styles.header}>
               <div className={styles.headerTextContainer}>
                 <h3 className={styles.restaurantName}>{restaurant.name}</h3>
-                <p className={styles.restaurantType}>{restaurant.cuisine_type || restaurant.type}</p>
+                {restaurant.type && (
+                  <p className={styles.restaurantType}>
+                    {restaurant.cuisine_type || restaurant.type}
+                  </p>
+                )}
               </div>
               <button
                 type="button"

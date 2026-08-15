@@ -83,7 +83,7 @@ export function LocationPickerPage() {
   const isSaveOnlyMode = navState?.mode === "saveOnly";
   const shouldReturnToMenuOpen = Boolean(navState?.returnToMenuOpen);
   const shouldSkipMenuOpenAnimation = Boolean(navState?.skipMenuOpenAnimation);
-  const { nearbyQuery, setCoordinates, setAddress } = useNearbyQueryStore();
+  const { nearbyQuery, setManualLocation } = useNearbyQueryStore();
   const savedAddresses = useSavedAddressesStore((s) => s.addresses);
   const addSavedAddress = useSavedAddressesStore((s) => s.addAddress);
   const [selectedPosition, setSelectedPosition] = useState<LatLng>({
@@ -99,6 +99,16 @@ export function LocationPickerPage() {
   const [isSearching, setIsSearching] = useState(false);
   const [, setIsResolvingAddress] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
+
+  // 저장 모달: 백드롭 클릭 외에 키보드로도 닫을 수 있어야 한다
+  useEffect(() => {
+    if (!isSaveModalOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsSaveModalOpen(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isSaveModalOpen]);
   const [isSavingAddress, setIsSavingAddress] = useState(false);
 
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -347,8 +357,7 @@ export function LocationPickerPage() {
     if (isConfirming) return;
     setIsConfirming(true);
     const resolved = selectedAddress || "선택한 위치";
-    setCoordinates(selectedPosition.lat, selectedPosition.lng);
-    setAddress(resolved);
+    setManualLocation(selectedPosition.lat, selectedPosition.lng, resolved);
 
     window.setTimeout(() => {
       navigate(routes.home, {
@@ -365,8 +374,7 @@ export function LocationPickerPage() {
     selectedAddress,
     selectedPosition.lat,
     selectedPosition.lng,
-    setAddress,
-    setCoordinates,
+    setManualLocation,
     shouldReturnToMenuOpen,
     shouldSkipMenuOpenAnimation,
   ]);
@@ -540,11 +548,13 @@ export function LocationPickerPage() {
           </section>
         )}
         {!isSaveOnlyMode && isSaveModalOpen && (
+          // biome-ignore lint/a11y/noStaticElementInteractions: 모달 백드롭. 키보드 사용자는 위의 Escape 핸들러와 모달 내 닫기 버튼으로 닫는다
           <div
             className={styles.saveModalOverlay}
             role="presentation"
             onClick={() => setIsSaveModalOpen(false)}
           >
+            {/* biome-ignore lint/a11y/useKeyWithClickEvents: 동작이 아니라 백드롭으로의 이벤트 전파를 막기 위한 핸들러라 대응 키 이벤트가 없다 */}
             <section
               className={styles.saveModal}
               role="dialog"

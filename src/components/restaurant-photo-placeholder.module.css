@@ -1,43 +1,73 @@
 @reference "../styles/globals.css";
 
 .placeholder {
-  @apply flex flex-col items-center justify-center gap-1.5 bg-white text-secondary;
+  @apply flex flex-col items-center justify-center gap-2 text-muted-foreground;
 }
 
 .cover {
-  @apply absolute inset-0 h-full w-full gap-2;
+  @apply absolute inset-0 h-full w-full items-center justify-center;
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--accent) 88%, white) 0%,
+    var(--muted) 48%,
+    color-mix(in srgb, var(--background) 92%, var(--border)) 100%
+  );
+}
+
+.messageGroup {
+  @apply flex flex-col items-center gap-2.5 px-6;
+}
+
+.cover .messageGroup {
+  @apply -translate-y-6;
 }
 
 .thumbnail {
-  @apply h-full w-full rounded-xl ring-1 ring-border/50;
+  @apply h-full w-full rounded-xl bg-muted ring-1 ring-border/50;
 }
 
 .thumbnailSm {
-  @apply h-full w-full rounded-lg ring-1 ring-border/45;
+  @apply h-full w-full rounded-lg bg-muted ring-1 ring-border/45;
 }
 
-.icon {
-  @apply shrink-0 text-secondary/85;
+.iconWrap {
+  @apply flex items-center justify-center rounded-full bg-card/80 shadow-sm ring-1 ring-border/60;
 }
 
-.cover .icon {
+.cover .iconWrap {
+  @apply size-16;
+}
+
+.thumbnail .iconWrap {
   @apply size-11;
 }
 
+.thumbnailSm .iconWrap {
+  @apply size-8;
+}
+
+.icon {
+  @apply shrink-0;
+}
+
+.cover .icon {
+  @apply size-7 text-secondary/70;
+}
+
 .thumbnail .icon {
-  @apply size-7;
+  @apply size-5 text-secondary/70;
 }
 
 .thumbnailSm .icon {
-  @apply size-5;
+  @apply size-4 text-secondary/70;
 }
 
 .label {
-  @apply font-medium text-muted-foreground text-center break-keep px-2;
+  @apply font-medium text-muted-foreground;
 }
 
 .cover .label {
-  @apply text-sm;
+  @apply text-base font-medium text-foreground;
 }
 
 .thumbnail .label {

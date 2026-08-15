@@ -26,7 +26,7 @@ export function RestaurantPhotoGrid({
     return (
       <RestaurantPhoto
         alt={alt}
-        className={cn(styles.gridContainer, className)}
+        className={cn(styles.gridContainer, styles.gridContainerEmpty, className)}
         onUsingPlaceholderChange={onUsingPlaceholderChange}
       />
     );
@@ -39,9 +39,12 @@ export function RestaurantPhotoGrid({
   return (
     <div className={cn(styles.gridContainer, layoutClass, className)}>
       {displayImages.map((url, index) => (
-        <div
+        <button
+          // biome-ignore lint/suspicious/noArrayIndexKey: 같은 음식점에 동일 photo_url이 중복될 수 있어 index를 함께 써야 키가 유일해진다
           key={`${url}-${index}`}
+          type="button"
           className={styles.photoItem}
+          aria-label={`${alt} ${index + 1} 크게 보기`}
           onClick={() => onPhotoClick?.(index)}
           onPointerDown={(e) => e.stopPropagation()}
         >
@@ -55,7 +58,7 @@ export function RestaurantPhotoGrid({
           {index === 3 && remainingCount > 0 && (
             <div className={styles.moreOverlay}>+{remainingCount}</div>
           )}
-        </div>
+        </button>
       ))}
     </div>
   );

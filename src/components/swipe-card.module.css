@@ -20,32 +20,17 @@
   @apply absolute inset-0 bg-linear-to-t from-foreground/90 via-foreground/30 to-transparent;
 }
 
-.contentSectionOnPlaceholder .restaurantName {
-  @apply text-card-foreground;
+/* Gradient Overlay */
+.gradientOverlay {
+  @apply absolute inset-0 bg-linear-to-t from-foreground/90 via-foreground/30 to-transparent;
 }
 
-.contentSectionOnPlaceholder .restaurantType {
-  @apply text-muted-foreground;
+.placeholderOverlay {
+  @apply absolute inset-x-0 bottom-0 h-[58%] bg-linear-to-t from-card via-card/92 to-transparent;
 }
 
-.contentSectionOnPlaceholder .ratingValue {
-  @apply text-card-foreground;
-}
-
-.contentSectionOnPlaceholder .distanceText {
-  @apply text-card-foreground;
-}
-
-.contentSectionOnPlaceholder .tag {
-  @apply bg-foreground/8 text-card-foreground;
-}
-
-.contentSectionOnPlaceholder .distanceBadge {
-  @apply bg-foreground/8 text-card-foreground;
-}
-
-.contentSectionOnPlaceholder .navigationIcon {
-  @apply text-card-foreground;
+.contentSectionOnPlaceholder {
+  @apply text-foreground;
 }
 
 /* Centered Action Icons - Advanced Overlay Style */
@@ -114,6 +99,10 @@
   @apply flex size-12 cursor-pointer items-center justify-center rounded-full bg-card/20 text-card transition-all hover:bg-card/40 active:scale-95 backdrop-blur-sm;
 }
 
+.actionButtonsOnPlaceholder .actionButton {
+  @apply border border-border/60 bg-card/90 text-foreground shadow-sm hover:bg-card;
+}
+
 .actionIcon {
   @apply size-6;
 }
@@ -158,4 +147,40 @@
 
 .amenityIcon {
   @apply size-3;
+}
+
+/*
+ * 플레이스홀더 배경 위에서의 색상 오버라이드.
+ * 기본 규칙보다 명시도가 높으므로 반드시 뒤에 와야 한다 (noDescendingSpecificity).
+ */
+.contentSectionOnPlaceholder .restaurantName {
+  @apply text-foreground;
+}
+
+.contentSectionOnPlaceholder .restaurantType {
+  @apply text-muted-foreground;
+}
+
+.contentSectionOnPlaceholder .ratingValue {
+  @apply text-foreground;
+}
+
+.contentSectionOnPlaceholder .distanceText {
+  @apply text-foreground;
+}
+
+.contentSectionOnPlaceholder .tag {
+  @apply border border-border/70 bg-background/85 text-foreground;
+}
+
+.contentSectionOnPlaceholder .distanceBadge {
+  @apply border border-border/70 bg-background/85 text-foreground;
+}
+
+.contentSectionOnPlaceholder .navigationIcon {
+  @apply text-foreground;
+}
+
+.contentSectionOnPlaceholder .amenityBadge {
+  @apply bg-accent text-accent-foreground;
 }

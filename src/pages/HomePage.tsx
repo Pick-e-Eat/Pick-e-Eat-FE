@@ -2,7 +2,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { HamburgerMenu } from "@/components/hamburger-menu";
+import { LocationPermissionDialog } from "@/components/location-permission-dialog";
 import { SavedAddressLimitDialog } from "@/components/saved-address-limit-dialog";
+import { ErrorPanel, LoadingPanel } from "@/components/status-panel";
 import { SwipeCard } from "@/components/swipe-card";
 import { HomeHeader } from "@/features/home/components/HomeHeader";
 import type { FilterSettings, SavedAddress, SwipeResult } from "@/lib/types";
@@ -12,6 +14,7 @@ import {
   restaurantAPI,
 } from "@/shared/api/restaurant";
 import { routes } from "@/shared/constants/routes";
+import { useInitialGeolocation } from "@/shared/hooks/useInitialGeolocation";
 import { useNearbyQueryStore } from "@/shared/stores/nearby-query-store";
 import { useResultsStore } from "@/shared/stores/results-store";
 import type { SavedAddressWithCoordinates } from "@/shared/stores/saved-addresses-store";
@@ -37,7 +40,13 @@ export function HomePage() {
     setRestaurants,
     resetResults,
   } = useResultsStore();
-  const { nearbyQuery, setCoordinates, setAddress, setRadius } = useNearbyQueryStore();
+  const { nearbyQuery, setAddress, setRadius, setManualLocation } = useNearbyQueryStore();
+  const {
+    isSettled: isLocationSettled,
+    isAskingPermission,
+    allowCurrentLocation,
+    declineCurrentLocation,
+  } = useInitialGeolocation();
   const savedAddresses = useSavedAddressesStore((s) => s.addresses);
   const removeSavedAddress = useSavedAddressesStore((s) => s.removeAddress);
 
@@ -54,6 +63,9 @@ export function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savedAddressLimitOpen, setSavedAddressLimitOpen] = useState(false);
+  /** 현재 위치 확인 전에는 기본 좌표로 검색하지 않고 로딩만 보여줌 */
+  const isWaitingForLocation = !isLocationSettled && !navState?.continueSearch;
+  const showLoading = isLoading || isWaitingForLocation;
 
   const searchQueryKey = [
     nearbyQuery.latitude,
@@ -83,6 +95,7 @@ export function HomePage() {
     navigate(location.pathname, { replace: true, state: null });
   }, [navState?.continueSearch, navigate, location.pathname]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: FilterSettings는 아래 4개 필드가 전부라 필드 단위 deps로도 누락이 없다. 객체째 넣으면 스토어가 새 객체를 낼 때마다 불필요하게 재생성된다
   const fetchNearby = useCallback(async () => {
     const response = await restaurantAPI.searchNearby(
       buildNearbySearchRequest(nearbyQuery.latitude, nearbyQuery.longitude, filterSettings, []),
@@ -101,8 +114,11 @@ export function HomePage() {
   ]);
 
   // 위치·필터 변경 시 1회 호출 (최대 20개 수신, 1차에는 10개만 노출)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: searchQueryKey는 본문에서 안 쓰지만 위치·필터 변경을 감지하는 트리거라 의도적으로 넣었다. 반대로 navState?.continueSearch를 넣으면 다른 effect가 navState를 비울 때 effect가 다시 돌아 "이어서 검색"인데도 재조회가 발생한다
   useEffect(() => {
     if (navState?.continueSearch) return;
+    // 위치가 확정되기 전에 기본 좌표로 검색하면 엉뚱한 지역 결과가 먼저 노출됨
+    if (!isLocationSettled) return;
 
     const loadInitialRestaurants = async () => {
       setIsLoading(true);
@@ -112,7 +128,7 @@ export function HomePage() {
       try {
         await fetchNearby();
       } catch (err) {
-        setError("Failed to fetch restaurants.");
+        setError("맛집 정보를 불러오지 못했어요.");
         console.error(err);
       } finally {
         setIsLoading(false);
@@ -120,7 +136,7 @@ export function HomePage() {
     };
 
     loadInitialRestaurants();
-  }, [searchQueryKey, fetchNearby, resetResults]);
+  }, [searchQueryKey, fetchNearby, resetResults, isLocationSettled]);
 
   const currentRestaurant = restaurants[currentIndex];
   const hasCardsInCurrentBatch =
@@ -153,7 +169,7 @@ export function HomePage() {
     setError(null);
     fetchNearby()
       .catch((err) => {
-        setError("Failed to fetch restaurants on start over.");
+        setError("맛집 정보를 다시 불러오지 못했어요.");
         console.error(err);
       })
       .finally(() => setIsLoading(false));
@@ -162,20 +178,20 @@ export function HomePage() {
   const handleRemoveAddress = (id: string) => removeSavedAddress(id);
   const handleSelectAddress = async (address: SavedAddress) => {
     const selectedAddress = address as SavedAddressWithCoordinates;
-    setAddress(address.address);
     if (
       typeof selectedAddress.latitude === "number" &&
       typeof selectedAddress.longitude === "number"
     ) {
-      setCoordinates(selectedAddress.latitude, selectedAddress.longitude);
+      setManualLocation(selectedAddress.latitude, selectedAddress.longitude, address.address);
       return;
     }
 
+    setAddress(address.address);
     try {
       const response = await restaurantAPI.searchText({ query: address.address });
       const first = response.locations[0];
       if (first) {
-        setCoordinates(first.latitude, first.longitude);
+        setManualLocation(first.latitude, first.longitude, address.address);
       }
     } catch (err) {
       setError("주소 좌표 검색에 실패했습니다.");
@@ -194,6 +210,12 @@ export function HomePage() {
     });
   };
 
+  /** 사전 안내에서 "직접 설정하기" — 브라우저 권한을 건드리지 않고 위치 피커로 보냄 */
+  const handleDeclineLocationPermission = () => {
+    declineCurrentLocation();
+    navigate(routes.locationPicker, { state: { mode: "setLocation" } });
+  };
+
   const handleOpenSaveLocationPicker = () => {
     navigate(routes.locationPicker, {
       state: { mode: "saveOnly", returnToMenuOpen: true, skipMenuOpenAnimation: true },
@@ -210,9 +232,20 @@ export function HomePage() {
       />
 
       <div className={styles.cardStackContainer}>
-        {isLoading && <div className={styles.loadingMessage}>Loading restaurants...</div>}
-        {error && <div className={styles.errorMessage}>Error: {error}</div>}
-        {!isLoading && !error && hasCardsInCurrentBatch ? (
+        {showLoading && !isAskingPermission && (
+          <LoadingPanel
+            message={isWaitingForLocation ? "현재 위치를 확인하고 있어요" : "맛집을 찾고 있어요"}
+            description={
+              isWaitingForLocation
+                ? "위치를 확인한 뒤 주변 맛집을 보여드릴게요."
+                : "잠시만 기다려 주세요."
+            }
+          />
+        )}
+        {!showLoading && error && (
+          <ErrorPanel message={error} actionLabel="다시 시도하기" onAction={handleStartOver} />
+        )}
+        {!showLoading && !error && hasCardsInCurrentBatch ? (
           <div className={styles.cardWrapper}>
             <AnimatePresence>
               {[restaurants[currentIndex + 1], restaurants[currentIndex]]
@@ -233,7 +266,7 @@ export function HomePage() {
             </AnimatePresence>
           </div>
         ) : (
-          !isLoading &&
+          !showLoading &&
           !error && (
             <div className={styles.noRestaurantsContainer}>
               <motion.div
@@ -292,6 +325,11 @@ export function HomePage() {
       <SavedAddressLimitDialog
         open={savedAddressLimitOpen}
         onOpenChange={setSavedAddressLimitOpen}
+      />
+      <LocationPermissionDialog
+        open={isAskingPermission}
+        onAllow={allowCurrentLocation}
+        onDecline={handleDeclineLocationPermission}
       />
     </main>
   );
