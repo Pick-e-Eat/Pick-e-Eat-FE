@@ -63,7 +63,7 @@
 }
 
 .label {
-  @apply max-w-[14rem] text-center font-medium leading-snug text-muted-foreground;
+  @apply font-medium text-muted-foreground;
 }
 
 .cover .label {
