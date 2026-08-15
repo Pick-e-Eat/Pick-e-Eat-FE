@@ -8,13 +8,10 @@ import { ErrorPanel, LoadingPanel } from "@/components/status-panel";
 import { SwipeCard } from "@/components/swipe-card";
 import { HomeHeader } from "@/features/home/components/HomeHeader";
 import type { FilterSettings, SavedAddress, SwipeResult } from "@/lib/types";
-import {
-  buildNearbySearchRequest,
-  mapRestaurantResponse,
-  restaurantAPI,
-} from "@/shared/api/restaurant";
+import { restaurantAPI } from "@/shared/api/restaurant";
 import { routes } from "@/shared/constants/routes";
 import { useInitialGeolocation } from "@/shared/hooks/useInitialGeolocation";
+import { useNearbySearchQuery } from "@/shared/hooks/useNearbySearchQuery";
 import { useNearbyQueryStore } from "@/shared/stores/nearby-query-store";
 import { useResultsStore } from "@/shared/stores/results-store";
 import type { SavedAddressWithCoordinates } from "@/shared/stores/saved-addresses-store";
@@ -60,21 +57,25 @@ export function HomePage() {
     petFriendly: null,
   });
   const [exitDirection, setExitDirection] = useState<"left" | "right" | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [savedAddressLimitOpen, setSavedAddressLimitOpen] = useState(false);
+  /** 주소 검색(handleSelectAddress) 실패 메시지 — nearby-search 에러와는 별개 */
+  const [manualError, setManualError] = useState<string | null>(null);
   /** 현재 위치 확인 전에는 기본 좌표로 검색하지 않고 로딩만 보여줌 */
   const isWaitingForLocation = !isLocationSettled && !navState?.continueSearch;
-  const showLoading = isLoading || isWaitingForLocation;
 
-  const searchQueryKey = [
-    nearbyQuery.latitude,
-    nearbyQuery.longitude,
-    filterSettings.searchRange,
-    filterSettings.hasParking,
-    filterSettings.hasGroupSeating,
-    filterSettings.petFriendly,
-  ].join("|");
+  const {
+    data: nearbySearchData,
+    isFetching: isFetchingNearby,
+    isError: hasNearbySearchError,
+    error: nearbySearchError,
+    refetch: refetchNearby,
+  } = useNearbySearchQuery(nearbyQuery, filterSettings, { enabled: isLocationSettled });
+  const showLoading = isFetchingNearby || isWaitingForLocation;
+  const error = manualError ?? (hasNearbySearchError ? "맛집 정보를 불러오지 못했어요." : null);
+
+  useEffect(() => {
+    if (nearbySearchError) console.error(nearbySearchError);
+  }, [nearbySearchError]);
 
   useEffect(() => {
     setFilterSettings((prev) =>
@@ -95,48 +96,15 @@ export function HomePage() {
     navigate(location.pathname, { replace: true, state: null });
   }, [navState?.continueSearch, navigate, location.pathname]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: FilterSettings는 아래 4개 필드가 전부라 필드 단위 deps로도 누락이 없다. 객체째 넣으면 스토어가 새 객체를 낼 때마다 불필요하게 재생성된다
-  const fetchNearby = useCallback(async () => {
-    const response = await restaurantAPI.searchNearby(
-      buildNearbySearchRequest(nearbyQuery.latitude, nearbyQuery.longitude, filterSettings, []),
-    );
-    const fetchedRestaurants = response.restaurants.map(mapRestaurantResponse);
-    setRestaurants(fetchedRestaurants, response.count);
-    return fetchedRestaurants;
-  }, [
-    nearbyQuery.latitude,
-    nearbyQuery.longitude,
-    filterSettings.searchRange,
-    filterSettings.hasParking,
-    filterSettings.hasGroupSeating,
-    filterSettings.petFriendly,
-    setRestaurants,
-  ]);
-
-  // 위치·필터 변경 시 1회 호출 (최대 20개 수신, 1차에는 10개만 노출)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: searchQueryKey는 본문에서 안 쓰지만 위치·필터 변경을 감지하는 트리거라 의도적으로 넣었다. 반대로 navState?.continueSearch를 넣으면 다른 effect가 navState를 비울 때 effect가 다시 돌아 "이어서 검색"인데도 재조회가 발생한다
+  // nearbySearchData는 같은 위치·필터로 리마운트되어 캐시 히트가 나면 참조가 바뀌지 않으므로,
+  // 스와이프 도중 재마운트(이어서 검색 등)돼도 세션이 다시 초기화되지 않는다.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: navState?.continueSearch/resetResults/setRestaurants를 deps에 넣으면 다른 이펙트가 navState를 비울 때 재실행되어 "이어서 검색"인데도 세션이 초기화된다
   useEffect(() => {
     if (navState?.continueSearch) return;
-    // 위치가 확정되기 전에 기본 좌표로 검색하면 엉뚱한 지역 결과가 먼저 노출됨
-    if (!isLocationSettled) return;
-
-    const loadInitialRestaurants = async () => {
-      setIsLoading(true);
-      setError(null);
-      resetResults();
-
-      try {
-        await fetchNearby();
-      } catch (err) {
-        setError("맛집 정보를 불러오지 못했어요.");
-        console.error(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadInitialRestaurants();
-  }, [searchQueryKey, fetchNearby, resetResults, isLocationSettled]);
+    if (!nearbySearchData) return;
+    resetResults();
+    setRestaurants(nearbySearchData.restaurants, nearbySearchData.count);
+  }, [nearbySearchData]);
 
   const currentRestaurant = restaurants[currentIndex];
   const hasCardsInCurrentBatch =
@@ -164,15 +132,9 @@ export function HomePage() {
   );
 
   const handleStartOver = () => {
-    resetResults();
-    setIsLoading(true);
-    setError(null);
-    fetchNearby()
-      .catch((err) => {
-        setError("맛집 정보를 다시 불러오지 못했어요.");
-        console.error(err);
-      })
-      .finally(() => setIsLoading(false));
+    // 명시적 재시도이므로 캐시 여부와 무관하게 항상 실제 네트워크 호출을 강제한다.
+    // 결과가 도착하면 위 이펙트가 resetResults/setRestaurants를 처리한다.
+    refetchNearby();
   };
 
   const handleRemoveAddress = (id: string) => removeSavedAddress(id);
@@ -187,6 +149,7 @@ export function HomePage() {
     }
 
     setAddress(address.address);
+    setManualError(null);
     try {
       const response = await restaurantAPI.searchText({ query: address.address });
       const first = response.locations[0];
@@ -194,7 +157,7 @@ export function HomePage() {
         setManualLocation(first.latitude, first.longitude, address.address);
       }
     } catch (err) {
-      setError("주소 좌표 검색에 실패했습니다.");
+      setManualError("주소 좌표 검색에 실패했습니다.");
       console.error(err);
     }
   };

@@ -4,7 +4,7 @@ import { markManualLocationSelected } from "@/shared/utils/manual-location-sessi
 
 type SearchRadius = 50 | 100 | 250;
 
-interface NearbyQuery {
+export interface NearbyQuery {
   latitude: number;
   longitude: number;
   radius: SearchRadius;
