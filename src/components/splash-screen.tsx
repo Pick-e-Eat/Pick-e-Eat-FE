@@ -6,7 +6,7 @@ import styles from "./splash-screen.module.css";
 /** Tailwind `sm`과 동일: 이 너비 미만이면 모바일 레이아웃으로 간주 */
 const MOBILE_MEDIA = "(max-width: 639px)";
 
-const DISPLAY_MS = 3000;
+const DISPLAY_MS = 2000;
 const FADE_MS = 350;
 /** 워드마크 페이드인 길이 */
 const WORDMARK_FADE_MS = 450;
