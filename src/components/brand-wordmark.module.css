@@ -17,7 +17,7 @@
 }
 
 .splash .logoImage {
-  @apply h-20;
+  @apply h-24;
 }
 
 .menu .logoImage {

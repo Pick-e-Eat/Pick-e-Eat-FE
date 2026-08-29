@@ -5,8 +5,7 @@
 }
 
 .tagline {
-  @apply order-first mb-4 max-w-[min(22rem,90vw)] text-[calc(1.125rem-1px)] font-bold leading-snug tracking-[0.04em] text-white/88;
-  text-shadow: 0 1px 10px rgb(0 0 0 / 0.12);
+  @apply order-first mb-4 max-w-[min(22rem,90vw)] text-xl font-bold leading-snug tracking-[0.04em] text-white;
   opacity: 0;
   transform: translateY(4px);
   transition:
