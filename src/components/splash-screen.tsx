@@ -94,7 +94,7 @@ export function SplashScreen() {
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
       }}
       role="status"
-      aria-label="Pick N Eat, 랜덤 맛집 추천서비스"
+      aria-label="Pick & Eat, 랜덤 맛집 추천서비스"
     >
       <div className={styles.stack}>
         <p className={cn(styles.tagline, taglineVisible && styles.taglineVisible)}>

@@ -17,14 +17,8 @@ export function BrandWordmark({
   const variantClass = variant === "splash" ? styles.splash : styles.menu;
 
   return (
-    <Tag className={cn(styles.root, variantClass, className)} style={style} aria-label="Pick N Eat">
-      <span className={styles.word}>Pick</span>
-      <span className={styles.nGroup} aria-hidden="true">
-        <span className={styles.nLine} />
-        <span className={styles.nHighlight}>N</span>
-        <span className={styles.nLine} />
-      </span>
-      <span className={styles.word}>Eat</span>
+    <Tag className={cn(styles.root, variantClass, className)} style={style} aria-label="Pick & Eat">
+      <img src="/logo.svg" alt="Pick & Eat" className={styles.logoImage} />
     </Tag>
   );
 }

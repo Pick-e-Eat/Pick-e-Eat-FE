@@ -5,33 +5,21 @@
 }
 
 .splash {
-  @apply px-5 text-[2rem] text-white;
+  @apply px-5;
 }
 
 .menu {
-  @apply text-[1.125rem] text-card-foreground;
+  @apply text-card-foreground;
 }
 
-.word {
-  @apply font-semibold;
+.logoImage {
+  @apply block h-auto w-auto object-contain;
 }
 
-.nGroup {
-  @apply inline-flex items-center gap-x-1;
+.splash .logoImage {
+  @apply h-20;
 }
 
-.nLine {
-  @apply h-px w-2 shrink-0 bg-[#111111];
-}
-
-.nHighlight {
-  @apply font-bold leading-none tracking-[0.1em];
-}
-
-.splash .nHighlight {
-  @apply text-[#111111];
-}
-
-.menu .nHighlight {
-  @apply text-primary;
+.menu .logoImage {
+  @apply h-12;
 }
