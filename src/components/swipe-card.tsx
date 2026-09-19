@@ -25,6 +25,8 @@ import { RestaurantPhotoGrid } from "@/components/restaurant-photo-grid";
 import { ReviewSheet } from "@/components/review-sheet";
 import { useHeaderColorStore } from "@/features/home/stores/header-color-store";
 import type { Restaurant } from "@/lib/types";
+import { analyticsEvents } from "@/shared/constants/analytics-events";
+import { trackEvent } from "@/shared/utils/analytics";
 import { cn } from "@/shared/utils/cn";
 import styles from "./swipe-card.module.css";
 
@@ -212,6 +214,7 @@ export function SwipeCard({
       if (offset.y > Y_SWIPE_DOWN_THRESHOLD) {
         onStop();
       } else if (offset.y < Y_SWIPE_UP_THRESHOLD) {
+        trackEvent(analyticsEvents.cardInteraction, { type: "review_sheet" });
         setIsReviewSheetOpen(true);
       }
       // Animate card back to center after any vertical swipe
@@ -260,6 +263,11 @@ export function SwipeCard({
       restaurant.google_maps_uri ??
       restaurant.kakao_map_uri;
 
+    trackEvent(analyticsEvents.openRestaurantMap, {
+      source: "card",
+      has_place_link: Boolean(mapsUrl),
+    });
+
     if (mapsUrl) {
       window.open(mapsUrl, "_blank", "noopener,noreferrer");
       return;
@@ -270,6 +278,7 @@ export function SwipeCard({
 
   const openGallery = (e: React.MouseEvent, index = 0) => {
     e.stopPropagation();
+    trackEvent(analyticsEvents.cardInteraction, { type: "photo_gallery" });
     setSelectedImageIndex(index);
     setIsGalleryOpen(true);
   };

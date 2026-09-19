@@ -9,6 +9,7 @@ import { SwipeCard } from "@/components/swipe-card";
 import { HomeHeader } from "@/features/home/components/HomeHeader";
 import type { FilterSettings, SavedAddress, SwipeResult } from "@/lib/types";
 import { restaurantAPI } from "@/shared/api/restaurant";
+import { analyticsEvents } from "@/shared/constants/analytics-events";
 import { routes } from "@/shared/constants/routes";
 import { useInitialGeolocation } from "@/shared/hooks/useInitialGeolocation";
 import { useNearbySearchQuery } from "@/shared/hooks/useNearbySearchQuery";
@@ -16,6 +17,7 @@ import { useNearbyQueryStore } from "@/shared/stores/nearby-query-store";
 import { useResultsStore } from "@/shared/stores/results-store";
 import type { SavedAddressWithCoordinates } from "@/shared/stores/saved-addresses-store";
 import { useSavedAddressesStore } from "@/shared/stores/saved-addresses-store";
+import { trackEvent } from "@/shared/utils/analytics";
 import styles from "./HomePage.module.css";
 
 export function HomePage() {
@@ -74,7 +76,12 @@ export function HomePage() {
   const error = manualError ?? (hasNearbySearchError ? "맛집 정보를 불러오지 못했어요." : null);
 
   useEffect(() => {
-    if (nearbySearchError) console.error(nearbySearchError);
+    if (!nearbySearchError) return;
+    console.error(nearbySearchError);
+    // retry(1)는 queryFn을 재실행하지만 error 객체는 최종 실패에서만 1회 세팅된다.
+    trackEvent(analyticsEvents.searchNearbyError, {
+      reason: nearbySearchError instanceof Error ? nearbySearchError.name : "unknown",
+    });
   }, [nearbySearchError]);
 
   useEffect(() => {
@@ -110,6 +117,21 @@ export function HomePage() {
   const hasCardsInCurrentBatch =
     restaurants.length > 0 && currentIndex < sessionBatchEnd && currentIndex < restaurants.length;
 
+  /** 스와이프 세션이 끝나는 모든 경로에서 결과 구성을 함께 남긴다 */
+  const trackSwipeSessionEnd = useCallback(
+    (reason: "batch_complete" | "user_stopped" | "exhausted") => {
+      const finalResults = useResultsStore.getState().results;
+      const likedCount = finalResults.filter((r) => r.liked).length;
+      trackEvent(analyticsEvents.swipeSessionEnd, {
+        reason,
+        liked_count: likedCount,
+        disliked_count: finalResults.length - likedCount,
+        total_count: finalResults.length,
+      });
+    },
+    [],
+  );
+
   const handleSwipe = useCallback(
     (direction: "left" | "right") => {
       if (!currentRestaurant) return;
@@ -118,27 +140,39 @@ export function HomePage() {
         restaurant: currentRestaurant,
         liked: direction === "right",
       };
+      // 가게 식별자는 보내지 않는다 — GA 카디널리티만 키우고, 어떤 가게가 선택됐는지는 BE가 이미 안다.
+      trackEvent(analyticsEvents.swipeCard, {
+        direction: direction === "right" ? "like" : "pass",
+        position: results.length + 1,
+      });
 
       setTimeout(() => {
         addResult(newResult);
         setExitDirection(null);
         const nextCount = results.length + 1;
         if (nextCount === sessionBatchEnd) {
+          trackSwipeSessionEnd("batch_complete");
           navigate(routes.results);
         }
       }, 480);
     },
-    [currentRestaurant, results.length, sessionBatchEnd, addResult, navigate],
+    [currentRestaurant, results.length, sessionBatchEnd, addResult, navigate, trackSwipeSessionEnd],
   );
 
-  const handleStartOver = () => {
+  const handleStartOver = (source: "error" | "empty_state") => {
+    trackEvent(analyticsEvents.restartSearch, { source });
     // 명시적 재시도이므로 캐시 여부와 무관하게 항상 실제 네트워크 호출을 강제한다.
     // 결과가 도착하면 위 이펙트가 resetResults/setRestaurants를 처리한다.
     refetchNearby();
   };
 
-  const handleRemoveAddress = (id: string) => removeSavedAddress(id);
+  const handleRemoveAddress = (id: string) => {
+    trackEvent(analyticsEvents.savedAddress, { action: "remove" });
+    removeSavedAddress(id);
+  };
   const handleSelectAddress = async (address: SavedAddress) => {
+    trackEvent(analyticsEvents.savedAddress, { action: "select" });
+    trackEvent(analyticsEvents.locationSet, { method: "saved_address" });
     const selectedAddress = address as SavedAddressWithCoordinates;
     if (
       typeof selectedAddress.latitude === "number" &&
@@ -206,7 +240,11 @@ export function HomePage() {
           />
         )}
         {!showLoading && error && (
-          <ErrorPanel message={error} actionLabel="다시 시도하기" onAction={handleStartOver} />
+          <ErrorPanel
+            message={error}
+            actionLabel="다시 시도하기"
+            onAction={() => handleStartOver("error")}
+          />
         )}
         {!showLoading && !error && hasCardsInCurrentBatch ? (
           <div className={styles.cardWrapper}>
@@ -220,7 +258,14 @@ export function HomePage() {
                       key={restaurant.id}
                       restaurant={restaurant}
                       onSwipe={isTop ? handleSwipe : () => {}}
-                      onStop={isTop ? () => navigate(routes.results) : () => {}}
+                      onStop={
+                        isTop
+                          ? () => {
+                              trackSwipeSessionEnd("user_stopped");
+                              navigate(routes.results);
+                            }
+                          : () => {}
+                      }
                       isTop={isTop}
                       exitDirection={isTop ? exitDirection : null}
                     />
@@ -246,7 +291,10 @@ export function HomePage() {
                   {results.length > 0 && (
                     <button
                       type="button"
-                      onClick={() => navigate(routes.results)}
+                      onClick={() => {
+                        trackSwipeSessionEnd("exhausted");
+                        navigate(routes.results);
+                      }}
                       className={styles.viewResultsButton}
                     >
                       결과 보기
@@ -254,7 +302,7 @@ export function HomePage() {
                   )}
                   <button
                     type="button"
-                    onClick={handleStartOver}
+                    onClick={() => handleStartOver("empty_state")}
                     className={styles.startOverButton}
                   >
                     {results.length > 0 ? "처음부터 다시하기" : "다시 시도하기"}
@@ -281,7 +329,10 @@ export function HomePage() {
         filterSettings={filterSettings}
         onFilterChange={handleFilterChange}
         savedAddresses={savedAddresses}
-        onSavedAddressLimit={() => setSavedAddressLimitOpen(true)}
+        onSavedAddressLimit={() => {
+          trackEvent(analyticsEvents.savedAddress, { action: "limit_reached" });
+          setSavedAddressLimitOpen(true);
+        }}
         onRemoveAddress={handleRemoveAddress}
         onSelectAddress={handleSelectAddress}
       />

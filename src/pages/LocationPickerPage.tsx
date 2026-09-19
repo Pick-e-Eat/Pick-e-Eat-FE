@@ -2,10 +2,12 @@ import { ArrowLeft, Crosshair, Minus, Plus, Save, Search, X } from "lucide-react
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { analyticsEvents } from "@/shared/constants/analytics-events";
 import { routes } from "@/shared/constants/routes";
 import { useNearbyQueryStore } from "@/shared/stores/nearby-query-store";
 import { MAX_SAVED_ADDRESSES, useSavedAddressesStore } from "@/shared/stores/saved-addresses-store";
 import type { LocationResult } from "@/shared/types/api.types";
+import { trackEvent } from "@/shared/utils/analytics";
 import {
   type GoogleGeocoderLike,
   pickLocationLabelFromGeocodeResult,
@@ -116,6 +118,8 @@ export function LocationPickerPage() {
   const markerRef = useRef<AdvancedMarkerInstance | null>(null);
   const geocoderRef = useRef<GoogleGeocoderLike | null>(null);
   const geocodeRequestIdRef = useRef(0);
+  /** 위치를 확정한 방법 — 어떤 입력 수단이 실제로 쓰이는지 보기 위해 마지막 조작을 기록 */
+  const locationMethodRef = useRef<"initial" | "gps" | "search" | "map_click">("initial");
 
   const navigateBackOrHome = useCallback(() => {
     if (window.history.length > 1) {
@@ -215,6 +219,7 @@ export function LocationPickerPage() {
           const latLng = event.latLng;
           if (!latLng) return;
           const nextPos = { lat: latLng.lat(), lng: latLng.lng() };
+          locationMethodRef.current = "map_click";
           moveMarker(nextPos, false);
           setSelectedAddress("위치 확인 중...");
           void resolveAddressFromLatLng(nextPos).then((resolvedAddress) => {
@@ -281,6 +286,7 @@ export function LocationPickerPage() {
 
   const handleSelectSearchResult = (location: LocationResult) => {
     const nextPos = { lat: location.latitude, lng: location.longitude };
+    locationMethodRef.current = "search";
     moveMarker(nextPos, true);
     setSelectedAddress(location.address || location.name);
     setSearchResults([]);
@@ -294,6 +300,7 @@ export function LocationPickerPage() {
     }
     const onSuccess = (pos: GeolocationPosition) => {
       const nextPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      locationMethodRef.current = "gps";
       moveMarker(nextPos, true);
       setSelectedAddress("위치 확인 중...");
       void resolveAddressFromLatLng(nextPos).then((resolvedAddress) => {
@@ -356,6 +363,7 @@ export function LocationPickerPage() {
   const handleConfirmLocation = useCallback(() => {
     if (isConfirming) return;
     setIsConfirming(true);
+    trackEvent(analyticsEvents.locationSet, { method: locationMethodRef.current });
     const resolved = selectedAddress || "선택한 위치";
     setManualLocation(selectedPosition.lat, selectedPosition.lng, resolved);
 
@@ -381,6 +389,7 @@ export function LocationPickerPage() {
 
   const handleOpenSaveModal = useCallback(() => {
     if (savedAddresses.length >= MAX_SAVED_ADDRESSES) {
+      trackEvent(analyticsEvents.savedAddress, { action: "limit_reached" });
       toast.message(`주소는 최대 ${MAX_SAVED_ADDRESSES}개까지 저장할 수 있어요.`);
       return;
     }
@@ -419,6 +428,11 @@ export function LocationPickerPage() {
       toast.message(`주소는 최대 ${MAX_SAVED_ADDRESSES}개까지 저장할 수 있어요.`);
       return;
     }
+
+    trackEvent(analyticsEvents.savedAddress, {
+      action: "add",
+      saved_count: savedAddresses.length + 1,
+    });
 
     window.setTimeout(() => {
       setIsSaveModalOpen(false);

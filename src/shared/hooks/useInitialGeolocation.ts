@@ -1,10 +1,12 @@
 import { useCallback, useEffect } from "react";
 import { toast } from "sonner";
+import { analyticsEvents } from "@/shared/constants/analytics-events";
 import {
   type LocationBootstrapStatus,
   useLocationBootstrapStore,
 } from "@/shared/stores/location-bootstrap-store";
 import { useNearbyQueryStore } from "@/shared/stores/nearby-query-store";
+import { trackEvent } from "@/shared/utils/analytics";
 import {
   hasStoredLocationConsent,
   readLocationPermissionState,
@@ -43,6 +45,13 @@ function isGeolocationSupported(): boolean {
   return typeof navigator !== "undefined" && Boolean(navigator.geolocation);
 }
 
+/** 최종 실패 코드를 분석용 결과 값으로 (고정밀 → 저정밀 재시도까지 끝난 뒤의 에러만 들어온다) */
+function toFailureResult(err: GeolocationPositionError): "denied" | "timeout" | "unavailable" {
+  if (err.code === err.PERMISSION_DENIED) return "denied";
+  if (err.code === err.TIMEOUT) return "timeout";
+  return "unavailable";
+}
+
 /**
  * 앱에 새로 진입할 때 현재 위치를 검색 기준으로 맞춥니다.
  *
@@ -57,57 +66,67 @@ export function useInitialGeolocation(): InitialGeolocation {
   const status = useLocationBootstrapStore((s) => s.status);
   const setStatus = useLocationBootstrapStore((s) => s.setStatus);
 
-  const requestCurrentPosition = useCallback(() => {
-    const onSuccess = (position: GeolocationPosition) => {
-      const { latitude, longitude } = position.coords;
-      // 좌표가 정해지면 곧바로 검색을 시작하고, 주소 문구는 뒤이어 채웁니다.
-      setCoordinates(latitude, longitude);
-      setAddress(FALLBACK_ADDRESS_LABEL);
-      setStatus("settled");
+  /** @param flow 사전 안내를 거쳤는지 — 같은 denied라도 경로에 따라 의미가 달라 결과 이벤트에 함께 싣는다 */
+  const requestCurrentPosition = useCallback(
+    (flow: "stored" | "prompted") => {
+      const onSuccess = (position: GeolocationPosition) => {
+        const { latitude, longitude } = position.coords;
+        trackEvent(analyticsEvents.locationPermissionResult, { result: "granted", flow });
+        trackEvent(analyticsEvents.locationSet, { method: "gps" });
+        // 좌표가 정해지면 곧바로 검색을 시작하고, 주소 문구는 뒤이어 채웁니다.
+        setCoordinates(latitude, longitude);
+        setAddress(FALLBACK_ADDRESS_LABEL);
+        setStatus("settled");
 
-      void reverseGeocodeToAddress(latitude, longitude)
-        .then((resolvedAddress) => {
-          if (resolvedAddress) {
-            setAddress(resolvedAddress);
-          }
-        })
-        .catch((error) => {
-          console.error("Reverse geocoding failed:", error);
-        });
-    };
+        void reverseGeocodeToAddress(latitude, longitude)
+          .then((resolvedAddress) => {
+            if (resolvedAddress) {
+              setAddress(resolvedAddress);
+            }
+          })
+          .catch((error) => {
+            console.error("Reverse geocoding failed:", error);
+          });
+      };
 
-    const run = (useHighAccuracy: boolean) => {
-      navigator.geolocation.getCurrentPosition(
-        onSuccess,
-        (err) => {
-          console.error("Initial geolocation error:", err.code, err.message);
-          if (
-            useHighAccuracy &&
-            (err.code === err.TIMEOUT || err.code === err.POSITION_UNAVAILABLE)
-          ) {
-            run(false);
-            return;
-          }
+      const run = (useHighAccuracy: boolean) => {
+        navigator.geolocation.getCurrentPosition(
+          onSuccess,
+          (err) => {
+            console.error("Initial geolocation error:", err.code, err.message);
+            if (
+              useHighAccuracy &&
+              (err.code === err.TIMEOUT || err.code === err.POSITION_UNAVAILABLE)
+            ) {
+              run(false);
+              return;
+            }
 
-          if (err.code === err.PERMISSION_DENIED) {
-            toast.message(
-              "위치 권한이 거부되어 기본 위치로 검색합니다. 메뉴에서 위치를 직접 설정할 수 있어요.",
-            );
-          } else {
-            toast.message("현재 위치를 확인할 수 없어 기본 위치로 검색합니다.");
-          }
-          setStatus("settled");
-        },
-        {
-          enableHighAccuracy: useHighAccuracy,
-          timeout: useHighAccuracy ? HIGH_ACCURACY_TIMEOUT_MS : LOW_ACCURACY_TIMEOUT_MS,
-          maximumAge: 0,
-        },
-      );
-    };
+            trackEvent(analyticsEvents.locationPermissionResult, {
+              result: toFailureResult(err),
+              flow,
+            });
+            if (err.code === err.PERMISSION_DENIED) {
+              toast.message(
+                "위치 권한이 거부되어 기본 위치로 검색합니다. 메뉴에서 위치를 직접 설정할 수 있어요.",
+              );
+            } else {
+              toast.message("현재 위치를 확인할 수 없어 기본 위치로 검색합니다.");
+            }
+            setStatus("settled");
+          },
+          {
+            enableHighAccuracy: useHighAccuracy,
+            timeout: useHighAccuracy ? HIGH_ACCURACY_TIMEOUT_MS : LOW_ACCURACY_TIMEOUT_MS,
+            maximumAge: 0,
+          },
+        );
+      };
 
-    run(true);
-  }, [setAddress, setCoordinates, setStatus]);
+      run(true);
+    },
+    [setAddress, setCoordinates, setStatus],
+  );
 
   useEffect(() => {
     // idle이 아니면 이미 진행 중이거나 끝난 흐름 — 리마운트에서 다시 시작하지 않습니다.
@@ -115,7 +134,12 @@ export function useInitialGeolocation(): InitialGeolocation {
     hasStartedBootstrap = true;
 
     // 새로고침: 사용자가 이번 세션에 지정한 위치를 유지 / 새 진입: 세션이 비어 있으므로 GPS 재검색
-    if (hasManualLocationInSession() || !isGeolocationSupported()) {
+    if (hasManualLocationInSession()) {
+      setStatus("settled");
+      return;
+    }
+    if (!isGeolocationSupported()) {
+      trackEvent(analyticsEvents.locationPermissionResult, { result: "unsupported" });
       setStatus("settled");
       return;
     }
@@ -126,6 +150,7 @@ export function useInitialGeolocation(): InitialGeolocation {
       const permission = await readLocationPermissionState();
 
       if (permission === "denied") {
+        trackEvent(analyticsEvents.locationPermissionResult, { result: "denied", flow: "blocked" });
         toast.message(
           "위치 권한이 차단되어 기본 위치로 검색합니다. 메뉴에서 직접 설정할 수 있어요.",
         );
@@ -136,7 +161,7 @@ export function useInitialGeolocation(): InitialGeolocation {
       // 이미 허용했거나 이전에 동의한 적 있으면 안내 없이 바로 조회
       if (permission === "granted" || hasStoredLocationConsent()) {
         setStatus("locating");
-        requestCurrentPosition();
+        requestCurrentPosition("stored");
         return;
       }
 
@@ -145,12 +170,16 @@ export function useInitialGeolocation(): InitialGeolocation {
   }, [status, setStatus, requestCurrentPosition]);
 
   const allowCurrentLocation = useCallback(() => {
+    trackEvent(analyticsEvents.locationPromptResponse, { choice: "allow" });
     storeLocationConsent();
     setStatus("locating");
-    requestCurrentPosition();
+    requestCurrentPosition("prompted");
   }, [requestCurrentPosition, setStatus]);
 
   const declineCurrentLocation = useCallback(() => {
+    trackEvent(analyticsEvents.locationPromptResponse, { choice: "decline" });
+    // 브라우저 권한창까지 가지 않고 끝난 흐름도 결과 1건으로 남겨 흐름 수 = 결과 수를 유지한다
+    trackEvent(analyticsEvents.locationPermissionResult, { result: "declined", flow: "prompted" });
     setStatus("settled");
   }, [setStatus]);
 

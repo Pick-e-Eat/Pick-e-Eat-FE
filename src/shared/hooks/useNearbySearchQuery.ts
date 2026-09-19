@@ -5,7 +5,9 @@ import {
   mapRestaurantResponse,
   restaurantAPI,
 } from "@/shared/api/restaurant";
+import { analyticsEvents } from "@/shared/constants/analytics-events";
 import type { NearbyQuery } from "@/shared/stores/nearby-query-store";
+import { trackEvent } from "@/shared/utils/analytics";
 
 interface NearbySearchResult {
   restaurants: Restaurant[];
@@ -18,6 +20,15 @@ interface NearbySearchResult {
  */
 function roundCoordinate(value: number) {
   return Math.round(value * 1e4) / 1e4;
+}
+
+/** 켜져 있는 부가 필터 개수 (필터를 몇 개나 쓰는지 = 필터 UI의 실효성 지표) */
+function countActiveFilters(filterSettings: FilterSettings): number {
+  return [
+    filterSettings.hasParking,
+    filterSettings.hasGroupSeating,
+    filterSettings.petFriendly,
+  ].filter((value) => value !== null).length;
 }
 
 export function buildNearbySearchQueryKey(
@@ -43,9 +54,18 @@ export function useNearbySearchQuery(
   return useQuery<NearbySearchResult>({
     queryKey: buildNearbySearchQueryKey(nearbyQuery, filterSettings),
     queryFn: async () => {
+      // queryFn은 실제 네트워크 호출에서만 실행되므로, 캐시 히트로 인한 중복 집계가 없다.
+      const startedAt = performance.now();
       const response = await restaurantAPI.searchNearby(
         buildNearbySearchRequest(nearbyQuery.latitude, nearbyQuery.longitude, filterSettings, []),
       );
+      trackEvent(analyticsEvents.searchNearby, {
+        radius: nearbyQuery.radius,
+        result_count: response.count,
+        is_empty: response.count === 0,
+        filter_count: countActiveFilters(filterSettings),
+        duration_ms: Math.round(performance.now() - startedAt),
+      });
       return {
         restaurants: response.restaurants.map(mapRestaurantResponse),
         count: response.count,

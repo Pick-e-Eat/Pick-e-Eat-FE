@@ -3,8 +3,10 @@ import { MapPin, MapPinned, RotateCcw, Star, ThumbsDown, ThumbsUp } from "lucide
 import { useNavigate } from "react-router-dom";
 import { RestaurantPhoto } from "@/components/restaurant-photo";
 import type { Restaurant } from "@/lib/types";
+import { analyticsEvents } from "@/shared/constants/analytics-events";
 import { routes } from "@/shared/constants/routes";
 import { canShowContinueSearch, useResultsStore } from "@/shared/stores/results-store";
+import { trackEvent } from "@/shared/utils/analytics";
 import styles from "./ResultsPage.module.css";
 
 export function ResultsPage() {
@@ -22,11 +24,13 @@ export function ResultsPage() {
   const dislikedRestaurants = results.filter((r) => !r.liked);
 
   const handleReset = () => {
+    trackEvent(analyticsEvents.restartSearch, { source: "results" });
     resetResults();
     navigate(routes.home);
   };
 
   const handleContinue = () => {
+    trackEvent(analyticsEvents.continueSearch, { liked_count: likedRestaurants.length });
     continueSession();
     navigate(routes.home, { state: { continueSearch: true } });
   };
@@ -52,6 +56,12 @@ export function ResultsPage() {
       restaurant.google_maps_links?.place_uri ??
       restaurant.google_maps_uri ??
       restaurant.kakao_map_uri;
+
+    // 앱을 떠나 실제 방문으로 이어지는 마지막 행동 — GA4에서 주요 이벤트로 지정한다.
+    trackEvent(analyticsEvents.openRestaurantMap, {
+      source: "results",
+      has_place_link: Boolean(mapsUrl),
+    });
 
     if (mapsUrl) {
       window.open(mapsUrl, "_blank", "noopener,noreferrer");
